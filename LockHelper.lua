@@ -2,26 +2,41 @@ local function fif(condition, if_true, if_false)
   if condition then return if_true else return if_false end
 end
 
+local function convertDifficulty(difficulty)
+	local difficultyName = "unknown"
+
+	if difficulty == 14 then		difficultyName = "normal";
+	elseif difficulty == 15 then	difficultyName = "heroic";
+	elseif difficulty == 16 then	difficultyName = "mythic";
+	elseif difficulty == 17 then	difficultyName = "lfr";
+	end
+
+	return difficultyName
+end
+
+--[[
+	this will generate the saved data for raids and dungeons for a specific player [and realm].
+	
+	the data is stored in this way [key] (prop1, prop2, ...):
+	
+	[realmName]
+		[playerName]
+			[instanceName]
+				[typeName]	(instanceId, numEncounters, lockoutExpiration)
+					[bossNdx] (name, isKilled)
+	
+--]]
 function LockHelper_PrintMsg()
 	local maxDungeonId = 2000;
 
-	local playerName = UnitName("player");
-	local realmName = GetRealmName();
+	local playerName = UnitName("player");						-- get the name of the current player
+	local realmName = GetRealmName();							-- get the name of the current realm
+
+	local t = t or {};											-- initialize variable if not already initialized
 	
-	print (playerName .. ' - ' .. realmName);
-	
-	local t = {};
-	
-	t[realmName] = {};
-	t[realmName][playerName] = '1';
-	
-	for realmKey, realmTable in pairs(t) do
-		print('realm: ' .. realmKey);
-		for playerKey, playerTable in pairs( realmTable ) do
-			print('=>player: ' .. playerKey .. ' ' .. playerTable);
-		end
-	end
-	
+	t[realmName] = t[realmName] or {};							-- initialize realm if not already initialized
+	t[realmName][playerName] = t[realmName][playerName] or {};	-- initialize player if not already initialized
+
 	---[[
 	print('just WoD RF Dungeons[begin]');
 	local lfrCount = GetNumRFDungeons();
@@ -31,8 +46,9 @@ function LockHelper_PrintMsg()
 			, groupID, textureFilename, difficulty, maxPlayers, description, isHoliday
 			, bonusRepAmount, minPlayers, isTimeWalker, name2, minGearLevel = GetRFDungeonInfo(lfrId);
 
-		--print('[' .. lfrId .. '|' .. id .. ']name:' .. name2 .. '-' .. name .. ' difficulty: ' .. difficulty);
-		local numEncounters, numCompleted = GetLFGDungeonNumEncounters(instanceID);
+		t[realmName][playerName][name2] = t[realmName][playerName][name2] or {};
+		
+		local numEncounters, _ = GetLFGDungeonNumEncounters(instanceID);
 
 		for ndx=1, numEncounters do
 			local bossName, _, isKilled = GetLFGDungeonEncounterInfo(instanceID, ndx)
@@ -42,31 +58,6 @@ function LockHelper_PrintMsg()
 		end
 	end -- lfrId=1,lfrCount do
 	print('just WoD RF Dungeons[end]');
-	--]]
-
-	-- we will use this to build the list.  the the GetNumSavedInstances() and GetNumRFDungeons() calls to populate.
-	---[[
-	print('Just all WoD Raids [begin]');
-	for dungeonId = 1,maxDungeonId do
-		-- get back a list of all the dungeon and scenarios.
-		-- we want only the raid and dungeons though
-		local name, typeID, subtypeID
-			, minLevel, maxLevel, recLevel, minRecLevel, maxRecLevel, expansionLevel
-			, groupID, textureFilename, difficulty, maxPlayers, description, isHoliday
-			, bonusRepAmount, minPlayers, isTimeWalker, name2, minGearLevel = GetLFGDungeonInfo(dungeonId);
-		
-		-- make sure the name is not nil/empty and the object is of a type Raid (2)
-		-- name2 holds the Proper name for LFR as opposed to the seperate wings
-		if not (name == nil or name == "") and typeID == 2 and expansionLevel == 6 then
-			local numEncounters, numCompleted = GetLFGDungeonNumEncounters(dungeonId);
-			local link = GetSavedInstanceChatLink(dungeonId);
-
-			if (numCompleted > 0) and (link ~= nil) then
-				print(link);
-			end
-		end --if not (name == nil or name == "") then
-	end -- for dungeonId = 1,maxDungeonId,1 do
-	print('Just all WoD Raids [end]');
 	--]]
 
 	---[[
