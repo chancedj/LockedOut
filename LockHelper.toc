@@ -1,0 +1,9 @@
+## Interface: 70200
+## Title: Lock Helper
+## Notes: An addon for tracking raid, world and dungeon lockouts
+## Author: Hwap
+## Version: 0.1
+## SavedVariables: LockHelperDb
+## SavedVariablesPerCharacter: LockHelperCharacterDb
+
+LockHelper.lua
