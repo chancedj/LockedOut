@@ -6,4 +6,5 @@
 ## SavedVariables: LockHelperDb
 ## SavedVariablesPerCharacter: LockHelperCharacterDb
 
+Helper.lua
 LockHelper.lua
