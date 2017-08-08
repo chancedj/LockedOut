@@ -1,52 +1,16 @@
 local _, addonHelpers = ...;
 
---[[
-local function fif(condition, if_true, if_false)
-  if condition then return if_true else return if_false end
-end
-
-local function convertDifficulty(difficulty)
-	local difficultyName = "unk: " .. difficulty
-
-	if difficulty == 14 then		difficultyName = "normal";
-	elseif difficulty == 15 then	difficultyName = "heroic";
-	elseif difficulty == 16 then	difficultyName = "mythic";
-	elseif difficulty == 17 then	difficultyName = "lfr";
-	elseif difficulty == 23 then	difficultyName = "mythic";
-	end
-
-	return difficultyName
-end
-
--- recursive printing for debug purposes
-local function printTable( tbl, indent )
-	if ( tbl == nil ) then return; end;
-	
-	for key, value in next, tbl do
-		if ( type ( value ) == "table" ) then
-			print( indent .. key );
-
-			printTable( value, "  " .. indent );
-		elseif( type( value ) == "boolean" ) then
-			print( indent .. key .. " - " .. fif( value, "true", "false" ) );
-		else
-			print( indent .. key .. " - " .. value );
-		end;
-	end;
-	
-end
---]]
 local function getDeadBosses( data )
 	local deadCount = 0;
 	
 	for _, data in next, data do
 		if ( data.isKilled ) then
 			deadCount = deadCount + 1;
-		end;
-	end
+		end -- if ( data.isKilled )
+	end -- for _, data in next, data
 	
 	return deadCount;
-end
+end -- function getDeadBosses()
 
 --[[
 	this will generate the saved data for raids and dungeons for a specific player [and realm].
@@ -68,7 +32,6 @@ function LockHelper_PrintMsg()
 	local playerData = {};
 	
 	---[[
-	print('just WoD RF Dungeons[begin]');
 	local lfrCount = GetNumRFDungeons();
 	for lfrNdx = 1, lfrCount do
 		local instanceID, name, typeID, subtypeID
@@ -85,7 +48,7 @@ function LockHelper_PrintMsg()
 			bossData[ encounterNdx ] = {};
 			bossData[ encounterNdx ].bossName = bossName;
 			bossData[ encounterNdx ].isKilled = isKilled;
-		end
+		end -- for encounterNdx = 1, numEncounters
 
 		-- only save if we've killed a boss
 		if getDeadBosses( bossData ) > 0 then
@@ -93,13 +56,11 @@ function LockHelper_PrintMsg()
 			playerData[ instanceName ] = playerData[ instanceName ] or {};
 			playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
 			playerData[ instanceName ][ difficultyName ].bossData = bossData;
-		end
-	end -- lfrId=1,lfrCount do
-	print('just WoD RF Dungeons[end]');
+		end -- if getDeadBosses( bossData ) > 0
+	end -- for lfrNdx = 1, lfrCount
 	--]]
 
 	---[[
-	print('show saved instances[begin]');
 	local lockCount = GetNumSavedInstances();
 	for lockId = 1, lockCount do
 		local instanceName, id, reset, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, difficultyName, numEncounters, encounterProgress = GetSavedInstanceInfo( lockId );
@@ -111,7 +72,7 @@ function LockHelper_PrintMsg()
 			bossData[ encounterNdx ] = {};
 			bossData[ encounterNdx ].bossName = bossName;
 			bossData[ encounterNdx ].isKilled = isKilled;
-		end
+		end -- for encounterNdx = 1, numEncounters
 
 		-- only save if we've killed a boss
 		if getDeadBosses( bossData ) > 0 then
@@ -119,21 +80,14 @@ function LockHelper_PrintMsg()
 			playerData[ instanceName ] = playerData[ instanceName ] or {};
 			playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
 			playerData[ instanceName ][ difficultyName ].bossData = bossData;
-		end
-	end -- for lockId=1, lockCount do
-	print('show saved instances[end]');
+		end -- if getDeadBosses( bossData ) > 0
+	end -- for lockId = 1, lockCount do
 	--]]
-	print('done');
 	
-	local t = t or {};											-- initialize variable if not already initialized
+	local LockHelperDb = LockHelperDb or {};						-- initialize variable if not already initialized
+	LockHelperDb[ realmName ] = LockHelperDb[ realmName ] or {};	-- initialize realm if not already initialized
+	LockHelperDb[ realmName ][ playerName ] = playerData;			-- initialize player if not already initialized
 	
-	t[ realmName ] = t[ realmName ] or {};							-- initialize realm if not already initialized
-	t[ realmName ][ playerName ] = playerData;	-- initialize player if not already initialized
-	
-	addonHelpers:printTable(t, "=>");
+	addonHelpers:printTable(LockHelperDb, "=>");
 
-end -- end PrintMsg
-
-LockHelper_PrintMsg();
-
---
+end -- function LockHelper_PrintMsg()

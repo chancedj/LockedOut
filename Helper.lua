@@ -1,8 +1,8 @@
 local _, addonHelpers = ...;
 
 function addonHelpers:fif(condition, if_true, if_false)
-  if condition then return if_true else return if_false end
-end
+  if condition then return if_true; else return if_false; end
+end -- function addonHelpers:fif
 
 function addonHelpers:convertDifficulty(difficulty)
 	local difficultyName = "unk: " .. difficulty
@@ -12,10 +12,10 @@ function addonHelpers:convertDifficulty(difficulty)
 	elseif difficulty == 16 then	difficultyName = "mythic";
 	elseif difficulty == 17 then	difficultyName = "lfr";
 	elseif difficulty == 23 then	difficultyName = "mythic";
-	end
+	end -- if difficulty
 
 	return difficultyName
-end
+end -- function addonHelpers:convertDifficulty
 
 -- recursive printing for debug purposes
 function addonHelpers:printTable( tbl, indent )
@@ -33,6 +33,4 @@ function addonHelpers:printTable( tbl, indent )
 		end;
 	end;
 	
-end
-
-return addonHelpers;
+end -- function addonHelpers:printTable
