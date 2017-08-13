@@ -101,7 +101,6 @@ function LockHelper_PrintMsg()
 	LockHelperDb[ realmName ] = LockHelperDb[ realmName ] or {};	-- initialize realmDb if not already initialized
 	LockHelperDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
 	
-	--addonHelpers:printTable(LockHelperDb, 2);
 	table.sort( LockHelperDb ); -- sort the realms alphabetically
-	addonHelpers:printTable(LockHelperDb, 2);
+	addonHelpers:printTable(LockHelperDb);
 end -- LockHelper_PrintMsg()
