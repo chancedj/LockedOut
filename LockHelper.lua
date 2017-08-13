@@ -1,16 +1,53 @@
 local _, addonHelpers = ...;
 
+local function convertDifficulty(difficulty)
+	if difficulty == 14 then		return "Normal", "N";
+	elseif difficulty == 15 then	return "Heroic", "H";
+	elseif difficulty == 16 then	return "Mythic", "M";
+	elseif difficulty == 17 then	return "Lfr", "L";
+	elseif difficulty == 23 then	return "Mythic", "M";
+	end -- if difficulty
+
+	return "Unknown", "U"
+end -- convertDifficulty
+
 local function getDeadBosses( data )
 	local deadCount = 0;
 	
-	for _, data in next, data do
-		if ( data.isKilled ) then
+	for _, boss in next, data do
+		if ( boss.isKilled ) then
 			deadCount = deadCount + 1;
 		end -- if ( data.isKilled )
 	end -- for _, data in next, data
 	
 	return deadCount;
-end -- function getDeadBosses()
+end -- getDeadBosses()
+
+local function getBossData( encounterId, numEncounters, fnEncounter  )
+	local bosses = {};
+	
+	for encounterNdx = 1, numEncounters do
+		local bossName, _, isKilled = fnEncounter( encounterId, encounterNdx );
+	
+		bosses [ encounterNdx ] = {};
+		bosses [ encounterNdx ].bossName = bossName;
+		bosses [ encounterNdx ].isKilled = isKilled;
+	end -- for encounterNdx = 1, numEncounters
+	
+	return bosses;
+end -- getBossData()
+
+local function addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked )
+	local deadBosses = getDeadBosses( bossData );
+	if ( deadBosses > 0 ) then
+		local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
+		playerData[ instanceName ] = playerData[ instanceName ] or {};
+		playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
+		playerData[ instanceName ][ difficultyName ].bossData = bossData;
+		playerData[ instanceName ][ difficultyName ].locked = locked;
+		playerData[ instanceName ][ difficultyName ].displayText = deadBosses .. "/" .. numEncounters .. difficultyAbbr;
+	end -- if ( deadBosses > 0 )
+end -- addInstanceData()
 
 --[[
 	this will generate the saved data for raids and dungeons for a specific player [and realm].
@@ -20,8 +57,8 @@ end -- function getDeadBosses()
 	[realmName]
 		[playerName]
 			[instanceName]
-				[typeName]	(instanceId, numEncounters, lockoutExpiration)
-					[bossNdx] (name, isKilled)
+				[difficultyName] (bossData, locked, displayText)
+					[bossNdx] (bossName, isKilled)
 	
 --]]
 function LockHelper_PrintMsg()
@@ -39,24 +76,10 @@ function LockHelper_PrintMsg()
 			, groupID, textureFilename, difficulty, maxPlayers, description, isHoliday
 			, bonusRepAmount, minPlayers, isTimeWalker, instanceName, minGearLevel = GetRFDungeonInfo( lfrNdx );
 
-		local bossData = {};
 		local numEncounters, _ = GetLFGDungeonNumEncounters( instanceID );
+		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 
-		for encounterNdx = 1, numEncounters do
-			local bossName, _, isKilled = GetLFGDungeonEncounterInfo( instanceID, encounterNdx );
-			
-			bossData[ encounterNdx ] = {};
-			bossData[ encounterNdx ].bossName = bossName;
-			bossData[ encounterNdx ].isKilled = isKilled;
-		end -- for encounterNdx = 1, numEncounters
-
-		-- only save if we've killed a boss
-		if getDeadBosses( bossData ) > 0 then
-			local difficultyName = addonHelpers:convertDifficulty( difficulty );
-			playerData[ instanceName ] = playerData[ instanceName ] or {};
-			playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
-			playerData[ instanceName ][ difficultyName ].bossData = bossData;
-		end -- if getDeadBosses( bossData ) > 0
+		addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, false );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -65,29 +88,20 @@ function LockHelper_PrintMsg()
 	for lockId = 1, lockCount do
 		local instanceName, id, reset, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, difficultyName, numEncounters, encounterProgress = GetSavedInstanceInfo( lockId );
 
-		local bossData = {};
-		for encounterNdx = 1,numEncounters do
-			local bossName, _, isKilled, _ = GetSavedInstanceEncounterInfo( lockId, encounterNdx );
-			
-			bossData[ encounterNdx ] = {};
-			bossData[ encounterNdx ].bossName = bossName;
-			bossData[ encounterNdx ].isKilled = isKilled;
-		end -- for encounterNdx = 1, numEncounters
+		-- if reset == 0, it's expired but can be extended - so it will still show in the list.
+		if ( reset > 0 ) then
+			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
 
-		-- only save if we've killed a boss
-		if getDeadBosses( bossData ) > 0 then
-			local difficultyName = addonHelpers:convertDifficulty( difficulty );
-			playerData[ instanceName ] = playerData[ instanceName ] or {};
-			playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
-			playerData[ instanceName ][ difficultyName ].bossData = bossData;
-		end -- if getDeadBosses( bossData ) > 0
-	end -- for lockId = 1, lockCount do
+			addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked );
+		end -- if( reset > 0 )
+	end -- for lockId = 1, lockCount
 	--]]
 	
-	local LockHelperDb = LockHelperDb or {};						-- initialize variable if not already initialized
-	LockHelperDb[ realmName ] = LockHelperDb[ realmName ] or {};	-- initialize realm if not already initialized
-	LockHelperDb[ realmName ][ playerName ] = playerData;			-- initialize player if not already initialized
+	local LockHelperDb = LockHelperDb or {};						-- initialize database if not already initialized
+	LockHelperDb[ realmName ] = LockHelperDb[ realmName ] or {};	-- initialize realmDb if not already initialized
+	LockHelperDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
 	
-	addonHelpers:printTable(LockHelperDb, "=>");
-
-end -- function LockHelper_PrintMsg()
+	--addonHelpers:printTable(LockHelperDb, 2);
+	table.sort( LockHelperDb ); -- sort the realms alphabetically
+	addonHelpers:printTable(LockHelperDb, 2);
+end -- LockHelper_PrintMsg()
