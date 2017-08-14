@@ -1,3 +1,6 @@
+--[[
+	This file is for overall helper functions that are to be used addon wide.
+--]]
 local _, addonHelpers = ...;
 
 function addonHelpers:fif(condition, if_true, if_false)

@@ -1,3 +1,7 @@
+--[[
+	This file is to deal with the code to generate the lockout table/vector and
+	to handle the refresh of data and deletion of stale data
+--]]
 local _, addonHelpers = ...;
 
 local function convertDifficulty(difficulty)
