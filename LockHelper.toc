@@ -2,7 +2,7 @@
 ## Title: Lock Helper
 ## Notes: An addon for tracking raid, world and dungeon lockouts
 ## Author: Hwap
-## Version: 0.7
+## Version: 0.71
 ## SavedVariables: LockHelperDb
 ## SavedVariablesPerCharacter: LockHelperMapDb
 
