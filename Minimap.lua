@@ -17,7 +17,7 @@ local LockHelperMo = LibStub("LibDataBroker-1.1"):NewDataObject("Lock Helper", {
 function addon:OnInitialize()
 	LockHelperMapDb = LockHelperMapDb or LibStub("AceDB-3.0"):New("LockHelperMapDb", { profile = { minimap = {hide = false } } });
 
-	icon:Register(addonName, LockHelperMo, LockHelperMapDb.minimap)
+	icon:Register(addonName, LockHelperMo, LockHelperMapDb.profile.minimap)
 end -- addon:OnInitialize
 
 function addon:OnClick()
