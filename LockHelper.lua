@@ -66,6 +66,10 @@ end -- addInstanceData()
 	
 --]]
 function LockHelper_PrintMsg()
+	addonHelpers:printTable( LockHelperDb );
+end -- LockHelper_PrintMsg
+
+function LockHelper_RebuildCharData()
 	local maxDungeonId = 2000;
 
 	local playerName = UnitName("player");						-- get the name of the current player
@@ -101,10 +105,9 @@ function LockHelper_PrintMsg()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	local LockHelperDb = LockHelperDb or {};						-- initialize database if not already initialized
+	LockHelperDb = LockHelperDb or {};						-- initialize database if not already initialized
 	LockHelperDb[ realmName ] = LockHelperDb[ realmName ] or {};	-- initialize realmDb if not already initialized
 	LockHelperDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
 	
 	table.sort( LockHelperDb ); -- sort the realms alphabetically
-	addonHelpers:printTable(LockHelperDb);
 end -- LockHelper_PrintMsg()
