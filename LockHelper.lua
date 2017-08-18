@@ -41,7 +41,7 @@ local function getBossData( encounterId, numEncounters, fnEncounter  )
 	return bosses;
 end -- getBossData()
 
-local function addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked )
+local function addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked, isRaid )
 	local deadBosses = getDeadBosses( bossData );
 	if ( deadBosses > 0 ) then
 		local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
@@ -49,6 +49,7 @@ local function addInstanceData( playerData, instanceName, difficulty, bossData, 
 		playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
 		playerData[ instanceName ][ difficultyName ].bossData = bossData;
 		playerData[ instanceName ][ difficultyName ].locked = locked;
+		playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
 		playerData[ instanceName ][ difficultyName ].displayText = deadBosses .. "/" .. numEncounters .. difficultyAbbr;
 	end -- if ( deadBosses > 0 )
 end -- addInstanceData()
@@ -87,7 +88,7 @@ function LockHelper_RebuildCharData()
 		local numEncounters, _ = GetLFGDungeonNumEncounters( instanceID );
 		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 
-		addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, false );
+		addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, false, false );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -100,7 +101,7 @@ function LockHelper_RebuildCharData()
 		if ( reset > 0 ) then
 			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
 
-			addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked );
+			addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked, isRaid );
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
