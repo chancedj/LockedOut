@@ -5,7 +5,16 @@
 local _, addonHelpers = ...;
 
 local function convertDifficulty(difficulty)
-	if difficulty == 14 then		return "Normal", "N";
+	if difficulty == 1 then			return "Normal", "N";
+	elseif difficulty == 2 then		return "Heroic", "H";
+	elseif difficulty == 3 then		return "Normal", "N";
+	elseif difficulty == 4 then		return "Normal", "N";
+	elseif difficulty == 5 then		return "Heroic", "H";
+	elseif difficulty == 6 then		return "Heroic", "H";
+	elseif difficulty == 7 then		return "Lfr", "L";
+	elseif difficulty == 11 then	return "Heroic", "H";
+	elseif difficulty == 12 then	return "Normal", "N";
+	elseif difficulty == 14 then	return "Normal", "N";
 	elseif difficulty == 15 then	return "Heroic", "H";
 	elseif difficulty == 16 then	return "Mythic", "M";
 	elseif difficulty == 17 then	return "Lfr", "L";
