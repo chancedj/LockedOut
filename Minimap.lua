@@ -5,26 +5,26 @@ local addonName, addonHelpers = ...;
 
 local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0");
 local icon = LibStub("LibDBIcon-1.0");
-local LockHelperMo = LibStub("LibDataBroker-1.1"):NewDataObject("Lock Helper", {
+local LockedoutMo = LibStub("LibDataBroker-1.1"):NewDataObject("Locked Out", {
 	type = "data source",
-	text = "Lock Helper",
+	text = "Locked Out",
 	icon = "Interface\\Icons\\Inv_misc_key_10",
 	OnClick = function( self ) addon:OnClick( self ) end,
 	OnEnter = function( self ) addon:OnEnter( self ) end,
-}); -- local LockHelperMo
+}); -- local LockedoutMo
 
 function addon:OnInitialize()
-	LockHelperMapDb = LockHelperMapDb or LibStub("AceDB-3.0"):New("LockHelperMapDb", { profile = { minimap = {hide = false } } });
+	LockoutMapDb = LockoutMapDb or LibStub("AceDB-3.0"):New("LockoutMapDb", { profile = { minimap = {hide = false } } });
 
-	icon:Register(addonName, LockHelperMo, LockHelperMapDb.profile.minimap)
+	icon:Register(addonName, LockedoutMo, LockoutMapDb.profile.minimap)
 end -- addon:OnInitialize
 
 -- Get a reference to the lib
 local LibQTip = LibStub('LibQTip-1.0')
 
 function addon:OnClick()
-	LockHelper_RebuildCharData();
-	LockHelper_PrintMsg();
+	Lockedout_RebuildCharData();
+	Lockedout_PrintMsg();
 end -- addon:OnClick
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
@@ -38,20 +38,20 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 		lineNum = tooltip:AddLine( instanceName );
 		
 		for colNdx, charData in next, charList do
-			if (LockHelperDb[ charData.realmName ] ~= nil) and
-			   (LockHelperDb[ charData.realmName ][ charData.charName ] ~= nil) and
-			   (LockHelperDb[ charData.realmName ][ charData.charName ][ instanceName ] ~= nil) then
+			if (LockoutDb[ charData.realmName ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charName ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charName ][ instanceName ] ~= nil) then
 
 				local data = {};
-				for difficulty, instanceDetails in next, LockHelperDb[ charData.realmName ][ charData.charName ][ instanceName ] do
+				for difficulty, instanceDetails in next, LockoutDb[ charData.realmName ][ charData.charName ][ instanceName ] do
 					data[ #data + 1 ] = instanceDetails.displayText;
-				end -- for difficulty, instanceDetails in next, LockHelperDb[ charData.realmName ][ charData.charName ][ instanceName ]
+				end -- for difficulty, instanceDetails in next, LockoutDb[ charData.realmName ][ charData.charName ][ instanceName ]
 				
 				tooltip:SetCell( lineNum, colNdx + 1, table.concat( data, " " ), nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() return; end );	-- close out tooltip when leaving
 				tooltip:SetLineScript( lineNum, "OnEnter", function() return; end );				-- empty function allows the background to highlight
-			end -- if (LockHelperDb[ charData.realmName ] ~= nil) and .....
+			end -- if (LockoutDb[ charData.realmName ] ~= nil) and .....
 		end -- for colNdx, charData in next, charList
 	end
 
@@ -64,9 +64,9 @@ function addon:OnEnter( self )
 		self.tooltip = nil;
 	end
 
-	LockHelper_RebuildCharData();
+	Lockedout_RebuildCharData();
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
-	local tooltip = LibQTip:Acquire("LockHelperTooltip");
+	local tooltip = LibQTip:Acquire("LockedoutTooltip");
 	self.tooltip = tooltip;
 
 	local charList = {};
@@ -74,7 +74,7 @@ function addon:OnEnter( self )
 	local raidList = {};
 
 	-- get list of characters and realms for the horizontal
-	for realmName, characters in next, LockHelperDb do
+	for realmName, characters in next, LockoutDb do
 		for charName, instances in next, characters do
 			local tblNdx = #charList + 1;
 			charList[ tblNdx ] = {}
@@ -92,7 +92,7 @@ function addon:OnEnter( self )
 				end
 			end -- for instanceName, _ in next, instances
 		end -- for charName, instances in next, characters
-	end -- for realmName, characters in next, LockHelperDb
+	end -- for realmName, characters in next, LockoutDb
 	
 	-- sort list by realm then character
 	table.sort( charList, function(l, r)

@@ -66,11 +66,11 @@ end -- addInstanceData()
 					[bossNdx] (bossName, isKilled)
 	
 --]]
-function LockHelper_PrintMsg()
-	addonHelpers:printTable( LockHelperDb );
-end -- LockHelper_PrintMsg
+function Lockedout_PrintMsg()
+	addonHelpers:printTable( LockoutDb );
+end -- Lockedout_PrintMsg
 
-function LockHelper_RebuildCharData()
+function Lockedout_RebuildCharData()
 	local maxDungeonId = 2000;
 
 	local playerName = UnitName("player");						-- get the name of the current player
@@ -106,9 +106,9 @@ function LockHelper_RebuildCharData()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	LockHelperDb = LockHelperDb or {};						-- initialize database if not already initialized
-	LockHelperDb[ realmName ] = LockHelperDb[ realmName ] or {};	-- initialize realmDb if not already initialized
-	LockHelperDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
+	LockoutDb = LockoutDb or {};						-- initialize database if not already initialized
+	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};	-- initialize realmDb if not already initialized
+	LockoutDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
 	
-	table.sort( LockHelperDb ); -- sort the realms alphabetically
-end -- LockHelper_PrintMsg()
+	table.sort( LockoutDb ); -- sort the realms alphabetically
+end -- Lockedout_PrintMsg()
