@@ -6,7 +6,7 @@
 ## SavedVariables: LockoutDb
 ## SavedVariablesPerCharacter: LockoutMapDb
 
-libs\embeds.xml
+embeds.xml
 
 Helper.lua
 Instances.lua
