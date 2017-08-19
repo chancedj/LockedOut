@@ -116,7 +116,7 @@ function addon:OnEnter( self )
 	-- add the characters and realms across the header
 	for colNdx, char in next, charList do
 		tooltip:SetCell( realmLineNum, colNdx + 1, char.realmName, nil, "CENTER" );
-		tooltip:SetCell( charLineNum, colNdx + 1, char.charName, nil, "CENTER" );
+		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( nil, char.charName ), nil, "CENTER" );
 	end -- for colNdx, char in next, charList
 
 	tooltip:AddSeparator( );

@@ -31,3 +31,13 @@ function addonHelpers:printTable( tbl, maxDepth, depth )
 	end -- for key, value in next, tbl
 	
 end -- addonHelpers:printTable()
+
+function addonHelpers:colorizeString( className, value )
+	if( className == nil ) then return value; end
+
+	local RAID_CLASS_COLORS = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS;
+	
+	local sStart, sTail, classColor = "|c", "|r", RAID_CLASS_COLORS[ className ].colorStr;
+	
+	return sStart .. classColor .. value .. sTail;
+end -- addonHelpers:colorizeString

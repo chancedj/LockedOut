@@ -82,7 +82,7 @@ end -- Lockedout_PrintMsg
 function Lockedout_RebuildCharData()
 	local maxDungeonId = 2000;
 
-	local playerName = UnitName("player");						-- get the name of the current player
+	local playerName = UnitName( "player" );					-- get the name of the current player
 	local realmName = GetRealmName();							-- get the name of the current realm
 	local playerData = {};
 	
@@ -115,8 +115,8 @@ function Lockedout_RebuildCharData()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	LockoutDb = LockoutDb or {};						-- initialize database if not already initialized
-	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};	-- initialize realmDb if not already initialized
+	LockoutDb = LockoutDb or {};								-- initialize database if not already initialized
+	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};		-- initialize realmDb if not already initialized
 	LockoutDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
 	
 	table.sort( LockoutDb ); -- sort the realms alphabetically
