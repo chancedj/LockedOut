@@ -4,6 +4,17 @@
 --]]
 local _, addonHelpers = ...;
 
+local function destroyDb()
+	if( LockoutDb == nil ) then return; end
+	
+	local _, charData = next( LockoutDb );
+	if( charData == nil ) then LockoutDb = nil; return; end
+	
+	local key = next( charData );
+	-- if the char ndx is not a number, we have the old style so destroy db
+	if( type( key ) ~= "number" ) then LockoutDb = nil; end;
+end -- destroyDb
+
 local function convertDifficulty(difficulty)
 	if difficulty == 1 then			return "Normal", "N";
 	elseif difficulty == 2 then		return "Heroic", "H";
@@ -69,7 +80,7 @@ end -- addInstanceData()
 	the data is stored in this way [key] (prop1, prop2, ...):
 	
 	[realmName]
-		[playerName]
+		[playerNdx] (charName, className)
 			[instanceName]
 				[difficultyName] (bossData, locked, displayText)
 					[bossNdx] (bossName, isKilled)
@@ -79,12 +90,29 @@ function Lockedout_PrintMsg()
 	addonHelpers:printTable( LockoutDb );
 end -- Lockedout_PrintMsg
 
+local function getCharIndex( characters, search_charName )
+	local charNdx = #characters + 1;
+
+	for searchNdx, character in next, characters do
+		if( search_charName == character.charName ) then
+			return searchNdx;
+		end;
+	end
+	
+	return charNdx;
+end
+
 function Lockedout_RebuildCharData()
+	destroyDb();
 	local maxDungeonId = 2000;
 
-	local playerName = UnitName( "player" );					-- get the name of the current player
-	local realmName = GetRealmName();							-- get the name of the current realm
+	local realmName = GetRealmName();						-- get the name of the current realm
+	local charName = UnitName( "player" );					-- get the name of the current player
+	local _, className = UnitClass( "player" );				-- get the class of the current player
 	local playerData = {};
+	playerData.instances = {};
+	playerData.charName = charName
+	playerData.className = className
 	
 	---[[
 	local lfrCount = GetNumRFDungeons();
@@ -97,7 +125,7 @@ function Lockedout_RebuildCharData()
 		local numEncounters, _ = GetLFGDungeonNumEncounters( instanceID );
 		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 
-		addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, false, false );
+		addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, false, false );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -110,14 +138,14 @@ function Lockedout_RebuildCharData()
 		if ( reset > 0 ) then
 			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
 
-			addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked, isRaid );
+			addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, locked, isRaid );
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	LockoutDb = LockoutDb or {};								-- initialize database if not already initialized
-	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};		-- initialize realmDb if not already initialized
-	LockoutDb[ realmName ][ playerName ] = playerData;			-- initialize playerDb if not already initialized
-	
+	LockoutDb = LockoutDb or {};																-- initialize database if not already initialized
+	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};										-- initialize realmDb if not already initialized
+	LockoutDb[ realmName ][ getCharIndex( LockoutDb[ realmName ], charName ) ] = playerData;	-- initialize playerDb if not already initialized
+
 	table.sort( LockoutDb ); -- sort the realms alphabetically
 end -- Lockedout_PrintMsg()
