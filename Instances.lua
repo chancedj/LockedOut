@@ -4,6 +4,9 @@
 --]]
 local _, addonHelpers = ...;
 
+-- Upvalues
+local dump = dump
+
 local function convertDifficulty(difficulty)
 	if difficulty == 1 then			return "Normal", "N";
 	elseif difficulty == 2 then		return "Heroic", "H";
@@ -76,7 +79,7 @@ end -- addInstanceData()
 	
 --]]
 function Lockedout_PrintMsg()
-	addonHelpers:printTable( LockoutDb );
+	dump(LockoutDb)
 end -- Lockedout_PrintMsg
 
 function Lockedout_RebuildCharData()
