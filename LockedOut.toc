@@ -2,7 +2,7 @@
 ## Title: Locked Out
 ## Notes: An addon for tracking lockouts.
 ## Author: Hwap
-## Version: 1.1
+## Version: 1.1.0
 ## SavedVariables: LockoutDb
 ## SavedVariablesPerCharacter: LockoutMapDb
 
