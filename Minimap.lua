@@ -39,15 +39,14 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 		
 		for colNdx, charData in next, charList do
 			if (LockoutDb[ charData.realmName ] ~= nil) and
-			   (LockoutDb[ charData.realmName ][ charData.charName ] ~= nil) and
-			   (LockoutDb[ charData.realmName ][ charData.charName ][ instanceName ] ~= nil) then
-
+			   (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ] ~= nil) then
 				local data = {};
-				for difficulty, instanceDetails in next, LockoutDb[ charData.realmName ][ charData.charName ][ instanceName ] do
+				for difficulty, instanceDetails in next, LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ] do
 					data[ #data + 1 ] = instanceDetails.displayText;
-				end -- for difficulty, instanceDetails in next, LockoutDb[ charData.realmName ][ charData.charName ][ instanceName ]
+				end -- for difficulty, instanceDetails in next, LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ]
 				
-				tooltip:SetCell( lineNum, colNdx + 1, table.concat( data, " " ), nil, "CENTER" );
+				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() return; end );	-- close out tooltip when leaving
 				tooltip:SetLineScript( lineNum, "OnEnter", function() return; end );				-- empty function allows the background to highlight
@@ -75,14 +74,16 @@ function addon:OnEnter( self )
 
 	-- get list of characters and realms for the horizontal
 	for realmName, characters in next, LockoutDb do
-		for charName, instances in next, characters do
+		for charNdx, charData in next, characters do
 			local tblNdx = #charList + 1;
 			charList[ tblNdx ] = {}
+			charList[ tblNdx ].charNdx = charNdx;
 			charList[ tblNdx ].realmName = realmName;
-			charList[ tblNdx ].charName = charName;
+			charList[ tblNdx ].charName = charData.charName;
+			charList[ tblNdx ].className = charData.className;
 
 			-- the get a list of all instances across characters for vertical
-			for instanceName, details in next, instances do
+			for instanceName, details in next, charData.instances do
 				local key, data = next( details );
 				
 				if (data.isRaid) then
@@ -115,8 +116,8 @@ function addon:OnEnter( self )
 	local charLineNum  = tooltip:AddHeader( "Character" ); -- char column
 	-- add the characters and realms across the header
 	for colNdx, char in next, charList do
-		tooltip:SetCell( realmLineNum, colNdx + 1, char.realmName, nil, "CENTER" );
-		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( nil, char.charName ), nil, "CENTER" );
+		tooltip:SetCell( realmLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.charName ), nil, "CENTER" );
 	end -- for colNdx, char in next, charList
 
 	tooltip:AddSeparator( );
