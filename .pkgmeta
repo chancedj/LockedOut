@@ -1,0 +1,23 @@
+package-as: LockedOut
+
+enable-nolib-creation: no
+
+externals:
+    Libs/LibStub:
+        url: https://repos.wowace.com/wow/libstub/trunk
+        tag: latest
+    Libs/CallbackHandler-1.0 :
+        url: https://repos.wowace.com/wow/callbackhandler/trunk
+        tag: latest
+    Libs/LibDataBroker-1.1:
+        url: https://repos.wowace.com/wow/libdatabroker-1-1
+        tag: latest
+    Libs/LibDBIcon-1.0:
+        url: https://repos.wowace.com/wow/libdbicon-1-0/trunk
+        tag: latest
+    Libs/LibQTip-1.0:
+        url: https://repos.wowace.com/wow/libqtip-1-0/trunk
+        tag: latest
+
+ignore:
+ - README.MD

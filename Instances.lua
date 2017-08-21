@@ -4,7 +4,8 @@
 --]]
 local _, addonHelpers = ...;
 
--- cache lua functions
+-- Upvalues
+local dump = dump
 local next, type, table = -- variables
 	  next, type, table	  -- lua functions
 -- cache blizzard function/globals
@@ -96,7 +97,7 @@ end -- addInstanceData()
 	
 --]]
 function Lockedout_PrintMsg()
-	addonHelpers:printTable( LockoutDb );
+	dump(LockoutDb)
 end -- Lockedout_PrintMsg
 
 local function getCharIndex( characters, search_charName )
