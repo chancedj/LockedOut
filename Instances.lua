@@ -4,6 +4,15 @@
 --]]
 local _, addonHelpers = ...;
 
+-- cache lua functions
+local next, type, table = -- variables
+	  next, type, table	  -- lua functions
+-- cache blizzard function/globals
+local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,										-- variables
+	  GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo = -- variables 
+	  GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,										-- blizzard api
+	  GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo   -- blizzard api
+
 local function destroyDb()
 	if( LockoutDb == nil ) then return; end
 	
@@ -117,12 +126,10 @@ function Lockedout_RebuildCharData()
 	---[[
 	local lfrCount = GetNumRFDungeons();
 	for lfrNdx = 1, lfrCount do
-		local instanceID, name, typeID, subtypeID
-			, minLevel, maxLevel, recLevel, minRecLevel, maxRecLevel, expansionLevel
-			, groupID, textureFilename, difficulty, maxPlayers, description, isHoliday
-			, bonusRepAmount, minPlayers, isTimeWalker, instanceName, minGearLevel = GetRFDungeonInfo( lfrNdx );
+		local instanceID, _, _, _, _, _, _, _, _, _, _, _, difficulty, _, _, _
+			, _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );
 
-		local numEncounters, _ = GetLFGDungeonNumEncounters( instanceID );
+		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
 		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 
 		addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, false, false );
@@ -132,7 +139,7 @@ function Lockedout_RebuildCharData()
 	---[[
 	local lockCount = GetNumSavedInstances();
 	for lockId = 1, lockCount do
-		local instanceName, id, reset, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, difficultyName, numEncounters, encounterProgress = GetSavedInstanceInfo( lockId );
+		local instanceName, _, reset, difficulty, locked, _, _, isRaid, _, _, numEncounters, _ = GetSavedInstanceInfo( lockId );
 
 		-- if reset == 0, it's expired but can be extended - so it will still show in the list.
 		if ( reset > 0 ) then

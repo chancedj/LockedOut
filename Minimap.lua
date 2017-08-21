@@ -3,6 +3,10 @@
 --]]
 local addonName, addonHelpers = ...;
 
+-- cache lua functions
+local next, table =								-- variables
+	  next, table								-- lua functions
+
 local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0");
 local icon = LibStub("LibDBIcon-1.0");
 local LockedoutMo = LibStub("LibDataBroker-1.1"):NewDataObject("Locked Out", {
