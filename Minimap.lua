@@ -72,12 +72,14 @@ function addon:OnEnter( self )
 	local tooltip = LibQTip:Acquire("LockedoutTooltip");
 	self.tooltip = tooltip;
 
+	local realmCount = 0;
 	local charList = {};
 	local dungeonList = {};
 	local raidList = {};
 
 	-- get list of characters and realms for the horizontal
 	for realmName, characters in next, LockoutDb do
+		realmCount = realmCount + 1;
 		for charNdx, charData in next, characters do
 			local tblNdx = #charList + 1;
 			charList[ tblNdx ] = {}
@@ -116,11 +118,18 @@ function addon:OnEnter( self )
 	tooltip:SetColumnLayout( #charList + 1 );
 
 	-- Add a header filling only the first columns in the first 2 rows (Realm, Character)
-	local realmLineNum = tooltip:AddHeader( "Realm" ); -- realm column
-	local charLineNum  = tooltip:AddHeader( "Character" ); -- char column
+	local realmLineNum;
+	local charLineNum;
+	
+	if( realmCount > 1 ) then -- show realm only when multiple are involved
+		realmLineNum = tooltip:AddHeader( "Realm" ); -- realm column
+	end
+	charLineNum  = tooltip:AddHeader( "Character" ); -- char column
 	-- add the characters and realms across the header
 	for colNdx, char in next, charList do
-		tooltip:SetCell( realmLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+		if( realmCount > 1 ) then -- show realm only when multiple are involved
+			tooltip:SetCell( realmLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+		end
 		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.charName ), nil, "CENTER" );
 	end -- for colNdx, char in next, charList
 
