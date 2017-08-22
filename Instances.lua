@@ -2,12 +2,16 @@
 	This file is to deal with the code to generate the lockout table/vector and
 	to handle the refresh of data and deletion of stale data
 --]]
-local _, addonHelpers = ...;
+local addonName, addonHelpers = ...;
+
+-- libraries
+local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
 local dump = dump
 local next, type, table = -- variables
 	  next, type, table	  -- lua functions
+
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,										-- variables
 	  GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo = -- variables 
@@ -26,23 +30,23 @@ local function destroyDb()
 end -- destroyDb
 
 local function convertDifficulty(difficulty)
-	if difficulty == 1 then			return "Normal", "N";
-	elseif difficulty == 2 then		return "Heroic", "H";
-	elseif difficulty == 3 then		return "Normal", "N";
-	elseif difficulty == 4 then		return "Normal", "N";
-	elseif difficulty == 5 then		return "Heroic", "H";
-	elseif difficulty == 6 then		return "Heroic", "H";
-	elseif difficulty == 7 then		return "Lfr", "L";
-	elseif difficulty == 11 then	return "Heroic", "H";
-	elseif difficulty == 12 then	return "Normal", "N";
-	elseif difficulty == 14 then	return "Normal", "N";
-	elseif difficulty == 15 then	return "Heroic", "H";
-	elseif difficulty == 16 then	return "Mythic", "M";
-	elseif difficulty == 17 then	return "Lfr", "L";
-	elseif difficulty == 23 then	return "Mythic", "M";
+	if difficulty == 1 then			return L[ "Normal" ], L[ "N" ];
+	elseif difficulty == 2 then		return L[ "Heroic" ], L[ "H" ];
+	elseif difficulty == 3 then		return L[ "Normal" ], L[ "N" ];
+	elseif difficulty == 4 then		return L[ "Normal" ], L[ "N" ];
+	elseif difficulty == 5 then		return L[ "Heroic" ], L[ "H" ];
+	elseif difficulty == 6 then		return L[ "Heroic" ], L[ "H" ];
+	elseif difficulty == 7 then		return L[ "Lfr" ], L[ "L" ];
+	elseif difficulty == 11 then	return L[ "Heroic" ], L[ "H" ];
+	elseif difficulty == 12 then	return L[ "Normal" ], L[ "N" ];
+	elseif difficulty == 14 then	return L[ "Normal" ], L[ "N" ];
+	elseif difficulty == 15 then	return L[ "Heroic" ], L[ "H" ];
+	elseif difficulty == 16 then	return L[ "Mythic" ], L[ "M" ];
+	elseif difficulty == 17 then	return L[ "Lfr" ], L[ "L" ];
+	elseif difficulty == 23 then	return L[ "Mythic" ], L[ "M" ];
 	end -- if difficulty
 
-	return "Unknown", "U"
+	return L[ "Unknown" ], L[ "U" ]
 end -- convertDifficulty
 
 local function getDeadBosses( data )

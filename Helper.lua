@@ -1,7 +1,8 @@
 --[[
 	This file is for overall helper functions that are to be used addon wide.
 --]]
-local _, addonHelpers = ...;
+local addonName, addonHelpers = ...;
+local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
 local print, type =								-- variables

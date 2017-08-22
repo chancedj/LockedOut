@@ -3,28 +3,31 @@
 --]]
 local addonName, addonHelpers = ...;
 
+-- libraries
+local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0" );
+local icon = LibStub( "LibDBIcon-1.0" );
+local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
+
 -- cache lua functions
 local next, table =								-- variables
 	  next, table								-- lua functions
 
-local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0");
-local icon = LibStub("LibDBIcon-1.0");
-local LockedoutMo = LibStub("LibDataBroker-1.1"):NewDataObject("Locked Out", {
+local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
 	type = "data source",
-	text = "Locked Out",
+	text = L[ "Locked Out" ],
 	icon = "Interface\\Icons\\Inv_misc_key_10",
 	OnClick = function( self ) addon:OnClick( self ) end,
 	OnEnter = function( self ) addon:OnEnter( self ) end,
-}); -- local LockedoutMo
+} ); -- local LockedoutMo
 
 function addon:OnInitialize()
-	LockoutMapDb = LockoutMapDb or LibStub("AceDB-3.0"):New("LockoutMapDb", { profile = { minimap = {hide = false } } });
+	LockoutMapDb = LockoutMapDb or LibStub( "AceDB-3.0" ):New( "LockoutMapDb", { profile = { minimap = {hide = false } } } );
 
 	icon:Register(addonName, LockedoutMo, LockoutMapDb.profile.minimap)
 end -- addon:OnInitialize
 
 -- Get a reference to the lib
-local LibQTip = LibStub('LibQTip-1.0')
+local LibQTip = LibStub( "LibQTip-1.0" )
 
 function addon:OnClick()
 	Lockedout_RebuildCharData();
@@ -69,7 +72,7 @@ function addon:OnEnter( self )
 
 	Lockedout_RebuildCharData();
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
-	local tooltip = LibQTip:Acquire("LockedoutTooltip");
+	local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
 	self.tooltip = tooltip;
 
 	local realmCount = 0;
@@ -122,9 +125,9 @@ function addon:OnEnter( self )
 	local charLineNum;
 	
 	if( realmCount > 1 ) then -- show realm only when multiple are involved
-		realmLineNum = tooltip:AddHeader( "Realm" ); -- realm column
+		realmLineNum = tooltip:AddHeader( L[ "Realm" ] ); -- realm column
 	end
-	charLineNum  = tooltip:AddHeader( "Character" ); -- char column
+	charLineNum  = tooltip:AddHeader( L[ "Character" ] ); -- char column
 	-- add the characters and realms across the header
 	for colNdx, char in next, charList do
 		if( realmCount > 1 ) then -- show realm only when multiple are involved
@@ -136,8 +139,8 @@ function addon:OnEnter( self )
 	tooltip:AddSeparator( );
 	tooltip:AddSeparator( );
 
-	populateInstanceData( "Dungeon", tooltip, charList, dungeonList );
-	populateInstanceData( "Raid", tooltip, charList, raidList );
+	populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
+	populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
 	
 	-- Use smart anchoring code to anchor the tooltip to our frame
 	tooltip:SmartAnchorTo( self );
