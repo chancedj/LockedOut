@@ -8,7 +8,6 @@ local addonName, addonHelpers = ...;
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local dump = dump
 local next, type, table = -- variables
 	  next, type, table	  -- lua functions
 
@@ -101,7 +100,7 @@ end -- addInstanceData()
 	
 --]]
 function Lockedout_PrintMsg()
-	dump(LockoutDb)
+	--dump(LockoutDb)
 end -- Lockedout_PrintMsg
 
 local function getCharIndex( characters, search_charName )
