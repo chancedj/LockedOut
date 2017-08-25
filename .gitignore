@@ -216,5 +216,7 @@ pip-log.txt
 .mr.developer.cfg
 
 Libs/
-libs/
 libs
+
+README.md
+CHANGES.txt
