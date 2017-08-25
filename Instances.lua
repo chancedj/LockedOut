@@ -136,7 +136,7 @@ function Lockedout_RebuildCharData()
 		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
 		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 
-		addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, false, false );
+		addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, false, true );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
