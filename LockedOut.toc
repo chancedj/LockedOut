@@ -1,4 +1,4 @@
-## Interface: 70200
+## Interface: 70300
 ## Title: Locked Out
 ## Notes: An addon for tracking lockouts.
 ## Author: Hwap
