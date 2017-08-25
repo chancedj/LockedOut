@@ -30,7 +30,7 @@ end -- addon:OnInitialize
 local LibQTip = LibStub( "LibQTip-1.0" )
 
 function addon:OnClick()
-	Lockedout_RebuildCharData();
+	Lockedout_BuildInstanceLockout();
 	Lockedout_PrintMsg();
 end -- addon:OnClick
 
@@ -70,7 +70,7 @@ function addon:OnEnter( self )
 		self.tooltip = nil;
 	end
 
-	Lockedout_RebuildCharData();
+	Lockedout_BuildInstanceLockout();
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
 	local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
 	self.tooltip = tooltip;

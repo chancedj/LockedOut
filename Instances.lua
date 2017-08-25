@@ -17,17 +17,6 @@ local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,				
 	  GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,										-- blizzard api
 	  GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo   -- blizzard api
 
-local function destroyDb()
-	if( LockoutDb == nil ) then return; end
-	
-	local _, charData = next( LockoutDb );
-	if( charData == nil ) then LockoutDb = nil; return; end
-	
-	local key = next( charData );
-	-- if the char ndx is not a number, we have the old style so destroy db
-	if( type( key ) ~= "number" ) then LockoutDb = nil; end;
-end -- destroyDb
-
 local function convertDifficulty(difficulty)
 	if difficulty == 1 then			return L[ "Normal" ], L[ "N" ];
 	elseif difficulty == 2 then		return L[ "Heroic" ], L[ "H" ];
@@ -87,45 +76,13 @@ local function addInstanceData( playerData, instanceName, difficulty, bossData, 
 	end -- if ( deadBosses > 0 )
 end -- addInstanceData()
 
---[[
-	this will generate the saved data for raids and dungeons for a specific player [and realm].
-	
-	the data is stored in this way [key] (prop1, prop2, ...):
-	
-	[realmName]
-		[playerNdx] (charName, className)
-			[instanceName]
-				[difficultyName] (bossData, locked, displayText)
-					[bossNdx] (bossName, isKilled)
-	
---]]
-function Lockedout_PrintMsg()
-	--dump(LockoutDb)
-end -- Lockedout_PrintMsg
+function Lockedout_BuildInstanceLockout()
+	addonHelpers:destroyDb();
 
-local function getCharIndex( characters, search_charName )
-	local charNdx = #characters + 1;
-
-	for searchNdx, character in next, characters do
-		if( search_charName == character.charName ) then
-			return searchNdx;
-		end;
-	end
-	
-	return charNdx;
-end
-
-function Lockedout_RebuildCharData()
-	destroyDb();
-	local maxDungeonId = 2000;
-
-	local realmName = GetRealmName();						-- get the name of the current realm
-	local charName = UnitName( "player" );					-- get the name of the current player
-	local _, className = UnitClass( "player" );				-- get the class of the current player
-	local playerData = {};
-	playerData.instances = {};
-	playerData.charName = charName
-	playerData.className = className
+	local realmName, charNdx, playerData;
+	realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
+	playerData = LockoutDb[ realmName ][ charNdx ];
+	playerData.instances = {}; -- initialize instance table;
 	
 	---[[
 	local lfrCount = GetNumRFDungeons();
@@ -154,9 +111,4 @@ function Lockedout_RebuildCharData()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	LockoutDb = LockoutDb or {};																-- initialize database if not already initialized
-	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};										-- initialize realmDb if not already initialized
-	LockoutDb[ realmName ][ getCharIndex( LockoutDb[ realmName ], charName ) ] = playerData;	-- initialize playerDb if not already initialized
-
-	table.sort( LockoutDb ); -- sort the realms alphabetically
-end -- Lockedout_PrintMsg()
+end -- Lockedout_BuildInstanceLockout()

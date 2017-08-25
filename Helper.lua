@@ -22,3 +22,15 @@ function addonHelpers:colorizeString( className, value )
 	
 	return sStart .. classColor .. value .. sTail;
 end -- addonHelpers:colorizeString
+
+function addonHelpers:destroyDb()
+	if( LockoutDb == nil ) then return; end
+	
+	local _, charData = next( LockoutDb );
+	if( charData == nil ) then LockoutDb = nil; return; end
+	
+	local key = next( charData );
+	-- if the char ndx is not a number, we have the old style so destroy db
+	if( type( key ) ~= "number" ) then LockoutDb = nil; end;
+end -- destroyDb
+
