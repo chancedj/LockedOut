@@ -92,7 +92,7 @@ function Lockedout_PrintMsg()
 	--dump(LockoutDb)
 end -- Lockedout_PrintMsg
 
-function Lockedout_RebuildCharData()
+function Lockedout_BuildInstanceLockout()
 	addonHelpers:destroyDb();
 
 	local realmName, charNdx, playerData;
@@ -127,4 +127,4 @@ function Lockedout_RebuildCharData()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-end -- Lockedout_PrintMsg()
+end -- Lockedout_BuildInstanceLockout()
