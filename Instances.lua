@@ -76,22 +76,6 @@ local function addInstanceData( playerData, instanceName, difficulty, bossData, 
 	end -- if ( deadBosses > 0 )
 end -- addInstanceData()
 
---[[
-	this will generate the saved data for raids and dungeons for a specific player [and realm].
-	
-	the data is stored in this way [key] (prop1, prop2, ...):
-	
-	[realmName]
-		[playerNdx] (charName, className)
-			[instanceName]
-				[difficultyName] (bossData, locked, displayText)
-					[bossNdx] (bossName, isKilled)
-	
---]]
-function Lockedout_PrintMsg()
-	--dump(LockoutDb)
-end -- Lockedout_PrintMsg
-
 function Lockedout_BuildInstanceLockout()
 	addonHelpers:destroyDb();
 
