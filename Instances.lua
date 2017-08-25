@@ -17,17 +17,6 @@ local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,				
 	  GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,										-- blizzard api
 	  GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo   -- blizzard api
 
-local function destroyDb()
-	if( LockoutDb == nil ) then return; end
-	
-	local _, charData = next( LockoutDb );
-	if( charData == nil ) then LockoutDb = nil; return; end
-	
-	local key = next( charData );
-	-- if the char ndx is not a number, we have the old style so destroy db
-	if( type( key ) ~= "number" ) then LockoutDb = nil; end;
-end -- destroyDb
-
 local function convertDifficulty(difficulty)
 	if difficulty == 1 then			return L[ "Normal" ], L[ "N" ];
 	elseif difficulty == 2 then		return L[ "Heroic" ], L[ "H" ];
@@ -103,29 +92,13 @@ function Lockedout_PrintMsg()
 	--dump(LockoutDb)
 end -- Lockedout_PrintMsg
 
-local function getCharIndex( characters, search_charName )
-	local charNdx = #characters + 1;
-
-	for searchNdx, character in next, characters do
-		if( search_charName == character.charName ) then
-			return searchNdx;
-		end;
-	end
-	
-	return charNdx;
-end
-
 function Lockedout_RebuildCharData()
-	destroyDb();
-	local maxDungeonId = 2000;
+	addonHelpers:destroyDb();
 
-	local realmName = GetRealmName();						-- get the name of the current realm
-	local charName = UnitName( "player" );					-- get the name of the current player
-	local _, className = UnitClass( "player" );				-- get the class of the current player
-	local playerData = {};
-	playerData.instances = {};
-	playerData.charName = charName
-	playerData.className = className
+	local realmName, charNdx, playerData;
+	realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
+	playerData = LockoutDb[ realmName ][ charNdx ];
+	playerData.instances = {}; -- initialize instance table;
 	
 	---[[
 	local lfrCount = GetNumRFDungeons();
@@ -154,9 +127,4 @@ function Lockedout_RebuildCharData()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	LockoutDb = LockoutDb or {};																-- initialize database if not already initialized
-	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};										-- initialize realmDb if not already initialized
-	LockoutDb[ realmName ][ getCharIndex( LockoutDb[ realmName ], charName ) ] = playerData;	-- initialize playerDb if not already initialized
-
-	table.sort( LockoutDb ); -- sort the realms alphabetically
 end -- Lockedout_PrintMsg()

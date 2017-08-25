@@ -10,5 +10,6 @@ embeds.xml
 locale.xml
 
 Helper.lua
+Character.lua
 Instances.lua
 Minimap.lua
