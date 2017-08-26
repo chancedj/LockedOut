@@ -95,12 +95,10 @@ function addon:OnEnter( self )
 			for instanceName, details in next, charData.instances do
 				local key, data = next( details );
 				
-				if( data ~= nil ) then
-					if ( data.isRaid ) then
-						raidList[ instanceName ] = "set";
-					else
-						dungeonList[ instanceName ] = "set";
-					end
+				if ( data.isRaid ) then
+					raidList[ instanceName ] = "set";
+				else
+					dungeonList[ instanceName ] = "set";
 				end
 			end -- for instanceName, _ in next, instances
 		end -- for charName, instances in next, characters

@@ -73,6 +73,30 @@ local function addInstanceData( playerData, instanceName, difficulty, numEncount
 	return playerData[ instanceName ][ difficultyName ];
 end -- addInstanceData()
 
+local function removeUntouchedInstances( playerData )
+	-- fix up the displayText now, and remove instances with no boss kills.
+	for instanceName, instanceDetails in next, playerData.instances do
+		local validInstanceCount = 0;
+		for difficultyName, instance in next, instanceDetails do
+			local killCount, totalCount = getBossData( instance.bossData );
+			
+			if( killCount == 0 ) then
+				-- remove instance from list
+				playerData.instances[ instanceName ][ difficultyName ] = nil;
+			else
+				local _, difficultyAbbr = convertDifficulty( instance.difficulty );
+				instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+				
+				validInstanceCount = validInstanceCount + 1;
+			end
+		end -- for difficultyName, instance in next, instanceDetails
+		
+		if( validInstanceCount == 0 ) then
+			playerData.instances[ instanceName ] = nil;
+		end -- if( validInstanceCount == 0 )
+	end -- for instanceName, instanceDetails in next, playerData.instances
+end -- removeUntouchedInstances()
+
 function Lockedout_BuildInstanceLockout()
 	addonHelpers:destroyDb();
 
@@ -110,19 +134,5 @@ function Lockedout_BuildInstanceLockout()
 	end -- for lockId = 1, lockCount
 	--]]
 	
-	-- fix up the displayText now, and remove instances with no boss kills.
-	for instanceName, instanceDetails in next, playerData.instances do
-		for difficultyName, instance in next, instanceDetails do
-			local killCount, totalCount = getBossData( instance.bossData );
-			
-			if( killCount == 0 ) then
-				-- remove instance from list
-				playerData.instances[ instanceName ][ difficultyName ] = nil;
-			else
-				local _, difficultyAbbr = convertDifficulty( instance.difficulty );
-				instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
-			end
-		end
-	end
-	
+	removeUntouchedInstances( playerData );
 end -- Lockedout_BuildInstanceLockout()
