@@ -37,44 +37,65 @@ local function convertDifficulty(difficulty)
 	return L[ "Unknown" ], L[ "U" ]
 end -- convertDifficulty
 
-local function getDeadBosses( data )
-	local deadCount = 0;
+local function getBossData( data )
+	local deadCount, totalCount = 0, 0;
 	
 	for _, boss in next, data do
+		totalCount = totalCount + 1;
 		if ( boss.isKilled ) then
 			deadCount = deadCount + 1;
 		end -- if ( data.isKilled )
 	end -- for _, data in next, data
 	
-	return deadCount;
-end -- getDeadBosses()
+	return deadCount, totalCount;
+end -- getBossData()
 
-local function getBossData( encounterId, numEncounters, fnEncounter  )
-	local bosses = {};
-	
+local function populateBossData( bossData, encounterId, numEncounters, fnEncounter  )
 	for encounterNdx = 1, numEncounters do
 		local bossName, _, isKilled = fnEncounter( encounterId, encounterNdx );
 	
-		bosses [ encounterNdx ] = {};
-		bosses [ encounterNdx ].bossName = bossName;
-		bosses [ encounterNdx ].isKilled = isKilled;
+		bossData[ bossName ] = {};
+		bossData[ bossName ].bossName = bossName;
+		bossData[ bossName ].isKilled = isKilled;
 	end -- for encounterNdx = 1, numEncounters
 	
 	return bosses;
-end -- getBossData()
+end -- populateBossData()
 
-local function addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked, isRaid )
-	local deadBosses = getDeadBosses( bossData );
-	if ( deadBosses > 0 ) then
-		local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
-		playerData[ instanceName ] = playerData[ instanceName ] or {};
-		playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
-		playerData[ instanceName ][ difficultyName ].bossData = bossData;
-		playerData[ instanceName ][ difficultyName ].locked = locked;
-		playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
-		playerData[ instanceName ][ difficultyName ].displayText = deadBosses .. "/" .. numEncounters .. difficultyAbbr;
-	end -- if ( deadBosses > 0 )
+local function addInstanceData( playerData, instanceName, difficulty, numEncounters, locked, isRaid )
+	local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
+	playerData[ instanceName ] = playerData[ instanceName ] or {};
+	playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
+	playerData[ instanceName ][ difficultyName ].locked = locked;
+	playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
+	playerData[ instanceName ][ difficultyName ].difficulty = difficulty;
+	
+	return playerData[ instanceName ][ difficultyName ];
 end -- addInstanceData()
+
+local function removeUntouchedInstances( playerData )
+	-- fix up the displayText now, and remove instances with no boss kills.
+	for instanceName, instanceDetails in next, playerData.instances do
+		local validInstanceCount = 0;
+		for difficultyName, instance in next, instanceDetails do
+			local killCount, totalCount = getBossData( instance.bossData );
+			
+			if( killCount == 0 ) then
+				-- remove instance from list
+				playerData.instances[ instanceName ][ difficultyName ] = nil;
+			else
+				local _, difficultyAbbr = convertDifficulty( instance.difficulty );
+				instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+				
+				validInstanceCount = validInstanceCount + 1;
+			end
+		end -- for difficultyName, instance in next, instanceDetails
+		
+		if( validInstanceCount == 0 ) then
+			playerData.instances[ instanceName ] = nil;
+		end -- if( validInstanceCount == 0 )
+	end -- for instanceName, instanceDetails in next, playerData.instances
+end -- removeUntouchedInstances()
 
 function Lockedout_BuildInstanceLockout()
 	addonHelpers:destroyDb();
@@ -91,9 +112,10 @@ function Lockedout_BuildInstanceLockout()
 			, _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );
 
 		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
-		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
+		local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, false, true );
 
-		addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, false, true );
+		instanceData.bossData = instanceData.bossData or {};
+		populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -104,11 +126,13 @@ function Lockedout_BuildInstanceLockout()
 
 		-- if reset == 0, it's expired but can be extended - so it will still show in the list.
 		if ( reset > 0 ) then
-			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
+			local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, locked, isRaid );
 
-			addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, locked, isRaid );
+			instanceData.bossData = instanceData.bossData or {};
+			populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
 	
+	removeUntouchedInstances( playerData );
 end -- Lockedout_BuildInstanceLockout()

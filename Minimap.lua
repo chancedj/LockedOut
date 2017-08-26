@@ -31,7 +31,6 @@ local LibQTip = LibStub( "LibQTip-1.0" )
 
 function addon:OnClick()
 	Lockedout_BuildInstanceLockout();
-	Lockedout_PrintMsg();
 end -- addon:OnClick
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
@@ -95,7 +94,7 @@ function addon:OnEnter( self )
 			for instanceName, details in next, charData.instances do
 				local key, data = next( details );
 				
-				if (data.isRaid) then
+				if ( data.isRaid ) then
 					raidList[ instanceName ] = "set";
 				else
 					dungeonList[ instanceName ] = "set";

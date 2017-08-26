@@ -40,7 +40,12 @@ end -- getCharIndex()
 function addonHelpers:Lockedout_GetCurrentCharData()
 	addonHelpers:destroyDb();
 	
+	-- get and initialize realm data
 	local realmName = GetRealmName();
+	LockoutDb = LockoutDb or {};							-- initialize database if not already initialized
+	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};	-- initialize realmDb if not already initialized
+
+	-- get and initialize character data
 	local charName = UnitName( "player" );
 	local _, className = UnitClass( "player" );
 	local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
@@ -49,8 +54,6 @@ function addonHelpers:Lockedout_GetCurrentCharData()
 	playerData.charName = charName
 	playerData.className = className
 	
-	LockoutDb = LockoutDb or {};							-- initialize database if not already initialized
-	LockoutDb[ realmName ] = LockoutDb[ realmName ] or {};	-- initialize realmDb if not already initialized
 	LockoutDb[ realmName ][ charNdx ] = playerData;			-- initialize playerDb if not already initialized
 
 	table.sort( LockoutDb ); -- sort the realms alphabetically
