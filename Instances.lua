@@ -92,10 +92,6 @@ function Lockedout_BuildInstanceLockout()
 
 		instanceData.bossData = instanceData.bossData or {};
 		populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
-		
-		if (instanceData.bossData == nil ) then
-			print ('bossdata is nil');
-		end
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -110,10 +106,6 @@ function Lockedout_BuildInstanceLockout()
 
 			instanceData.bossData = instanceData.bossData or {};
 			populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
-
-			if (instanceData.bossData == nil ) then
-				print ('bossdata is nil');
-			end
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
@@ -122,8 +114,14 @@ function Lockedout_BuildInstanceLockout()
 	for instanceName, instanceDetails in next, playerData.instances do
 		for difficultyName, instance in next, instanceDetails do
 			local killCount, totalCount = getBossData( instance.bossData );
-			local _, difficultyAbbr = convertDifficulty( instance.difficulty );
-			instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+			
+			if( killCount == 0 ) then
+				-- remove instance from list
+				playerData.instances[ instanceName ][ difficultyName ] = nil;
+			else
+				local _, difficultyAbbr = convertDifficulty( instance.difficulty );
+				instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+			end
 		end
 	end
 	
