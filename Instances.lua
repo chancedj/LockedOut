@@ -38,8 +38,7 @@ local function convertDifficulty(difficulty)
 end -- convertDifficulty
 
 local function getBossData( data )
-	local deadCount = 0
-	local totalCount = 0;
+	local deadCount, totalCount = 0, 0;
 	
 	for _, boss in next, data do
 		totalCount = totalCount + 1;
@@ -55,9 +54,9 @@ local function populateBossData( bossData, encounterId, numEncounters, fnEncount
 	for encounterNdx = 1, numEncounters do
 		local bossName, _, isKilled = fnEncounter( encounterId, encounterNdx );
 	
-		bossData[ encounterNdx ] = {};
-		bossData[ encounterNdx ].bossName = bossName;
-		bossData[ encounterNdx ].isKilled = isKilled;
+		bossData[ bossName ] = {};
+		bossData[ bossName ].bossName = bossName;
+		bossData[ bossName ].isKilled = isKilled;
 	end -- for encounterNdx = 1, numEncounters
 	
 	return bosses;
@@ -93,6 +92,10 @@ function Lockedout_BuildInstanceLockout()
 
 		instanceData.bossData = instanceData.bossData or {};
 		populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
+		
+		if (instanceData.bossData == nil ) then
+			print ('bossdata is nil');
+		end
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -107,6 +110,10 @@ function Lockedout_BuildInstanceLockout()
 
 			instanceData.bossData = instanceData.bossData or {};
 			populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
+
+			if (instanceData.bossData == nil ) then
+				print ('bossdata is nil');
+			end
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
