@@ -37,17 +37,19 @@ local function convertDifficulty(difficulty)
 	return L[ "Unknown" ], L[ "U" ]
 end -- convertDifficulty
 
-local function getDeadBosses( data )
-	local deadCount = 0;
+local function getBossData( data )
+	local deadCount = 0
+	local totalCount = 0;
 	
 	for _, boss in next, data do
+		totalCount = totalCount + 1;
 		if ( boss.isKilled ) then
 			deadCount = deadCount + 1;
 		end -- if ( data.isKilled )
 	end -- for _, data in next, data
 	
-	return deadCount;
-end -- getDeadBosses()
+	return deadCount, totalCount;
+end -- getBossData()
 
 local function populateBossData( bossData, encounterId, numEncounters, fnEncounter  )
 	for encounterNdx = 1, numEncounters do
@@ -59,7 +61,7 @@ local function populateBossData( bossData, encounterId, numEncounters, fnEncount
 	end -- for encounterNdx = 1, numEncounters
 	
 	return bosses;
-end -- getBossData()
+end -- populateBossData()
 
 local function addInstanceData( playerData, instanceName, difficulty, numEncounters, locked, isRaid )
 	local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
@@ -67,6 +69,7 @@ local function addInstanceData( playerData, instanceName, difficulty, numEncount
 	playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
 	playerData[ instanceName ][ difficultyName ].locked = locked;
 	playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
+	playerData[ instanceName ][ difficultyName ].difficulty = difficulty;
 	
 	return playerData[ instanceName ][ difficultyName ];
 end -- addInstanceData()
@@ -111,7 +114,9 @@ function Lockedout_BuildInstanceLockout()
 	-- fix up the displayText now, and remove instances with no boss kills.
 	for instanceName, instanceDetails in next, playerData.instances do
 		for difficultyName, instance in next, instanceDetails do
-			instance.displayText = "temporary";
+			local killCount, totalCount = getBossData( instance.bossData );
+			local _, difficultyAbbr = convertDifficulty( instance.difficulty );
+			instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
 		end
 	end
 	
