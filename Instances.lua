@@ -69,7 +69,6 @@ local function addInstanceData( playerData, instanceName, difficulty, numEncount
 		local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
 		playerData[ instanceName ] = playerData[ instanceName ] or {};
 		playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
-		--playerData[ instanceName ][ difficultyName ].bossData = bossData;
 		playerData[ instanceName ][ difficultyName ].locked = locked;
 		playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
 		playerData[ instanceName ][ difficultyName ].displayText = deadBosses .. "/" .. numEncounters .. difficultyAbbr;
@@ -93,9 +92,9 @@ function Lockedout_BuildInstanceLockout()
 			, _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );
 
 		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
-		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
-
 		local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, false, true );
+
+		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -106,9 +105,8 @@ function Lockedout_BuildInstanceLockout()
 
 		-- if reset == 0, it's expired but can be extended - so it will still show in the list.
 		if ( reset > 0 ) then
-			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
-
 			local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, locked, isRaid );
+			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
