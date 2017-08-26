@@ -70,6 +70,8 @@ function addon:OnEnter( self )
 	end
 
 	Lockedout_BuildInstanceLockout();
+	Lockedout_BuildIWorldBoss();
+
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
 	local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
 	self.tooltip = tooltip;
