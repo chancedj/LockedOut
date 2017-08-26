@@ -16,8 +16,6 @@ local GetNumSavedWorldBosses, GetSavedWorldBossInfo =	-- variables
 		GetNumSavedWorldBosses, GetSavedWorldBossInfo	-- blizzard api
 
 function Lockedout_BuildIWorldBoss()
-	addonHelpers:destroyDb();
-
 	local realmName, charNdx, playerData;
 	realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
 	playerData = LockoutDb[ realmName ][ charNdx ];
@@ -28,6 +26,5 @@ function Lockedout_BuildIWorldBoss()
 		print( GetSavedWorldBossInfo( index ) );
 	end -- for index = 1, GetNumSavedWorldBosses()
 	--]]
-	
-	removeUntouchedInstances( playerData );
+
 end -- Lockedout_BuildInstanceLockout()

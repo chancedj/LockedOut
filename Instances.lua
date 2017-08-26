@@ -98,8 +98,6 @@ local function removeUntouchedInstances( playerData )
 end -- removeUntouchedInstances()
 
 function Lockedout_BuildInstanceLockout()
-	addonHelpers:destroyDb();
-
 	local realmName, charNdx, playerData;
 	realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
 	playerData = LockoutDb[ realmName ][ charNdx ];
