@@ -63,16 +63,18 @@ local function getBossData( encounterId, numEncounters, fnEncounter  )
 	return bosses;
 end -- getBossData()
 
-local function addInstanceData( playerData, instanceName, difficulty, bossData, numEncounters, locked, isRaid )
+local function addInstanceData( playerData, instanceName, difficulty, numEncounters, locked, isRaid )
 	local deadBosses = getDeadBosses( bossData );
 	if ( deadBosses > 0 ) then
 		local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
 		playerData[ instanceName ] = playerData[ instanceName ] or {};
 		playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
-		playerData[ instanceName ][ difficultyName ].bossData = bossData;
+		--playerData[ instanceName ][ difficultyName ].bossData = bossData;
 		playerData[ instanceName ][ difficultyName ].locked = locked;
 		playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
 		playerData[ instanceName ][ difficultyName ].displayText = deadBosses .. "/" .. numEncounters .. difficultyAbbr;
+		
+		return playerData[ instanceName ][ difficultyName ];
 	end -- if ( deadBosses > 0 )
 end -- addInstanceData()
 
@@ -93,7 +95,7 @@ function Lockedout_BuildInstanceLockout()
 		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
 		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 
-		addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, false, true );
+		local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, false, true );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -106,7 +108,7 @@ function Lockedout_BuildInstanceLockout()
 		if ( reset > 0 ) then
 			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
 
-			addInstanceData( playerData.instances, instanceName, difficulty, bossData, numEncounters, locked, isRaid );
+			local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, locked, isRaid );
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
