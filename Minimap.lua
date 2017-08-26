@@ -31,7 +31,6 @@ local LibQTip = LibStub( "LibQTip-1.0" )
 
 function addon:OnClick()
 	Lockedout_BuildInstanceLockout();
-	Lockedout_PrintMsg();
 end -- addon:OnClick
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
