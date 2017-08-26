@@ -15,18 +15,41 @@ local next, type, table = -- variables
 local GetNumSavedWorldBosses, GetSavedWorldBossInfo =	-- variables 
 		GetNumSavedWorldBosses, GetSavedWorldBossInfo	-- blizzard api
 
+function CheckForMissingMappings()
+	-- get current tier setting so we don't step on what's currently set
+	local showRaid = true;
+	local currentTier = EJ_GetCurrentTier();
+
+	local worldBosses = {}
+	
+	-- world bosses started with Pandaria - so start with that one and skip the ones before it.
+	for tierId = 5, EJ_GetNumTiers() do
+		EJ_SelectTier( tierId );
+		
+		-- the world bosses are under the first instance for all (Pandaria, Draenor, Broken Isles)
+		-- so just stick with getting the instance back for the first
+		local instanceID, instanceName = EJ_GetInstanceByIndex( 1, showRaid );
+		print( "[" .. instanceName .. "]" );
+		---[[
+		local bossIndex = 1;
+		local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex, instanceID );
+		while bossID do
+			worldBosses[ bossID ] = {}
+			worldBosses[ bossID ].instanceID = instanceID;
+			worldBosses[ bossID ].bossName = bossName;
+
+			bossIndex = bossIndex + 1;
+			bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex, instanceID );
+		end
+		--]]
+	end
+
+	-- set it back to the current tier
+	EJ_SelectTier( currentTier );	
+end
+		
 function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	playerData.worldbosses = {}; -- initialize world boss table;
 	
-	---[[
-	for index = 1, GetNumSavedWorldBosses() do
-		print( GetSavedWorldBossInfo( index ) );
-	end -- for index = 1, GetNumSavedWorldBosses()
-	--]]
-
-	--loop through the encounters
-	--EJ_GetEncounterInfoByIndex( 2 )
-	-- get questid for boss above, for the below
-	--IsQuestFlaggedCompleted( 47061 )
-	
+	CheckForMissingMappings()
 end -- Lockedout_BuildInstanceLockout()
