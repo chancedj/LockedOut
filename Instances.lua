@@ -62,17 +62,13 @@ local function populateBossData( bossData, encounterId, numEncounters, fnEncount
 end -- getBossData()
 
 local function addInstanceData( playerData, instanceName, difficulty, numEncounters, locked, isRaid )
-	--local deadBosses = getDeadBosses( bossData );
-	--if ( deadBosses > 0 ) then
-		local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
-		playerData[ instanceName ] = playerData[ instanceName ] or {};
-		playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
-		playerData[ instanceName ][ difficultyName ].locked = locked;
-		playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
-		playerData[ instanceName ][ difficultyName ].displayText =  "temporary" -- deadBosses .. "/" .. numEncounters .. difficultyAbbr;
-		
-		return playerData[ instanceName ][ difficultyName ];
-	--end -- if ( deadBosses > 0 )
+	local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
+	playerData[ instanceName ] = playerData[ instanceName ] or {};
+	playerData[ instanceName ][ difficultyName ] = playerData[ instanceName ][ difficultyName ] or {};
+	playerData[ instanceName ][ difficultyName ].locked = locked;
+	playerData[ instanceName ][ difficultyName ].isRaid = isRaid;
+	
+	return playerData[ instanceName ][ difficultyName ];
 end -- addInstanceData()
 
 function Lockedout_BuildInstanceLockout()
@@ -111,5 +107,12 @@ function Lockedout_BuildInstanceLockout()
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
+	
+	-- fix up the displayText now, and remove instances with no boss kills.
+	for instanceName, instanceDetails in next, playerData.instances do
+		for difficultyName, instance in next, instanceDetails do
+			instance.displayText = "temporary";
+		end
+	end
 	
 end -- Lockedout_BuildInstanceLockout()
