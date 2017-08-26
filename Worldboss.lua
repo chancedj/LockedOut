@@ -24,4 +24,9 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	end -- for index = 1, GetNumSavedWorldBosses()
 	--]]
 
+	--loop through the encounters
+	--EJ_GetEncounterInfoByIndex( 2 )
+	-- get questid for boss above, for the below
+	--IsQuestFlaggedCompleted( 47061 )
+	
 end -- Lockedout_BuildInstanceLockout()
