@@ -15,11 +15,8 @@ local next, type, table = -- variables
 local GetNumSavedWorldBosses, GetSavedWorldBossInfo =	-- variables 
 		GetNumSavedWorldBosses, GetSavedWorldBossInfo	-- blizzard api
 
-function Lockedout_BuildIWorldBoss()
-	local realmName, charNdx, playerData;
-	realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
-	playerData = LockoutDb[ realmName ][ charNdx ];
-	playerData.worldBosses = {}; -- initialize world bosses table;
+function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
+	playerData.worldbosses = {}; -- initialize world boss table;
 	
 	---[[
 	for index = 1, GetNumSavedWorldBosses() do

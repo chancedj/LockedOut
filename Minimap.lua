@@ -69,8 +69,11 @@ function addon:OnEnter( self )
 		self.tooltip = nil;
 	end
 
-	Lockedout_BuildInstanceLockout();
-	Lockedout_BuildIWorldBoss();
+	local realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
+	local playerData = LockoutDb[ realmName ][ charNdx ];
+
+	Lockedout_BuildInstanceLockout( realmName, charNdx, playerData );
+	Lockedout_BuildWorldBoss( realmName, charNdx, playerData );
 
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
 	local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
