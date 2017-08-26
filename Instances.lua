@@ -49,15 +49,13 @@ local function getDeadBosses( data )
 	return deadCount;
 end -- getDeadBosses()
 
-local function getBossData( encounterId, numEncounters, fnEncounter  )
-	local bosses = {};
-	
+local function populateBossData( bossData, encounterId, numEncounters, fnEncounter  )
 	for encounterNdx = 1, numEncounters do
 		local bossName, _, isKilled = fnEncounter( encounterId, encounterNdx );
 	
-		bosses [ encounterNdx ] = {};
-		bosses [ encounterNdx ].bossName = bossName;
-		bosses [ encounterNdx ].isKilled = isKilled;
+		bossData[ encounterNdx ] = {};
+		bossData[ encounterNdx ].bossName = bossName;
+		bossData[ encounterNdx ].isKilled = isKilled;
 	end -- for encounterNdx = 1, numEncounters
 	
 	return bosses;
@@ -94,7 +92,8 @@ function Lockedout_BuildInstanceLockout()
 		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
 		local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, false, true );
 
-		local bossData = getBossData( instanceID, numEncounters, GetLFGDungeonEncounterInfo );
+		instanceData.bossData = instanceData.bossData or {};
+		populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
 	end -- for lfrNdx = 1, lfrCount
 	--]]
 
@@ -106,7 +105,9 @@ function Lockedout_BuildInstanceLockout()
 		-- if reset == 0, it's expired but can be extended - so it will still show in the list.
 		if ( reset > 0 ) then
 			local instanceData = addInstanceData( playerData.instances, instanceName, difficulty, numEncounters, locked, isRaid );
-			local bossData = getBossData( lockId, numEncounters, GetSavedInstanceEncounterInfo );
+
+			instanceData.bossData = instanceData.bossData or {};
+			populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
 		end -- if( reset > 0 )
 	end -- for lockId = 1, lockCount
 	--]]
