@@ -12,4 +12,5 @@ locale.xml
 Helper.lua
 Character.lua
 Instances.lua
+Worldboss.lua
 Minimap.lua
