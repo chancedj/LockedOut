@@ -90,14 +90,17 @@ function CheckForMissingMappings()
 end
 		
 function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
-	playerData.worldBosses = {}; -- initialize world boss table;
+	local worldBosses = {}; -- initialize world boss table;
 	
 	--HaveQuestData( questId ) -- when returns true, is valid for the week
 	--IsQuestFlaggedCompleted( questd ) -- when returns true, boss killed for week.
 	
 	for bossId, bossData in next, WORLD_BOSS_LIST do
 		if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) ) then
-			playerData.worldBosses[ bossData.bossName ] = L["Killed"];
+			worldBosses[ bossData.bossName ] = {}
+			worldBosses[ bossData.bossName ].displayText = L["Killed"];
 		end -- if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) )
 	end -- for bossId, bossData in next, WORLD_BOSS_LIST
+	
+	playerData.worldBosses = worldBosses;
 end -- Lockedout_BuildInstanceLockout()
