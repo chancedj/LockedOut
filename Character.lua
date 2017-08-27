@@ -37,8 +37,44 @@ local function getCharIndex( characters, search_charName )
 	return charNdx;
 end -- getCharIndex()
 
+local function clearExpiredLockouts( dataTable )
+	local currentServerTime = GetServerTime();
+	
+	for key, data in next, dataTable do
+		if( data.resetDate == nil ) or ( data.resetDate < currentServerTime ) then
+			print( "removing: " .. key );
+			dataTable[ key ] = nil;
+		end
+	end -- for key, data in next, dataTable
+end
+
+local function checkExpiredLockouts()
+	if( LockoutDb == nil ) then return; end
+	
+	for realmName, characters in next, LockoutDb do
+		for charNdx, charData in next, characters do
+			print( realmName .. " - " .. charNdx );
+
+			for instanceName, instanceData in next, charData.instances do
+				clearExpiredLockouts( instanceData );
+				
+				-- if the data expired and emptys our table, clear the instance table
+				local key = next(instanceData);
+				if( key == nil ) then
+					charData.instances[ instanceName ] = nil;
+				end
+			end
+			
+			clearExpiredLockouts( charData.worldBosses );
+		end -- for charNdx, charData in next, characters
+	end -- for realmName, charData in next, LockoutDb
+	
+	print( "finished Clearing" )
+end
+
 function addonHelpers:Lockedout_GetCurrentCharData()
 	addonHelpers:destroyDb();
+	checkExpiredLockouts();
 	
 	-- get and initialize realm data
 	local realmName = GetRealmName();
