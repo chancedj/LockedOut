@@ -34,3 +34,17 @@ function addonHelpers:destroyDb()
 	if( type( key ) ~= "number" ) then LockoutDb = nil; end;
 end -- destroyDb
 
+function getWeeklyLockoutDate()
+	local daysInweek, serverResetDay = 7, 3
+	local currentServerTime = GetServerTime();
+	local daysLefToReset = (daysInweek + serverResetDay - date( "*t", currentServerTime ).wday) % daysInweek
+	-- build next reset date
+	local nextResetTime = currentServerTime + GetQuestResetTime();
+
+	local weeklyResetTime = nextResetTime + (daysLefToReset * 24 * 60 * 60);
+	-- if we've already exceeded the expected lockout date, bump it a week
+	if( currentServerTime > weeklyResetTime ) then
+		weeklyResetTime = nextResetTime + (7 * 24 * 60 * 60);
+	end
+	return weeklyResetTime
+end
