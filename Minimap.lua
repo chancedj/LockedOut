@@ -178,7 +178,7 @@ function addon:OnEnter( self )
 
 	populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
 	populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
-	populateWorldBossData( "World boss", tooltip, charList, worldBossList );
+	populateWorldBossData( L["World Boss"], tooltip, charList, worldBossList );
 
 	-- Use smart anchoring code to anchor the tooltip to our frame
 	tooltip:SmartAnchorTo( self );

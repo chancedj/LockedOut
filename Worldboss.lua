@@ -97,7 +97,7 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	
 	for bossId, bossData in next, WORLD_BOSS_LIST do
 		if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) ) then
-			playerData.worldBosses[ bossData.bossName ] = "Killed"
+			playerData.worldBosses[ bossData.bossName ] = L["Killed"];
 		end -- if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) )
 	end -- for bossId, bossData in next, WORLD_BOSS_LIST
 end -- Lockedout_BuildInstanceLockout()
