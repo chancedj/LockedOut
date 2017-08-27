@@ -96,9 +96,8 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	--IsQuestFlaggedCompleted( questd ) -- when returns true, boss killed for week.
 	
 	for bossId, bossData in next, WORLD_BOSS_LIST do
-		if( IsQuestFlaggedCompleted( bossData.questId ) ) then
-			print( " boss killed: " .. bossData.bossName );
-		end
-	end
-
+		if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) ) then
+			playerData.worldbosses[ bossData.bossName ] = "Killed"
+		end -- if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) )
+	end -- for bossId, bossData in next, WORLD_BOSS_LIST
 end -- Lockedout_BuildInstanceLockout()
