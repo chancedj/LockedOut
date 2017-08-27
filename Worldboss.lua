@@ -12,8 +12,8 @@ local next, type, table = -- variables
 	  next, type, table	  -- lua functions
 
 -- cache blizzard function/globals
-local GetNumSavedWorldBosses, GetSavedWorldBossInfo =	-- variables 
-		GetNumSavedWorldBosses, GetSavedWorldBossInfo	-- blizzard api
+local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex =	-- variables 
+	  EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex	-- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
 local WORLD_BOSS_LIST = {
@@ -70,10 +70,10 @@ function CheckForMissingMappings()
 
 		local bossIndex = 1;
 		local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex );
-		while bossID do
-			worldBosses[ bossID ] = {}
-			worldBosses[ bossID ].instanceId = instanceId;
-			worldBosses[ bossID ].bossName = bossName;
+		while bossId do
+			worldBosses[ bossId ] = {}
+			worldBosses[ bossId ].instanceId = instanceId;
+			worldBosses[ bossId ].bossName = bossName;
 
 			bossIndex = bossIndex + 1;
 			bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex );
@@ -83,10 +83,22 @@ function CheckForMissingMappings()
 	-- set it back to the current tier
 	EJ_SelectTier( currentTierId );	
 
-	return worldBosses;
+	--[[
+	-- loop through worldBosses and verify against WORLD_BOSS_LIST
+	--]]
+	
 end
 		
 function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	playerData.worldbosses = {}; -- initialize world boss table;
+	
+	--HaveQuestData( questId ) -- when returns true, is valid for the week
+	--IsQuestFlaggedCompleted( questd ) -- when returns true, boss killed for week.
+	
+	for bossId, bossData in next, WORLD_BOSS_LIST do
+		if( IsQuestFlaggedCompleted( bossData.questId ) ) then
+			print( " boss killed: " .. bossData.bossName );
+		end
+	end
 
 end -- Lockedout_BuildInstanceLockout()
