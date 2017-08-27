@@ -77,7 +77,7 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
 			if (LockoutDb[ charData.realmName ] ~= nil) and
 			   (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
 			   (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ] ~= nil) then
-				local displayText = "killed";
+				local displayText = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ];
 				
 				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, displayText ), nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
