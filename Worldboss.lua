@@ -95,10 +95,12 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	--HaveQuestData( questId ) -- when returns true, is valid for the week
 	--IsQuestFlaggedCompleted( questd ) -- when returns true, boss killed for week.
 	
+	local calculatedResetDate = addonHelpers:getWeeklyLockoutDate();
 	for bossId, bossData in next, WORLD_BOSS_LIST do
 		if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) ) then
 			worldBosses[ bossData.bossName ] = {}
 			worldBosses[ bossData.bossName ].displayText = L["Killed"];
+			worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
 		end -- if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) )
 	end -- for bossId, bossData in next, WORLD_BOSS_LIST
 	

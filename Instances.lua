@@ -62,12 +62,13 @@ local function populateBossData( bossData, encounterId, numEncounters, fnEncount
 	return bosses;
 end -- populateBossData()
 
-local function addInstanceData( instanceData, instanceName, difficulty, numEncounters, locked, isRaid )
+local function addInstanceData( instanceData, instanceName, difficulty, numEncounters, locked, isRaid, resetDate )
 	local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
 	instanceData[ instanceName ] = instanceData[ instanceName ] or {};
 	instanceData[ instanceName ][ difficultyName ] = instanceData[ instanceName ][ difficultyName ] or {};
 	instanceData[ instanceName ][ difficultyName ].locked = locked;
 	instanceData[ instanceName ][ difficultyName ].isRaid = isRaid;
+	instanceData[ instanceName ][ difficultyName ].resetDate = resetDate;
 	instanceData[ instanceName ][ difficultyName ].difficulty = difficulty;
 	
 	return instanceData[ instanceName ][ difficultyName ];
@@ -102,12 +103,13 @@ function Lockedout_BuildInstanceLockout( realmName, charNdx, playerData )
 	
 	---[[
 	local lfrCount = GetNumRFDungeons();
+	local calculatedResetDate = addonHelpers:getWeeklyLockoutDate();
 	for lfrNdx = 1, lfrCount do
 		local instanceID, _, _, _, _, _, _, _, _, _, _, _, difficulty, _, _, _
 			, _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );
 
 		local numEncounters = GetLFGDungeonNumEncounters( instanceID );
-		local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, false, true );
+		local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, false, true, calculatedResetDate );
 
 		instanceData.bossData = instanceData.bossData or {};
 		populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
@@ -121,7 +123,8 @@ function Lockedout_BuildInstanceLockout( realmName, charNdx, playerData )
 
 		-- if reset == 0, it's expired but can be extended - so it will still show in the list.
 		if ( reset > 0 ) then
-			local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, locked, isRaid );
+			local resetDate = GetServerTime() + reset;
+			local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, locked, isRaid, resetDate);
 
 			instanceData.bossData = instanceData.bossData or {};
 			populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
