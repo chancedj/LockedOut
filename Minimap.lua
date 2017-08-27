@@ -63,6 +63,33 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 	tooltip:AddSeparator( );
 end -- populateInstanceData
 
+local function populateWorldBossData( header, tooltip, charList, worldBossList )
+	-- make sure it's not empty
+	if ( next( worldBossList ) == nil ) then return; end
+
+	-- start adding the instances we have completed with any chacters
+	local lineNum = tooltip:AddLine( );
+	tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
+	for bossName, _  in next, worldBossList do
+		lineNum = tooltip:AddLine( bossName );
+		
+		for colNdx, charData in next, charList do
+			if (LockoutDb[ charData.realmName ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ] ~= nil) then
+				local displayText = "killed";
+				
+				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, displayText ), nil, "CENTER" );
+				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
+				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() return; end );	-- close out tooltip when leaving
+				tooltip:SetLineScript( lineNum, "OnEnter", function() return; end );				-- empty function allows the background to highlight
+			end -- if (LockoutDb[ charData.realmName ] ~= nil) and .....
+		end -- for colNdx, charData in next, charList
+	end
+
+	tooltip:AddSeparator( );
+end -- populateInstanceData
+
 function addon:OnEnter( self )
 	if ( self.tooltip ~= nil ) then
 		LibQTip:Release( self.tooltip );
@@ -83,6 +110,7 @@ function addon:OnEnter( self )
 	local charList = {};
 	local dungeonList = {};
 	local raidList = {};
+	local worldBossList = {};
 
 	-- get list of characters and realms for the horizontal
 	for realmName, characters in next, LockoutDb do
@@ -105,6 +133,11 @@ function addon:OnEnter( self )
 					dungeonList[ instanceName ] = "set";
 				end
 			end -- for instanceName, _ in next, instances
+			
+			charData.worldBosses = charData.worldBosses or {};
+			for bossName, _ in next, charData.worldBosses do
+				worldBossList[ bossName ] = "set"
+			end
 		end -- for charName, instances in next, characters
 	end -- for realmName, characters in next, LockoutDb
 	
@@ -145,7 +178,8 @@ function addon:OnEnter( self )
 
 	populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
 	populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
-	
+	populateWorldBossData( "World boss", tooltip, charList, worldBossList );
+
 	-- Use smart anchoring code to anchor the tooltip to our frame
 	tooltip:SmartAnchorTo( self );
 	tooltip:SetAutoHideDelay( 0.25, self );
