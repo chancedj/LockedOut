@@ -8,12 +8,12 @@ local addonName, addonHelpers = ...;
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, type, table = -- variables
-	  next, type, table	  -- lua functions
+local next = -- variables
+	  next	  -- lua functions
 
 -- cache blizzard function/globals
-local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex =	-- variables 
-	  EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex	-- blizzard api
+local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted, READY_CHECK_READY_TEXTURE =	-- variables 
+	  EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted, READY_CHECK_READY_TEXTURE	-- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
 local WORLD_BOSS_LIST = {
@@ -88,18 +88,17 @@ function CheckForMissingMappings()
 	--]]
 	
 end
-		
+
+--local BOSS_KILL_TEXT = "\124T" .. READY_CHECK_READY_TEXTURE .. ":0\124t";
+local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	local worldBosses = {}; -- initialize world boss table;
-	
-	--HaveQuestData( questId ) -- when returns true, is valid for the week
-	--IsQuestFlaggedCompleted( questd ) -- when returns true, boss killed for week.
 	
 	local calculatedResetDate = addonHelpers:getWeeklyLockoutDate();
 	for bossId, bossData in next, WORLD_BOSS_LIST do
 		if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) ) then
 			worldBosses[ bossData.bossName ] = {}
-			worldBosses[ bossData.bossName ].displayText = L["Killed"];
+			worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
 			worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
 		end -- if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) )
 	end -- for bossId, bossData in next, WORLD_BOSS_LIST

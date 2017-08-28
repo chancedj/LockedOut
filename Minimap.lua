@@ -80,7 +80,7 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
 			   (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ] ~= nil) then
 				local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ];
 				
-				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, bossData.displayText ), nil, "CENTER" );
+				tooltip:SetCell( lineNum, colNdx + 1, bossData.displayText, nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() return; end );	-- close out tooltip when leaving
 				tooltip:SetLineScript( lineNum, "OnEnter", function() return; end );				-- empty function allows the background to highlight
