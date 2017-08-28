@@ -25,6 +25,3 @@ L["N"] 	= "N";
 L["H"] 	= "H";
 L["M"]	= "M";
 L["L"]	= "L";
-
--- world boss local
-L["Killed"] = "Killed";
