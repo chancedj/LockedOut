@@ -12,8 +12,10 @@ local next = -- variables
 	  next	  -- lua functions
 
 -- cache blizzard function/globals
-local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted, READY_CHECK_READY_TEXTURE =	-- variables 
-	  EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted, READY_CHECK_READY_TEXTURE	-- blizzard api
+local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
+		READY_CHECK_READY_TEXTURE, READY_CHECK_WAITING_TEXTURE, IsQuestActive =	-- variables 
+	  EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
+		READY_CHECK_READY_TEXTURE, READY_CHECK_WAITING_TEXTURE, C_TaskQuest.IsActive	-- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
 local WORLD_BOSS_LIST = {
@@ -113,11 +115,17 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	
 	local calculatedResetDate = addonHelpers:getWeeklyLockoutDate();
 	for bossId, bossData in next, WORLD_BOSS_LIST do
-		if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) ) then
-			worldBosses[ bossData.bossName ] = {}
-			worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
-			worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
-		end -- if( bossData.questId ) and ( IsQuestFlaggedCompleted( bossData.questId ) )
+		if( bossData.questId ) then
+			if ( IsQuestFlaggedCompleted( bossData.questId ) ) then
+				worldBosses[ bossData.bossName ] = {}
+				worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
+				worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
+			elseif( IsQuestActive( bossData.questId ) ) then
+				worldBosses[ bossData.bossName ] = {}
+				worldBosses[ bossData.bossName ].displayText = " ";
+				worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
+			end -- if ( IsQuestFlaggedCompleted( bossData.questId ) )
+		end -- if( bossData.questId )
 	end -- for bossId, bossData in next, WORLD_BOSS_LIST
 	
 	playerData.worldBosses = worldBosses;
