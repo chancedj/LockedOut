@@ -50,6 +50,16 @@ local WORLD_BOSS_LIST = {
 	[1884] = { instanceId=822, questId=46948, bossName="Malificus" },
 	[1885] = { instanceId=822, questId=46945, bossName="Si'vash" },
 	[1956] = { instanceId=822, questId=47061, bossName="Apocron" }
+
+	--[[
+	-- Argus
+	[2010] = { instanceId=959, questId=49199, bossName="Matron Folnuna" }
+	[2011] = { instanceId=959, questId=0,     bossName="Mistress Alluradel" }
+	[2012] = { instanceId=959, questId=49198, bossName="Inquisitor Meto" }
+	[2013] = { instanceId=959, questId=0,     bossName="Occularus" }
+	[2014] = { instanceId=959, questId=49197, bossName="Sotanathor" }
+	[2015] = { instanceId=959, questId=49196, bossName="Pit Lord Vilemus" }
+	--]]
 }
 
 function CheckForMissingMappings()
@@ -77,17 +87,24 @@ function CheckForMissingMappings()
 
 			bossIndex = bossIndex + 1;
 			bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex );
-		end
-	end
+		end -- while bossId
+	end -- for tierId = 5, EJ_GetNumTiers()
 
 	-- set it back to the current tier
 	EJ_SelectTier( currentTierId );	
 
-	--[[
-	-- loop through worldBosses and verify against WORLD_BOSS_LIST
-	--]]
+	local found = false;
+	for bossId, bossData in next, worldBosses do
+		if( WORLD_BOSS_LIST[ bossId ] == nil ) then
+			print( 'unmapped boss found: [' .. bossId .. '] = { instanceId=' .. bossData.instanceId .. ', questId=0, bossName="' .. bossData.bossName .. '" }' );
+			found = true;
+		end -- if( WORLD_BOSS_LIST[ bossId ] == nil )
+	end; -- for bossId, bossData in next, worldBosses
 	
-end
+	if( not found ) then
+		print( "no mappping issues found" );
+	end -- if( not found )
+end -- CheckForMissingMappings()
 
 --local BOSS_KILL_TEXT = "\124T" .. READY_CHECK_READY_TEXTURE .. ":0\124t";
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
