@@ -16,8 +16,8 @@ local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", 
 	type = "data source",
 	text = L[ "Locked Out" ],
 	icon = "Interface\\Icons\\Inv_misc_key_10",
-	OnClick = function( self ) addon:OnClick( self ) end,
-	OnEnter = function( self ) addon:OnEnter( self ) end,
+	OnClick = function( self ) addonHelpers:OnClick( self ) end,
+	OnEnter = function( self ) addonHelpers:OnEnter( self ) end,
 } ); -- local LockedoutMo
 
 function addon:OnInitialize()
@@ -29,10 +29,10 @@ end -- addon:OnInitialize
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
 
-function addon:OnClick()
+function addonHelpers:OnClick()
 	-- removed, can't rebuild data while tooltip is displaying
 	--Lockedout_BuildInstanceLockout();
-end -- addon:OnClick
+end -- addonHelpers:OnClick
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
 	-- make sure it's not empty
@@ -91,7 +91,7 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
 	tooltip:AddSeparator( );
 end -- populateInstanceData
 
-function addon:OnEnter( self )
+function addonHelpers:OnEnter( self )
 	if ( self.tooltip ~= nil ) then
 		LibQTip:Release( self.tooltip );
 		self.tooltip = nil;
@@ -187,10 +187,10 @@ function addon:OnEnter( self )
 
 	-- Show it, et voilà !
 	tooltip:Show();
-end --  addon:OnEnter
+end --  addonHelpers:OnEnter
 
-function addon:OnLeave( self )
+function addonHelpers:OnLeave( self )
 	-- Release the tooltip
 	--LibQTip:Release( self.tooltip );
 	--self.tooltip = nil;
-end -- addon:OnLeave
+end -- addonHelpers:OnLeave
