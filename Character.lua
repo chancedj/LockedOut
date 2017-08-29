@@ -42,19 +42,29 @@ local function clearExpiredLockouts( dataTable )
 	
 	for key, data in next, dataTable do
 		if( data.resetDate == nil ) or ( data.resetDate < currentServerTime ) then
-			print( "removing: " .. key );
 			dataTable[ key ] = nil;
-		end
+		end -- if( data.resetDate == nil ) or ( data.resetDate < currentServerTime )
 	end -- for key, data in next, dataTable
-end
+end -- clearExpiredLockouts()
+
+local function allCleared( args, ... )
+	for i, v in ipairs( args ) do
+		-- if this returns data, we still have data that's not expired
+		local key, data = next(v);
+		
+		if( data ~= nil ) then
+			return false;
+		end -- if( data ~= nil )
+	end -- for i, v in ipairs( args )
+
+	return true;
+end -- allCleared( args, ... )
 
 local function checkExpiredLockouts()
 	if( LockoutDb == nil ) then return; end
 	
 	for realmName, characters in next, LockoutDb do
 		for charNdx, charData in next, characters do
-			print( realmName .. " - " .. charNdx );
-
 			for instanceName, instanceData in next, charData.instances do
 				clearExpiredLockouts( instanceData );
 				
@@ -66,11 +76,14 @@ local function checkExpiredLockouts()
 			end
 			
 			clearExpiredLockouts( charData.worldBosses );
+			
+			local emptySet = allCleared( charData.instances,
+										 charData.worldBosses );
+			
+			if( emptySet ) then characters[ charNdx ] = nil; end
 		end -- for charNdx, charData in next, characters
 	end -- for realmName, charData in next, LockoutDb
-	
-	print( "finished Clearing" )
-end
+end -- checkExpiredLockouts()
 
 function addonHelpers:Lockedout_GetCurrentCharData()
 	addonHelpers:destroyDb();
