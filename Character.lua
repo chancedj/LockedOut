@@ -38,6 +38,7 @@ local function getCharIndex( characters, search_charName )
 end -- getCharIndex()
 
 local function clearExpiredLockouts( dataTable )
+	if( dataTable == ni ) then return; end
 	local currentServerTime = GetServerTime();
 	
 	for key, data in next, dataTable do
@@ -49,18 +50,22 @@ end -- clearExpiredLockouts()
 
 local function allCleared( args, ... )
 	for i, v in ipairs( args ) do
-		-- if this returns data, we still have data that's not expired
-		local key, data = next(v);
-		
-		if( data ~= nil ) then
-			return false;
-		end -- if( data ~= nil )
+		if( v ~= nil ) then
+			-- if this returns data, we still have data that's not expired
+			local key, data = next(v);
+			
+			if( data ~= nil ) then
+				return false;
+			end -- if( data ~= nil )
+		end;
 	end -- for i, v in ipairs( args )
 
 	return true;
 end -- allCleared( args, ... )
 
 local function checkExpiredLockouts()
+	-- if we add a new element, it will be empty for the charData
+	-- take care of this by exiting.
 	if( LockoutDb == nil ) then return; end
 	
 	for realmName, characters in next, LockoutDb do
