@@ -215,7 +215,7 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-Libs/
+libs/
 libs
 
 README.md
