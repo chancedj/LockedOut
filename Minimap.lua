@@ -16,8 +16,8 @@ local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", 
 	type = "data source",
 	text = L[ "Locked Out" ],
 	icon = "Interface\\Icons\\Inv_misc_key_10",
-	OnClick = function( self ) addon:OnClick( self ) end,
-	OnEnter = function( self ) addon:OnEnter( self ) end,
+	OnClick = function( self ) addonHelpers:OnClick( self ) end,
+	OnEnter = function( self ) addonHelpers:OnEnter( self ) end,
 } ); -- local LockedoutMo
 
 function addon:OnInitialize()
@@ -29,9 +29,10 @@ end -- addon:OnInitialize
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
 
-function addon:OnClick()
-	Lockedout_BuildInstanceLockout();
-end -- addon:OnClick
+function addonHelpers:OnClick()
+	-- removed, can't rebuild data while tooltip is displaying
+	--Lockedout_BuildInstanceLockout();
+end -- addonHelpers:OnClick
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
 	-- make sure it's not empty
@@ -63,13 +64,45 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 	tooltip:AddSeparator( );
 end -- populateInstanceData
 
-function addon:OnEnter( self )
+local function populateWorldBossData( header, tooltip, charList, worldBossList )
+	-- make sure it's not empty
+	if ( next( worldBossList ) == nil ) then return; end
+
+	-- start adding the instances we have completed with any chacters
+	local lineNum = tooltip:AddLine( );
+	tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
+	for bossName, _ in next, worldBossList do
+		lineNum = tooltip:AddLine( bossName );
+		
+		for colNdx, charData in next, charList do
+			if (LockoutDb[ charData.realmName ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
+			   (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ] ~= nil) then
+				local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ];
+				
+				tooltip:SetCell( lineNum, colNdx + 1, bossData.displayText, nil, "CENTER" );
+				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
+				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() return; end );	-- close out tooltip when leaving
+				tooltip:SetLineScript( lineNum, "OnEnter", function() return; end );				-- empty function allows the background to highlight
+			end -- if (LockoutDb[ charData.realmName ] ~= nil) and .....
+		end -- for colNdx, charData in next, charList
+	end
+
+	tooltip:AddSeparator( );
+end -- populateInstanceData
+
+function addonHelpers:OnEnter( self )
 	if ( self.tooltip ~= nil ) then
 		LibQTip:Release( self.tooltip );
 		self.tooltip = nil;
 	end
 
-	Lockedout_BuildInstanceLockout();
+	local realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
+	local playerData = LockoutDb[ realmName ][ charNdx ];
+
+	Lockedout_BuildInstanceLockout( realmName, charNdx, playerData );
+	Lockedout_BuildWorldBoss( realmName, charNdx, playerData );
+
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
 	local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
 	self.tooltip = tooltip;
@@ -78,6 +111,7 @@ function addon:OnEnter( self )
 	local charList = {};
 	local dungeonList = {};
 	local raidList = {};
+	local worldBossList = {};
 
 	-- get list of characters and realms for the horizontal
 	for realmName, characters in next, LockoutDb do
@@ -100,6 +134,11 @@ function addon:OnEnter( self )
 					dungeonList[ instanceName ] = "set";
 				end
 			end -- for instanceName, _ in next, instances
+			
+			charData.worldBosses = charData.worldBosses or {};
+			for bossName, _ in next, charData.worldBosses do
+				worldBossList[ bossName ] = "set"
+			end
 		end -- for charName, instances in next, characters
 	end -- for realmName, characters in next, LockoutDb
 	
@@ -140,17 +179,18 @@ function addon:OnEnter( self )
 
 	populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
 	populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
-	
+	populateWorldBossData( L["World Boss"], tooltip, charList, worldBossList );
+
 	-- Use smart anchoring code to anchor the tooltip to our frame
 	tooltip:SmartAnchorTo( self );
 	tooltip:SetAutoHideDelay( 0.25, self );
 
 	-- Show it, et voilà !
 	tooltip:Show();
-end --  addon:OnEnter
+end --  addonHelpers:OnEnter
 
-function addon:OnLeave( self )
+function addonHelpers:OnLeave( self )
 	-- Release the tooltip
 	--LibQTip:Release( self.tooltip );
 	--self.tooltip = nil;
-end -- addon:OnLeave
+end -- addonHelpers:OnLeave

@@ -8,8 +8,8 @@ local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 local print, type =								-- variables
 	  print, type								-- lua functions
 -- cache blizzard function/globals
-local RAID_CLASS_COLORS =						-- variables
-	  CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
+local GetCurrentRegion, RAID_CLASS_COLORS =						-- variables
+	  GetCurrentRegion, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
 
 function addonHelpers:fif(condition, if_true, if_false)
   if condition then return if_true; else return if_false; end
@@ -34,3 +34,26 @@ function addonHelpers:destroyDb()
 	if( type( key ) ~= "number" ) then LockoutDb = nil; end;
 end -- destroyDb
 
+-- tues for US, Wed for rest?
+local MapRegionReset = {
+	[1] = 3, -- US
+	[2] = 4, -- KR
+	[3] = 4, -- EU
+	[4] = 4, -- TW
+	[5] = 4  -- CN
+}
+
+function addonHelpers:getWeeklyLockoutDate()
+	local daysInweek, serverResetDay = 7, MapRegionReset[ GetCurrentRegion() ];
+	local currentServerTime = GetServerTime();
+	local daysLefToReset = (daysInweek + serverResetDay - date( "*t", currentServerTime ).wday) % daysInweek
+	-- build next reset date
+	local nextResetTime = currentServerTime + GetQuestResetTime();
+
+	local weeklyResetTime = nextResetTime + (daysLefToReset * 24 * 60 * 60);
+	-- if we've already exceeded the expected lockout date, bump it a week
+	if( currentServerTime > weeklyResetTime ) then
+		weeklyResetTime = nextResetTime + (7 * 24 * 60 * 60);
+	end
+	return weeklyResetTime
+end
