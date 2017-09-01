@@ -11,6 +11,7 @@ L["Character"]	= "Character";
 L["Dungeon"]	= "Dungeon";
 L["Raid"]		= "Raid";
 L["World Boss"]	= "World Boss";
+L["Currency"]	= "Currency";
 
 -- difficulty mapping full
 L["Unknown"]	= "Unknown";
