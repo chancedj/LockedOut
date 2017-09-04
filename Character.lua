@@ -48,6 +48,17 @@ local function clearExpiredLockouts( dataTable )
 	end -- for key, data in next, dataTable
 end -- clearExpiredLockouts()
 
+local function clearCurrencyQuests( dataTable )
+	if( dataTable == ni ) then return; end
+	local currentServerTime = GetServerTime();
+
+	for _, currData in next, dataTable do
+		if( currData.resetDate ~= nil ) and ( currData.resetDate < currentServerTime ) then
+			currData.displayTextAddl = "(0)";
+		end
+	end
+end
+
 local function allCleared( ... )
 	local arg = { ... };
 
@@ -86,6 +97,8 @@ local function checkExpiredLockouts()
 			
 			local emptySet = allCleared( charData.instances,
 										 charData.worldBosses );
+			
+			clearCurrencyQuests( charData.currency );
 			
 			if( emptySet ) then characters[ charNdx ] = nil; end
 		end -- for charNdx, charData in next, characters

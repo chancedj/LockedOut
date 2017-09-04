@@ -110,7 +110,11 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
 			   (LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyName ] ~= nil) then
 				local currData = LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyName ];
 				
-				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, currData.displayText ), nil, "CENTER" );
+				local displayText = currData.displayText;
+				if( currData.displayTextAddl ~= nil ) then
+					displayText = displayText .. currData.displayTextAddl;
+				end
+				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, displayText ), nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() return; end );	-- open tooltip with info when entering cell.
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() return; end );	-- close out tooltip when leaving
 				tooltip:SetLineScript( lineNum, "OnEnter", function() return; end );				-- empty function allows the background to highlight
@@ -188,8 +192,8 @@ function addonHelpers:OnEnter( self )
 			end
 			
 			charData.currency = charData.currency or {};
-			for currData, _ in next, charData.currency do
-				currencyList[ currData ] = "set"
+			for currName, _ in next, charData.currency do
+				currencyList[ currName ] = "set"
 			end
 		end -- for charName, instances in next, characters
 	end -- for realmName, characters in next, LockoutDb
@@ -206,6 +210,8 @@ function addonHelpers:OnEnter( self )
 	-- sort instance list
 	table.sort( dungeonList );
 	table.sort( raidList );
+	table.sort( worldBossList );
+	table.sort( currencyList );
 	
 	-- initialize the column count going forward
 	tooltip:SetColumnLayout( #charList + 1 );
