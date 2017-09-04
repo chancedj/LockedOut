@@ -40,6 +40,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
 	-- start adding the instances we have completed with any chacters
 	local lineNum = tooltip:AddLine( );
+	tooltip.lines[ lineNum ].is_header = true;
 	tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
 	for instanceName, _  in next, instanceList do
 		lineNum = tooltip:AddLine( instanceName );
@@ -70,6 +71,7 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
 
 	-- start adding the instances we have completed with any chacters
 	local lineNum = tooltip:AddLine( );
+	tooltip.lines[ lineNum ].is_header = true;
 	tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
 	for bossName, _ in next, worldBossList do
 		lineNum = tooltip:AddLine( bossName );
@@ -97,6 +99,7 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
 
 	-- start adding the instances we have completed with any chacters
 	local lineNum = tooltip:AddLine( );
+	tooltip.lines[ lineNum ].is_header = true;
 	tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
 	for currencyName, _ in next, currencyList do
 		lineNum = tooltip:AddLine( currencyName );
@@ -117,6 +120,21 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
 
 	tooltip:AddSeparator( );
 end -- populateInstanceData
+
+local function addColorBanding( tt )
+	local resetnum = 0;
+	local opacLevel;
+	for i = 1, tt:GetLineCount() do
+		opacLevel = 0;
+		if( tt.lines[ i ].is_header ) then
+			resetnum = i % 2;
+			opacLevel = 0.3;
+		elseif( ( i + resetnum ) % 2 == 0 ) then
+			opacLevel = 0.1;
+		end
+		tt:SetLineColor( i, 1, 1, 1, opacLevel );
+	end
+end
 
 function addonHelpers:OnEnter( self )
 	if ( self.tooltip ~= nil ) then
@@ -220,6 +238,8 @@ function addonHelpers:OnEnter( self )
 	tooltip:SmartAnchorTo( self );
 	tooltip:SetAutoHideDelay( 0.25, self );
 
+	addColorBanding( tooltip );
+	
 	-- Show it, et voilà !
 	tooltip:Show();
 end --  addonHelpers:OnEnter
