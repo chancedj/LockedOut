@@ -17,7 +17,26 @@ local GetCurrencyListSize, GetCurrencyListInfo, IsQuestFlaggedCompleted =	-- var
 
 ---[[
 local BONUS_ROLL_QUESTID = {
-	[ "Seal of Broken Fate" ] = { 43892, 43893, 43894, 43895, 43896, 43897, 47851, 47864, 47865, 47040, 47045, 47054 }
+	[ "Seal of Broken Fate" ] = {
+		[1] = {
+			43892,	-- order resources
+			43893,	-- order resources
+			43894,	-- order resources
+			43895,	-- gold
+			43896,	-- gold
+			43897,	-- gold
+			47851,	-- marks of honor
+			47864,	-- marks of honor
+			47865,	-- marks of honor
+			43510	-- class hall
+		},
+		[2] = {
+			47040,	-- broken shore
+			47045,	-- broken shore
+			47054	-- broken shore
+
+		}
+	}
 }
 --]]
 
@@ -39,14 +58,19 @@ function Lockedout_BuildCurrentList( realmName, charNdx, playerData )
 			
 			local questList = BONUS_ROLL_QUESTID[ name ];
 			if( questList ~= nil ) then
-				local bonusCompleted = 0;
-				for _, questId in next, questList do
-					if( IsQuestFlaggedCompleted( questId ) ) then
-						bonusCompleted = bonusCompleted + 1;
+				local bonus = {};
+				for _, questGroup in next, questList do
+					local bonusCompleted = 0;
+					for _, questId in next, questGroup do
+						if( IsQuestFlaggedCompleted( questId ) ) then
+							bonusCompleted = bonusCompleted + 1;
+						end
 					end
+					
+					bonus[ #bonus + 1 ] = bonusCompleted;
 				end
 				currency[ name ].resetDate = calculatedResetDate;
-				currency[ name ].displayTextAddl = "(" .. bonusCompleted  .. ")";
+				currency[ name ].displayTextAddl = "(" .. table.concat( bonus, "/" ) .. ")";
 			end
 		end
 	end
