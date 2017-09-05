@@ -119,9 +119,15 @@ function addonHelpers:Lockedout_GetCurrentCharData()
 	local _, className = UnitClass( "player" );
 	local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
 	local playerData = {};
+	local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
 
 	playerData.charName = charName
 	playerData.className = className
+
+	playerData.iLevel = {};
+	playerData.iLevel[ "total" ]  = total_ilevel;
+	playerData.iLevel[ "ilevel" ] = equippped_ilevel;
+	playerData.iLevel[ "pvp" ]    = pvp_ilevel;
 	
 	LockoutDb[ realmName ][ charNdx ] = playerData;			-- initialize playerDb if not already initialized
 
