@@ -174,6 +174,7 @@ function addonHelpers:OnEnter( self )
 			charList[ tblNdx ].realmName = realmName;
 			charList[ tblNdx ].charName = charData.charName;
 			charList[ tblNdx ].className = charData.className;
+			charList[ tblNdx ].displayTT = charData.displayTT or function() print( "New Test" ); end
 
 			-- the get a list of all instances across characters for vertical
 			for instanceName, details in next, charData.instances do
@@ -229,7 +230,30 @@ function addonHelpers:OnEnter( self )
 		if( realmCount > 1 ) then -- show realm only when multiple are involved
 			tooltip:SetCell( realmLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.realmName ), nil, "CENTER" );
 		end
+		local charData = LockoutDb[ char.realmName ][ char.charNdx ];
+		charData.displayTT =	function( data, ln, cn )
+									local tt = LibQTip:Acquire( "LockedoutTooltip" );
+									local tooltip = LibQTip:Acquire( "LockedoutCharTooltip" );
+									tooltip:SetColumnLayout( 2 );
+									local ln = tooltip:AddHeader( "" );
+									tooltip:SetCell( ln, 1, "Character iLevels", 2 );
+									for k, p in next, data.iLevel do
+										tooltip:AddLine( k, p );
+									end
+
+									tooltip:SmartAnchorTo( tt.lines[ ln ].cells[ cn ] );
+									tooltip:Show();
+								end
+		charData.deleteTT =		function()
+									local tooltip = LibQTip:Acquire( "LockedoutCharTooltip" );
+									
+									LibQTip:Release( tooltip );
+								end
+
+
 		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.charName ), nil, "CENTER" );
+		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charData:displayTT( charData, charLineNum, colNdx + 1 ); end );	-- close out tooltip when leaving
+		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charData:deleteTT(); end );	-- close out tooltip when leaving
 	end -- for colNdx, char in next, charList
 
 	tooltip:AddSeparator( );
