@@ -51,15 +51,15 @@ local WORLD_BOSS_LIST = {
 	[1883] = { instanceId=822, questId=46947, bossName="Brutallus" },
 	[1884] = { instanceId=822, questId=46948, bossName="Malificus" },
 	[1885] = { instanceId=822, questId=46945, bossName="Si'vash" },
-	[1956] = { instanceId=822, questId=47061, bossName="Apocron" }
+	[1956] = { instanceId=822, questId=47061, bossName="Apocron" },
 
-	--[[
+	---[[
 	-- Argus
-	[2010] = { instanceId=959, questId=49199, bossName="Matron Folnuna" }
-	[2011] = { instanceId=959, questId=0,     bossName="Mistress Alluradel" }
-	[2012] = { instanceId=959, questId=49198, bossName="Inquisitor Meto" }
-	[2013] = { instanceId=959, questId=0,     bossName="Occularus" }
-	[2014] = { instanceId=959, questId=49197, bossName="Sotanathor" }
+	[2010] = { instanceId=959, questId=49199, bossName="Matron Folnuna" },
+	[2011] = { instanceId=959, questId=48620, bossName="Mistress Alluradel" },
+	[2012] = { instanceId=959, questId=49198, bossName="Inquisitor Meto" },
+	[2013] = { instanceId=959, questId=49195, bossName="Occularus" },
+	[2014] = { instanceId=959, questId=49197, bossName="Sotanathor" },
 	[2015] = { instanceId=959, questId=49196, bossName="Pit Lord Vilemus" }
 	--]]
 }
