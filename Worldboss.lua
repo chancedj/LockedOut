@@ -54,17 +54,12 @@ local WORLD_BOSS_LIST = {
 	[1956] = { instanceId=822, questId=47061, bossName="Apocron" },
 
 	-- Argus
-	 -- is this for Mistress Alluradel, or all Argus World bosses?
-	 -- hopefully each will get their own unique one....otherwise this name will have to stick.
-	[2010] = { instanceId=959, questId=49167, bossName="Argus Fel Commander" }
-	--[[
-	[2010] = { instanceId=959, questId=49199, bossName="Matron Folnuna" },
-	[2011] = { instanceId=959, questId=48620, bossName="Mistress Alluradel" }, -- 48605?
-	[2012] = { instanceId=959, questId=49198, bossName="Inquisitor Meto" },
-	[2013] = { instanceId=959, questId=49195, bossName="Occularus" },
-	[2014] = { instanceId=959, questId=49197, bossName="Sotanathor" },
-	[2015] = { instanceId=959, questId=49196, bossName="Pit Lord Vilemus" }
-	--]]
+	[2010] = { instanceId=959, questId=49169, bossName="Matron Folnuna" },
+	[2011] = { instanceId=959, questId=49167, bossName="Mistress Alluradel" },
+	[2012] = { instanceId=959, questId=49168, bossName="Inquisitor Meto" }, -- assuming above format (unverified)
+	[2013] = { instanceId=959, questId=49165, bossName="Occularus" }, -- assuming above format (unverified)
+	[2014] = { instanceId=959, questId=49167, bossName="Sotanathor" }, -- assuming above format (unverified)
+	[2015] = { instanceId=959, questId=49166, bossName="Pit Lord Vilemus" } -- assuming above format (unverified)
 }
 
 function CheckForMissingMappings()
