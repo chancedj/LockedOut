@@ -53,15 +53,13 @@ local WORLD_BOSS_LIST = {
 	[1885] = { instanceId=822, questId=46945, bossName="Si'vash" },
 	[1956] = { instanceId=822, questId=47061, bossName="Apocron" }
 
-	--[[
 	-- Argus
-	[2010] = { instanceId=959, questId=49199, bossName="Matron Folnuna" }
-	[2011] = { instanceId=959, questId=0,     bossName="Mistress Alluradel" }
-	[2012] = { instanceId=959, questId=49198, bossName="Inquisitor Meto" }
-	[2013] = { instanceId=959, questId=0,     bossName="Occularus" }
-	[2014] = { instanceId=959, questId=49197, bossName="Sotanathor" }
-	[2015] = { instanceId=959, questId=49196, bossName="Pit Lord Vilemus" }
-	--]]
+	[2010] = { instanceId=959, questId=49169, bossName="Matron Folnuna" },
+	[2011] = { instanceId=959, questId=49167, bossName="Mistress Alluradel" },
+	[2012] = { instanceId=959, questId=0, bossName="Inquisitor Meto" }, -- assuming above format (unverified)
+	[2013] = { instanceId=959, questId=0, bossName="Occularus" }, -- assuming above format (unverified)
+	[2014] = { instanceId=959, questId=49171, bossName="Sotanathor" },
+	[2015] = { instanceId=959, questId=0, bossName="Pit Lord Vilemus" } -- assuming above format (unverified)
 }
 
 function CheckForMissingMappings()
