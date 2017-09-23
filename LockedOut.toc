@@ -9,6 +9,7 @@
 embeds.xml
 locale.xml
 
+Configuration.lua
 Helper.lua
 Character.lua
 Instances.lua
