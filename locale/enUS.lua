@@ -6,12 +6,13 @@ local L = LibStub( "AceLocale-3.0" ):NewLocale( addonName, "enUS", true );
 L["Locked Out"]	= "Locked Out";
 
 -- tooltip labels and headers
-L["Realm"]		= "Realm";
-L["Character"]	= "Character";
-L["Dungeon"]	= "Dungeon";
-L["Raid"]		= "Raid";
-L["World Boss"]	= "World Boss";
-L["Currency"]	= "Currency";
+L["Realm"]				= "Realm";
+L["Character"]			= "Character";
+L["Dungeon"]			= "Dungeon";
+L["Raid"]				= "Raid";
+L["World Boss"]			= "World Boss";
+L["Currency"]			= "Currency";
+L["Character iLevels"]	= "Character iLevels";
 
 -- difficulty mapping full
 L["Unknown"]	= "Unknown";
