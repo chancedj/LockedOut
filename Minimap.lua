@@ -231,29 +231,34 @@ function addonHelpers:OnEnter( self )
 			tooltip:SetCell( realmLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.realmName ), nil, "CENTER" );
 		end
 		local charData = LockoutDb[ char.realmName ][ char.charNdx ];
-		charData.displayTT =	function( data, ln, cn )
+		charData.displayTT =	function( data )
+									if ( data.iLevel == nil ) then
+										return;
+									end
+									local ttName = "loChTT" .. data.charName;
 									local tt = LibQTip:Acquire( "LockedoutTooltip" );
-									local tooltip = LibQTip:Acquire( "LockedoutCharTooltip" );
+									local tooltip = LibQTip:Acquire( ttName );
 									tooltip:SetColumnLayout( 2 );
-									local ln = tooltip:AddHeader( "" );
-									tooltip:SetCell( ln, 1, "Character iLevels", 2 );
+									local line = tooltip:AddHeader( "" );
+									tooltip:SetCell( line, 1, "Character iLevels", 2 );
 									for k, p in next, data.iLevel do
 										tooltip:AddLine( k, p );
 									end
 
-									tooltip:SmartAnchorTo( tt.lines[ ln ].cells[ cn ] );
+									tooltip:SmartAnchorTo( tt );
 									tooltip:Show();
 								end
-		charData.deleteTT =		function()
-									local tooltip = LibQTip:Acquire( "LockedoutCharTooltip" );
+		charData.deleteTT =		function( data )
+									local ttName = "loChTT" .. data.charName;
+									local tooltip = LibQTip:Acquire( ttName );
 									
 									LibQTip:Release( tooltip );
 								end
 
 
 		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.charName ), nil, "CENTER" );
-		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charData:displayTT( charData, charLineNum, colNdx + 1 ); end );	-- close out tooltip when leaving
-		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charData:deleteTT(); end );	-- close out tooltip when leaving
+		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charData:displayTT( charData ); end );	-- close out tooltip when leaving
+		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charData.deleteTT( charData); end );	-- close out tooltip when leaving
 	end -- for colNdx, char in next, charList
 
 	tooltip:AddSeparator( );
