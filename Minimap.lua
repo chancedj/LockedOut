@@ -4,7 +4,7 @@
 local addonName, addonHelpers = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName );
+local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local icon = LibStub( "LibDBIcon-1.0" );
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
