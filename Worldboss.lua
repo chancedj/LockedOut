@@ -13,9 +13,9 @@ local next = -- variables
 
 -- cache blizzard function/globals
 local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
-		READY_CHECK_READY_TEXTURE, READY_CHECK_WAITING_TEXTURE, IsQuestActive =	-- variables 
+		READY_CHECK_READY_TEXTURE, IsQuestActive =	-- variables 
 	  EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
-		READY_CHECK_READY_TEXTURE, READY_CHECK_WAITING_TEXTURE, C_TaskQuest.IsActive	-- blizzard api
+		READY_CHECK_READY_TEXTURE, C_TaskQuest.IsActive	-- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
 local WORLD_BOSS_LIST = {
@@ -106,7 +106,6 @@ function CheckForMissingMappings()
 	end -- if( not found )
 end -- CheckForMissingMappings()
 
---local BOSS_KILL_TEXT = "\124T" .. READY_CHECK_READY_TEXTURE .. ":0\124t";
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	local worldBosses = {}; -- initialize world boss table;
