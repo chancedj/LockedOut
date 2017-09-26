@@ -48,5 +48,5 @@ function addon:OnInitialize()
 	print( "addon initialized ... " );
 end
 
-LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( addonName .. "Panel" , options);
-LibStub( "AceConfigDialog-3.0" ):AddToBlizOptions( addonName .. "Panel", addonName );
+--LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( addonName .. "Panel" , options);
+--LibStub( "AceConfigDialog-3.0" ):AddToBlizOptions( addonName .. "Panel", addonName );
