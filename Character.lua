@@ -6,6 +6,8 @@ local addonName, addonHelpers = ...;
 
 -- libraries
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
+-- Get a reference to the lib
+local LibQTip = LibStub( "LibQTip-1.0" )
 
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetAverageItemLevel =  -- variables 
@@ -48,6 +50,17 @@ local function clearExpiredLockouts( dataTable )
 	end -- for key, data in next, dataTable
 end -- clearExpiredLockouts()
 
+local function clearCurrencyQuests( dataTable )
+	if( dataTable == ni ) then return; end
+	local currentServerTime = GetServerTime();
+
+	for _, currData in next, dataTable do
+		if( currData.resetDate ~= nil ) and ( currData.resetDate < currentServerTime ) then
+			currData.displayTextAddl = "(0)";
+		end
+	end
+end
+
 local function allCleared( ... )
 	local arg = { ... };
 
@@ -87,6 +100,8 @@ local function checkExpiredLockouts()
 			local emptySet = allCleared( charData.instances,
 										 charData.worldBosses );
 			
+			clearCurrencyQuests( charData.currency );
+			
 			if( emptySet ) then characters[ charNdx ] = nil; end
 		end -- for charNdx, charData in next, characters
 	end -- for realmName, charData in next, LockoutDb
@@ -106,9 +121,15 @@ function addonHelpers:Lockedout_GetCurrentCharData()
 	local _, className = UnitClass( "player" );
 	local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
 	local playerData = {};
+	local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
 
 	playerData.charName = charName
 	playerData.className = className
+
+	playerData.iLevel = {};
+	playerData.iLevel[ "total" ]  = total_ilevel;
+	playerData.iLevel[ "equipped" ] = equippped_ilevel;
+	playerData.iLevel[ "pvp" ]    = pvp_ilevel;
 	
 	LockoutDb[ realmName ][ charNdx ] = playerData;			-- initialize playerDb if not already initialized
 

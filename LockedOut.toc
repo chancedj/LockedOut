@@ -9,8 +9,10 @@
 embeds.xml
 locale.xml
 
+Configuration.lua
 Helper.lua
 Character.lua
 Instances.lua
 Worldboss.lua
+Currency.lua
 Minimap.lua
