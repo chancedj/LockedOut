@@ -5,34 +5,14 @@ local addonName, addonHelpers = ...;
 
 -- libraries
 local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
-local icon = LibStub( "LibDBIcon-1.0" );
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
 local next, table =	-- variables
 	  next, table	-- lua functions
 
-local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
-	type = "data source",
-	text = L[ "Locked Out" ],
-	icon = "Interface\\Icons\\Inv_misc_key_10",
-	OnClick = function( self ) addonHelpers:OnClick( self ) end,
-	OnEnter = function( self ) addonHelpers:OnEnter( self ) end,
-} ); -- local LockedoutMo
-
-function addon:OnInitialize()
-	LockoutMapDb = LockoutMapDb or LibStub( "AceDB-3.0" ):New( "LockoutMapDb", { profile = { minimap = {hide = false } } } );
-
-	icon:Register(addonName, LockedoutMo, LockoutMapDb.profile.minimap)
-end -- addon:OnInitialize
-
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
-
-function addonHelpers:OnClick()
-	-- removed, can't rebuild data while tooltip is displaying
-	--Lockedout_BuildInstanceLockout();
-end -- addonHelpers:OnClick
 
 local function emptyFunction()
 end
@@ -189,7 +169,7 @@ local function addColorBanding( tt )
 	end -- for i = 1, tt:GetLineCount()
 end -- addColorBanding
 
-function addonHelpers:OnEnter( self )
+function addon:ShowInfo( self )
 	if ( self.tooltip ~= nil ) then
 		LibQTip:Release( self.tooltip );
 		self.tooltip = nil;
