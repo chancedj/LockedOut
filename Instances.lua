@@ -2,9 +2,10 @@
 	This file is to deal with the code to generate the lockout table/vector and
 	to handle the refresh of data and deletion of stale data
 --]]
-local addonName, addonHelpers = ...;
+local addonName, _ = ...;
 
 -- libraries
+local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
@@ -103,7 +104,7 @@ function Lockedout_BuildInstanceLockout( realmName, charNdx, playerData )
 	
 	---[[
 	local lfrCount = GetNumRFDungeons();
-	local calculatedResetDate = addonHelpers:getWeeklyLockoutDate();
+	local calculatedResetDate = addon:getWeeklyLockoutDate();
 	for lfrNdx = 1, lfrCount do
 		local instanceID, _, _, _, _, _, _, _, _, _, _, _, difficulty, _, _, _
 			, _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );

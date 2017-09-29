@@ -2,9 +2,10 @@
 	This file is to deal with the code to generate the lockout table/vector and
 	to handle the refresh of data and deletion of stale data
 --]]
-local addonName, addonHelpers = ...;
+local addonName, _ = ...;
 
 -- libraries
+local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
@@ -110,7 +111,7 @@ local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
 	local worldBosses = {}; -- initialize world boss table;
 	
-	local calculatedResetDate = addonHelpers:getWeeklyLockoutDate();
+	local calculatedResetDate = addon:getWeeklyLockoutDate();
 	for bossId, bossData in next, WORLD_BOSS_LIST do
 		if( bossData.questId ) then
 			if ( IsQuestFlaggedCompleted( bossData.questId ) ) then

@@ -2,11 +2,11 @@
 	This file is to deal with the code to generate the lockout table/vector and
 	to handle the refresh of data and deletion of stale data
 --]]
-local addonName, addonHelpers = ...;
+local addonName, _ = ...;
 
 -- libraries
+local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
--- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
 
 -- cache blizzard function/globals
@@ -107,8 +107,8 @@ local function checkExpiredLockouts()
 	end -- for realmName, charData in next, LockoutDb
 end -- checkExpiredLockouts()
 
-function addonHelpers:Lockedout_GetCurrentCharData()
-	addonHelpers:destroyDb();
+function addon:Lockedout_GetCurrentCharData()
+	addon:destroyDb();
 	checkExpiredLockouts();
 	
 	-- get and initialize realm data

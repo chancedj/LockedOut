@@ -1,7 +1,7 @@
 --[[
 	This file is for dealing with handling the minimap creation and display
 --]]
-local addonName, addonHelpers = ...;
+local addonName, _ = ...;
 
 -- libraries
 local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
@@ -83,7 +83,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 												LibQTip:Release( tooltip );
 											end -- function( data )
 
-				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
+				tooltip:SetCell( lineNum, colNdx + 1, addon:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() instanceDisplay:displayTT( instances ); end );	-- open tooltip with info when entering cell.
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() instanceDisplay:deleteTT( instances ); end );	-- close out tooltip when leaving
 				tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );				-- empty function allows the background to highlight
@@ -143,7 +143,7 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
 				if( currData.displayTextAddl ~= nil ) then
 					displayText = displayText .. currData.displayTextAddl;
 				end
-				tooltip:SetCell( lineNum, colNdx + 1, addonHelpers:colorizeString( charData.className, displayText ), nil, "CENTER" );
+				tooltip:SetCell( lineNum, colNdx + 1, addon:colorizeString( charData.className, displayText ), nil, "CENTER" );
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", emptyFunction );	-- close out tooltip when leaving
 				tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", emptyFunction );	-- open tooltip with info when entering cell.
 				tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );				-- empty function allows the background to highlight
@@ -175,7 +175,7 @@ function addon:ShowInfo( self )
 		self.tooltip = nil;
 	end -- if ( self.tooltip ~= nil )
 
-	local realmName, _, charNdx = addonHelpers:Lockedout_GetCurrentCharData();
+	local realmName, _, charNdx = addon:Lockedout_GetCurrentCharData();
 	local playerData = LockoutDb[ realmName ][ charNdx ];
 
 	Lockedout_BuildInstanceLockout( realmName, charNdx, playerData );
@@ -256,7 +256,7 @@ function addon:ShowInfo( self )
 	-- add the characters and realms across the header
 	for colNdx, char in next, charList do
 		if( realmCount > 1 ) then -- show realm only when multiple are involved
-			tooltip:SetCell( realmLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+			tooltip:SetCell( realmLineNum, colNdx + 1, addon:colorizeString( char.className, char.realmName ), nil, "CENTER" );
 		end
 		local charData = LockoutDb[ char.realmName ][ char.charNdx ];
 		local charDisplay = {};
@@ -286,7 +286,7 @@ function addon:ShowInfo( self )
 									LibQTip:Release( tooltip );
 								end -- function( data )
 
-		tooltip:SetCell( charLineNum, colNdx + 1, addonHelpers:colorizeString( char.className, char.charName ), nil, "CENTER" );
+		tooltip:SetCell( charLineNum, colNdx + 1, addon:colorizeString( char.className, char.charName ), nil, "CENTER" );
 		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charDisplay:displayTT( charData ); end ); -- close out tooltip when leaving
 		tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charDisplay:deleteTT( charData ); end );	 -- close out tooltip when leaving
 	end -- for colNdx, char in next, charList
@@ -307,10 +307,4 @@ function addon:ShowInfo( self )
 	
 	-- Show it, et voilà !
 	tooltip:Show();
-end --  addonHelpers:OnEnter
-
-function addonHelpers:OnLeave( self )
-	-- Release the tooltip
-	--LibQTip:Release( self.tooltip );
-	--self.tooltip = nil;
-end -- addonHelpers:OnLeave
+end --  addon:OnEnter

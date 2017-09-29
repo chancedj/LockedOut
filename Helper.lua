@@ -1,7 +1,10 @@
 --[[
 	This file is for overall helper functions that are to be used addon wide.
 --]]
-local addonName, addonHelpers = ...;
+local addonName, _ = ...;
+
+-- libraries
+local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
@@ -11,19 +14,19 @@ local print, type =								-- variables
 local GetCurrentRegion, RAID_CLASS_COLORS =						-- variables
 	  GetCurrentRegion, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
 
-function addonHelpers:fif(condition, if_true, if_false)
+function addon:fif(condition, if_true, if_false)
   if condition then return if_true; else return if_false; end
-end -- addonHelpers:fif()
+end -- addon:fif()
 
-function addonHelpers:colorizeString( className, value )
+function addon:colorizeString( className, value )
 	if( className == nil ) then return value; end
 
 	local sStart, sTail, classColor = "|c", "|r", RAID_CLASS_COLORS[ className ].colorStr;
 	
 	return sStart .. classColor .. value .. sTail;
-end -- addonHelpers:colorizeString
+end -- addon:colorizeString
 
-function addonHelpers:destroyDb()
+function addon:destroyDb()
 	if( LockoutDb == nil ) then return; end
 	
 	local _, charData = next( LockoutDb );
@@ -43,7 +46,7 @@ local MapRegionReset = {
 	[5] = 4  -- CN
 }
 
-function addonHelpers:getWeeklyLockoutDate()
+function addon:getWeeklyLockoutDate()
 	local daysInweek, serverResetDay = 7, MapRegionReset[ GetCurrentRegion() ];
 	local currentServerTime = GetServerTime();
 	local daysLefToReset = (daysInweek + serverResetDay - date( "*t", currentServerTime ).wday) % daysInweek
