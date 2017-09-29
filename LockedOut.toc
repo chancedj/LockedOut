@@ -3,7 +3,7 @@
 ## Notes: An addon for tracking lockouts.
 ## Author: Hwap
 ## Version: @project-version@
-## SavedVariables: LockoutDb LockoutMapDb
+## SavedVariables: LockoutDb LockedOutConfig
 
 embeds.xml
 locale.xml

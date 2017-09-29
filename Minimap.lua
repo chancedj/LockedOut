@@ -169,7 +169,7 @@ local function addColorBanding( tt )
     end -- for i = 1, tt:GetLineCount()
 end -- addColorBanding
 
-function addon:ShowInfo( self )
+function addon:ShowInfo( frame )
     if ( self.tooltip ~= nil ) then
         LibQTip:Release( self.tooltip );
         self.tooltip = nil;
@@ -195,7 +195,7 @@ function addon:ShowInfo( self )
 
     -- get list of characters and realms for the horizontal
     for realmName, characters in next, LockoutDb do
-        if( not LockoutMapDb.profile.general.currentRealm ) or ( currRealmName == realmName ) then
+        if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
                 local tblNdx = #charList + 1;
@@ -296,22 +296,22 @@ function addon:ShowInfo( self )
     tooltip:AddSeparator( );
     tooltip:AddSeparator( );
 
-    if( LockoutMapDb.profile.dungeon.show ) then
+    if( self.config.profile.dungeon.show ) then
         populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
     end
-    if( LockoutMapDb.profile.raid.show ) then
+    if( self.config.profile.raid.show ) then
         populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
     end
-    if( LockoutMapDb.profile.worldBoss.show ) then
+    if( self.config.profile.worldBoss.show ) then
         populateWorldBossData( L["World Boss"], tooltip, charList, worldBossList );
     end
-    if( LockoutMapDb.profile.currency.show ) then
+    if( self.config.profile.currency.show ) then
         populateCurrencyData( L["Currency"], tooltip, charList, currencyList );
     end
 
     -- Use smart anchoring code to anchor the tooltip to our frame
-    tooltip:SmartAnchorTo( self );
-    tooltip:SetAutoHideDelay( 0.25, self );
+    tooltip:SmartAnchorTo( frame );
+    tooltip:SetAutoHideDelay( 0.25, frame );
 
     addColorBanding( tooltip );
     
