@@ -5,9 +5,9 @@
 local addonName, _ = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
-local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
-local LibQTip = LibStub( "LibQTip-1.0" )
+local addon		= LibStub( "AceAddon-3.0" ):GetAddon( addonName );
+local L			= LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
+local LibQTip	= LibStub( "LibQTip-1.0" )
 
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetAverageItemLevel =  -- variables 

@@ -5,8 +5,8 @@
 local addonName, _ = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
-local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
+local addon	= LibStub( "AceAddon-3.0" ):GetAddon( addonName );
+local L		= LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
 local next, type, table = -- variables

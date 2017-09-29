@@ -5,9 +5,9 @@
 local addonName, _ = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceEvent-3.0" );
-local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
-local icon = LibStub( "LibDBIcon-1.0" );
+local addon	= LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceEvent-3.0" );
+local L		= LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
+local icon	= LibStub( "LibDBIcon-1.0" );
 
 -- cache lua functions
 local InterfaceOptionsFrame_OpenToCategory =	-- variables

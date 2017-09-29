@@ -4,8 +4,8 @@
 local addonName, _ = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
-local L = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
+local addon	= LibStub( "AceAddon-3.0" ):GetAddon( addonName );
+local L		= LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
 local print, type =								-- variables
