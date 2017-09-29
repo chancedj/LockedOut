@@ -14,10 +14,6 @@ local print, type =								-- variables
 local GetCurrentRegion, RAID_CLASS_COLORS =						-- variables
 	  GetCurrentRegion, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
 
-function addon:fif(condition, if_true, if_false)
-  if condition then return if_true; else return if_false; end
-end -- addon:fif()
-
 function addon:colorizeString( className, value )
 	if( className == nil ) then return value; end
 
