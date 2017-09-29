@@ -35,8 +35,8 @@ local configOptions = {
 		  name = "Current Realm",
 		  desc = "Show characters from current realm only",
 		  type = "toggle",
-		  set = function(info,val) LockoutMapDb.profile.general.showAllRealm = val; end,
-		  get = function(info) return LockoutMapDb.profile.general.showAllRealm end
+		  set = function(info,val) LockoutMapDb.profile.general.currentRealm = val; end,
+		  get = function(info) return LockoutMapDb.profile.general.currentRealm end
 		},
 		showMinimapIcon = {
 		  order = 12,
@@ -108,7 +108,7 @@ local defaultOptions = {
 			hide = false
 		},
 		general = {
-			showAllRealm = true
+			currentRealm = false
 		},
 		dungeon = {
 			show = true

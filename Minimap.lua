@@ -175,12 +175,12 @@ function addon:ShowInfo( self )
 		self.tooltip = nil;
 	end -- if ( self.tooltip ~= nil )
 
-	local realmName, _, charNdx = addon:Lockedout_GetCurrentCharData();
-	local playerData = LockoutDb[ realmName ][ charNdx ];
+	local currRealmName, _, charNdx = addon:Lockedout_GetCurrentCharData();
+	local playerData = LockoutDb[ currRealmName ][ charNdx ];
 
-	Lockedout_BuildInstanceLockout( realmName, charNdx, playerData );
-	Lockedout_BuildWorldBoss( realmName, charNdx, playerData );
-	Lockedout_BuildCurrentList( realmName, charNdx, playerData );
+	Lockedout_BuildInstanceLockout( currRealmName, charNdx, playerData );
+	Lockedout_BuildWorldBoss( currRealmName, charNdx, playerData );
+	Lockedout_BuildCurrentList( currRealmName, charNdx, playerData );
 
 	-- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
 	local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
@@ -195,36 +195,38 @@ function addon:ShowInfo( self )
 
 	-- get list of characters and realms for the horizontal
 	for realmName, characters in next, LockoutDb do
-		realmCount = realmCount + 1;
-		for charNdx, charData in next, characters do
-			local tblNdx = #charList + 1;
-			charList[ tblNdx ] = {}
-			charList[ tblNdx ].charNdx = charNdx;
-			charList[ tblNdx ].realmName = realmName;
-			charList[ tblNdx ].charName = charData.charName;
-			charList[ tblNdx ].className = charData.className;
+		if( not LockoutMapDb.profile.general.currentRealm ) or ( currRealmName == realmName ) then
+			realmCount = realmCount + 1;
+			for charNdx, charData in next, characters do
+				local tblNdx = #charList + 1;
+				charList[ tblNdx ] = {}
+				charList[ tblNdx ].charNdx = charNdx;
+				charList[ tblNdx ].realmName = realmName;
+				charList[ tblNdx ].charName = charData.charName;
+				charList[ tblNdx ].className = charData.className;
 
-			-- the get a list of all instances across characters for vertical
-			for instanceName, details in next, charData.instances do
-				local key, data = next( details );
+				-- the get a list of all instances across characters for vertical
+				for instanceName, details in next, charData.instances do
+					local key, data = next( details );
+					
+					if ( data.isRaid ) then
+						raidList[ instanceName ] = "set";
+					else
+						dungeonList[ instanceName ] = "set";
+					end -- if ( data.isRaid )
+				end -- for instanceName, _ in next, instances
 				
-				if ( data.isRaid ) then
-					raidList[ instanceName ] = "set";
-				else
-					dungeonList[ instanceName ] = "set";
-				end -- if ( data.isRaid )
-			end -- for instanceName, _ in next, instances
-			
-			charData.worldBosses = charData.worldBosses or {};
-			for bossName, _ in next, charData.worldBosses do
-				worldBossList[ bossName ] = "set"
-			end -- for bossName, _ in next, charData.worldBosses
-			
-			charData.currency = charData.currency or {};
-			for currName, _ in next, charData.currency do
-				currencyList[ currName ] = "set"
-			end -- for currName, _ in next, charData.currency
-		end -- for charName, instances in next, characters
+				charData.worldBosses = charData.worldBosses or {};
+				for bossName, _ in next, charData.worldBosses do
+					worldBossList[ bossName ] = "set"
+				end -- for bossName, _ in next, charData.worldBosses
+				
+				charData.currency = charData.currency or {};
+				for currName, _ in next, charData.currency do
+					currencyList[ currName ] = "set"
+				end -- for currName, _ in next, charData.currency
+			end -- for charName, instances in next, characters
+		end
 	end -- for realmName, characters in next, LockoutDb
 	
 	-- sort list by realm then character
