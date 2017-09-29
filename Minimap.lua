@@ -294,10 +294,18 @@ function addon:ShowInfo( self )
 	tooltip:AddSeparator( );
 	tooltip:AddSeparator( );
 
-	populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
-	populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
-	populateWorldBossData( L["World Boss"], tooltip, charList, worldBossList );
-	populateCurrencyData( L["Currency"], tooltip, charList, currencyList );
+	if( LockoutMapDb.profile.dungeon.show ) then
+		populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
+	end
+	if( LockoutMapDb.profile.raid.show ) then
+		populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
+	end
+	if( LockoutMapDb.profile.worldBoss.show ) then
+		populateWorldBossData( L["World Boss"], tooltip, charList, worldBossList );
+	end
+	if( LockoutMapDb.profile.currency.show ) then
+		populateCurrencyData( L["Currency"], tooltip, charList, currencyList );
+	end
 
 	-- Use smart anchoring code to anchor the tooltip to our frame
 	tooltip:SmartAnchorTo( self );
