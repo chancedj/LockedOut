@@ -30,6 +30,7 @@ L["Enable"]                     = "Enable";
 L["Show"]                       = "Show";
 
 -- * label descriptions
+L["Enables / disables the addon"]   = "Enables / disables the addon";
 L["Show dungeon information"]       = "Show dungeon information";
 L["Show raid information"]          = "Show raid information";
 L["Show world boss information"]    = "Show world boss information";
