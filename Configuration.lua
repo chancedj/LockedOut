@@ -5,7 +5,7 @@
 local addonName, _ = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceEvent-3.0" );
+local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "AceEvent-3.0" );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 local icon  = LibStub( "LibDBIcon-1.0" );
 
@@ -18,14 +18,16 @@ function addon:getConfigOptions()
 		type = "group",
 		name = addonName,
 		args = {
+			--[[
 			enableAddon = {
 			  order = 1,
 			  name = "Enable",
 			  desc = "Enables / disables the addon",
 			  type = "toggle",
-			  set = function(info,val) self.config.profile.enabled = val; end,
-			  get = function(info) return self.config.profile.enabled end
+			  set = function(info,val) self.config.global.enabled = val; end,
+			  get = function(info) return self.config.global.enabled end
 			},
+			--]]
 			generalHeader={
 			  order = 10,
 			  name = "General Options",
@@ -107,8 +109,10 @@ end
 
 function addon:getDefaultOptions()
 	local defaultOptions = {
+		global = {
+			enabled = true
+		},
 		profile = {
-			enabled = true,
 			minimap = {
 				hide = false
 			},
@@ -133,12 +137,20 @@ function addon:getDefaultOptions()
 	return defaultOptions;
 end
 
+function addon:OnEnable()
+	print( addonName .. " Enabled ");
+end
+
+function addon:OnDisable()
+	print( addonName .. " Disabled ");
+end
+
 function addon:OnInitialize()
     local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
         type = "data source",
         text = L[ "Locked Out" ],
         icon = "Interface\\Icons\\Inv_misc_key_10",
-        OnClick = function( frame ) self:OpenConfigDialog( frame ) end,
+        OnClick = function( frame, button ) self:OpenConfigDialog( button ) end,
         OnEnter = function( frame ) self:ShowInfo( frame ) end,
     } ); -- local LockedoutMo
 
@@ -151,6 +163,12 @@ function addon:OnInitialize()
     LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( self.optionFrameName, self:getConfigOptions() );
     self.optionFrame = LibStub( "AceConfigDialog-3.0" ):AddToBlizOptions( self.optionFrameName, addonName );
     self.optionFrame.default = function() self:ResetDefaults() end;
+	self:RegisterChatCommand( "lo", "ChatCommand" );
+	self:RegisterChatCommand( "lockedout", "ChatCommand" );
+end
+
+function addon:ChatCommand()
+	self:OpenConfigDialog();
 end
 
 function addon:ResetDefaults()
@@ -159,6 +177,10 @@ function addon:ResetDefaults()
     LibStub("AceConfigRegistry-3.0"):NotifyChange( self.optionFrameName );
 end
 
-function addon:OpenConfigDialog()
-    InterfaceOptionsFrame_OpenToCategory( self.optionFrame );
+function addon:OpenConfigDialog( button )
+	if( button == nil) or ( button == "RightButton" ) then
+		-- this command is buggy, open it twice to fix the bug.
+		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #1
+		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
+	end
 end
