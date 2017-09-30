@@ -21,7 +21,7 @@ function addon:getConfigOptions()
 			--[[
 			enableAddon = {
 			  order = 1,
-			  name = "Enable",
+			  name = L["Enable"],
 			  desc = "Enables / disables the addon",
 			  type = "toggle",
 			  set = function(info,val) self.config.global.enabled = val; end,
@@ -30,12 +30,12 @@ function addon:getConfigOptions()
 			--]]
 			generalHeader={
 			  order = 10,
-			  name = "General Options",
+			  name = L["General Options"],
 			  type = "header",
 			},
 			currentRealmOnly = {
 			  order = 11,
-			  name = "Current Realm",
+			  name = L["Current Realm"],
 			  desc = "Show characters from current realm only",
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.general.currentRealm = val; end,
@@ -51,12 +51,12 @@ function addon:getConfigOptions()
 			},
 			dungeonHeader={
 			  order = 20,
-			  name = "Instance Options",
+			  name = L["Instance Options"],
 			  type = "header",
 			},
 			dungeonShow = {
 			  order = 21,
-			  name = "Show",
+			  name = L["Show"],
 			  desc = "Show dungeon information",
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.dungeon.show = val; end,
@@ -64,39 +64,39 @@ function addon:getConfigOptions()
 			},
 			raidHeader={
 			  order = 30,
-			  name = "Raid Options",
+			  name = L["Raid Options"],
 			  type = "header",
 			},
 			raidShow = {
 			  order = 31,
-			  name = "Show",
-			  desc = "Show raid information",
+			  name = L["Show"],
+			  desc = L["Show raid information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.raid.show = val; end,
 			  get = function(info) return self.config.profile.raid.show end
 			},
 			worldBossHeader={
 			  order = 40,
-			  name = "World Boss Options",
+			  name = L["World Boss Options"],
 			  type = "header",
 			},
 			worldBossShow = {
 			  order = 41,
-			  name = "Show",
-			  desc = "Show world boss information",
+			  name = L["Show"],
+			  desc = L["Show world boss information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.worldBoss.show = val; end,
 			  get = function(info) return self.config.profile.worldBoss.show end
 			},
 			currencyHeader={
 			  order = 50,
-			  name = "Currency Options",
+			  name = L["Currency Options"],
 			  type = "header",
 			},
 			currencyShow = {
 			  order = 51,
-			  name = "Show",
-			  desc = "Show currency information",
+			  name = L["Show"],
+			  desc = L["Show currency information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.currency.show = val; end,
 			  get = function(info) return self.config.profile.currency.show end

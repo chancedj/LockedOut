@@ -16,6 +16,26 @@ L["Character iLevels"]  = "Character iLevels";
 L["Defeated"]           = "Defeated";
 L["Available"]          = "Available";
 
+-- configuration menu
+-- * headers
+L["General Options"]    = "General Options";
+L["Current Realm"]      = "Current Realm";
+L["Instance Options"]   = "Instance Options";
+L["Raid Options"]       = "Raid Options";
+L["World Boss Options"] = "World Boss Options";
+L["Currency Options"]   = "Currency Options";
+
+-- * generic labels
+L["Enable"]                     = "Enable";
+L["Show"]                       = "Show";
+
+-- * label descriptions
+L["Show dungeon information"]       = "Show dungeon information";
+L["Show raid information"]          = "Show raid information";
+L["Show world boss information"]    = "Show world boss information";
+L["Show currency information"]      = "Show currency information";
+
+
 -- difficulty mapping full
 L["Unknown"]    = "Unknown";
 L["Normal"]     = "Normal";
