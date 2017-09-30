@@ -7,7 +7,6 @@ local addonName, _ = ...;
 -- libraries
 local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "AceEvent-3.0" );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
-local icon  = LibStub( "LibDBIcon-1.0" );
 
 -- cache lua functions
 local InterfaceOptionsFrame_OpenToCategory =    -- variables
@@ -46,7 +45,14 @@ function addon:getConfigOptions()
 			  name = "Hide Icon",
 			  desc = "Show Minimap Icon",
 			  type = "toggle",
-			  set = function(info,val) self.config.profile.minimap.hide = val; end,
+			  set = function(info,val)
+                        self.config.profile.minimap.hide = val;
+                        if( self.config.profile.minimap.hide ) then
+                            self.icon:Hide( addonName );
+                        else
+                            self.icon:Show( addonName );
+                        end
+                    end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
 			dungeonHeader={
@@ -137,14 +143,6 @@ function addon:getDefaultOptions()
 	return defaultOptions;
 end
 
-function addon:OnEnable()
-	print( addonName .. " Enabled ");
-end
-
-function addon:OnDisable()
-	print( addonName .. " Disabled ");
-end
-
 function addon:OnInitialize()
     local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
         type = "data source",
@@ -157,7 +155,9 @@ function addon:OnInitialize()
 	local defaultOptions = self:getDefaultOptions();
     self.config = LibStub( "AceDB-3.0" ):New( "LockedOutConfig", defaultOptions, true );
     self.config:RegisterDefaults( defaultOptions );
-    icon:Register(addonName, LockedoutMo, self.config.profile.minimap)
+
+    self.icon = LibStub( "LibDBIcon-1.0" );
+    self.icon:Register(addonName, LockedoutMo, self.config.profile.minimap)
 
     self.optionFrameName = addonName .. "OptionPanel"
     LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( self.optionFrameName, self:getConfigOptions() );
