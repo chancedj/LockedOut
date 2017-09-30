@@ -35,15 +35,15 @@ function addon:getConfigOptions()
 			currentRealmOnly = {
 			  order = 11,
 			  name = L["Current Realm"],
-			  desc = "Show characters from current realm only",
+			  desc = L["Show characters from current realm only"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.general.currentRealm = val; end,
 			  get = function(info) return self.config.profile.general.currentRealm end
 			},
 			showMinimapIcon = {
 			  order = 12,
-			  name = "Hide Icon",
-			  desc = "Show Minimap Icon",
+			  name = L["Hide Icon"],
+			  desc = L["Show Minimap Icon"],
 			  type = "toggle",
 			  set = function(info,val)
                         self.config.profile.minimap.hide = val;
@@ -63,7 +63,7 @@ function addon:getConfigOptions()
 			dungeonShow = {
 			  order = 21,
 			  name = L["Show"],
-			  desc = "Show dungeon information",
+			  desc = L["Show dungeon information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.dungeon.show = val; end,
 			  get = function(info) return self.config.profile.dungeon.show end
