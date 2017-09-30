@@ -309,6 +309,10 @@ function addon:ShowInfo( frame )
         populateCurrencyData( L["Currency"], tooltip, charList, currencyList );
     end
 
+    local lineNum = tooltip:AddLine( );
+    tooltip:SetCell( lineNum, 1, "* " .. L["Right-click for configuration menu"], nil, "LEFT", #charList + 1 );
+    tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );
+    
     -- Use smart anchoring code to anchor the tooltip to our frame
     tooltip:SmartAnchorTo( frame );
     tooltip:SetAutoHideDelay( 0.25, frame );

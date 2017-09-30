@@ -22,7 +22,7 @@ function addon:getConfigOptions()
 			enableAddon = {
 			  order = 1,
 			  name = L["Enable"],
-			  desc = "Enables / disables the addon",
+			  desc = L["Enables / disables the addon"],
 			  type = "toggle",
 			  set = function(info,val) self.config.global.enabled = val; end,
 			  get = function(info) return self.config.global.enabled end
