@@ -118,7 +118,7 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
                 worldBosses[ bossData.bossName ] = {}
                 worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
                 worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
-            elseif( IsQuestActive( bossData.questId ) ) and ( false ) then -- add option later on to show unkilled bosses
+            elseif( IsQuestActive( bossData.questId ) ) and ( not addon.config.profile.worldBoss.showKilledOnly ) then -- add option later on to show unkilled bosses
                 worldBosses[ bossData.bossName ] = {}
                 worldBosses[ bossData.bossName ].displayText = " ";
                 worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;

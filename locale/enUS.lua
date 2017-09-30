@@ -27,9 +27,10 @@ L["World Boss Options"] = "World Boss Options";
 L["Currency Options"]   = "Currency Options";
 
 -- * labels
-L["Enable"]     = "Enable";
-L["Show"]       = "Show";
-L["Hide Icon"]  = "Hide Icon";
+L["Enable"]         = "Enable";
+L["Show"]           = "Show";
+L["Hide Icon"]      = "Hide Icon";
+L["Show when dead"] = "Show when dead";
 
 -- * label descriptions
 L["Enables / disables the addon"]               = "Enables / disables the addon";
@@ -38,6 +39,7 @@ L["Show Minimap Icon"]                          = "Show Minimap Icon";
 L["Show dungeon information"]                   = "Show dungeon information";
 L["Show raid information"]                      = "Show raid information";
 L["Show world boss information"]                = "Show world boss information";
+L["Show in list only when killed"]              = "Show in list only when killed";
 L["Show currency information"]                  = "Show currency information";
 
 -- difficulty mapping full

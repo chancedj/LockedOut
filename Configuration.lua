@@ -94,6 +94,14 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.worldBoss.show = val; end,
 			  get = function(info) return self.config.profile.worldBoss.show end
 			},
+            worldBossOnlyDead = {
+              order = 42,
+              name = L["Show when dead"],
+              desc = L["Show in list only when killed"],
+              type = "toggle",
+			  set = function(info,val) self.config.profile.worldBoss.showKilledOnly = val; end,
+			  get = function(info) return self.config.profile.worldBoss.showKilledOnly end
+            },
 			currencyHeader={
 			  order = 50,
 			  name = L["Currency Options"],
@@ -132,7 +140,8 @@ function addon:getDefaultOptions()
 				show = true
 			},
 			worldBoss = {
-				show = true
+				show = true,
+                showKilledOnly = true
 			},
 			currency = {
 				show = true
