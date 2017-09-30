@@ -35,7 +35,7 @@ local WORLD_BOSS_LIST = {
     [1211] = { instanceId=557, questId=37462, bossName="Tarlna the Ageless" },
     [1262] = { instanceId=557, questId=37464, bossName="Rukhmar" },
     [1291] = { instanceId=557, questId=37462, bossName="Drov the Ruiner" },
-    [1452] = { instanceId=557, questId=94015, bossName="Supreme Lord Kazzak" },
+    [1452] = { instanceId=557, questId=39380, bossName="Supreme Lord Kazzak" },
 
     -- Broken Isles
     [1749] = { instanceId=822, questId=42270, bossName="Nithogg" },
