@@ -57,10 +57,10 @@ local WORLD_BOSS_LIST = {
     -- Argus
     [2010] = { instanceId=959, questId=49169, bossName="Matron Folnuna" },
     [2011] = { instanceId=959, questId=49167, bossName="Mistress Alluradel" },
-    [2012] = { instanceId=959, questId=49172, bossName="Inquisitor Meto" },
-    [2013] = { instanceId=959, questId=0, bossName="Occularus" }, -- assuming above format (unverified)
+    [2012] = { instanceId=959, questId=49166, bossName="Inquisitor Meto" },
+    [2013] = { instanceId=959, questId=49165, bossName="Occularus" }, -- unverified
     [2014] = { instanceId=959, questId=49171, bossName="Sotanathor" },
-    [2015] = { instanceId=959, questId=0, bossName="Pit Lord Vilemus" } -- assuming above format (unverified)
+    [2015] = { instanceId=959, questId=49168, bossName="Pit Lord Vilemus" } -- unverified
 }
 
 function CheckForMissingMappings()
