@@ -67,7 +67,7 @@ end
 
 local QUEST_LIBRARY = {
     ["blingtron"] = {name=L["Blingtron"], checkIds={40753,34774,31752}, resetForm="daily", checkStatus=checkBlingtron, copyAccountWide=true },
-    ["instantquest"] = {name=L["Instant Complete"], checkIds={219540,221597,221557}, resetForm="custom", checkStatus=checkInstantQuests, copyAccountWide=false }
+    ["instantquest"] = {name=L["Instant Complete"], checkIds={219540,221597,221557,221602}, resetForm="custom", checkStatus=checkInstantQuests, copyAccountWide=false }
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
