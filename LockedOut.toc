@@ -14,4 +14,6 @@ Character.lua
 Instances.lua
 Worldboss.lua
 Currency.lua
+Emissary.lua
+Quests.lua
 Minimap.lua

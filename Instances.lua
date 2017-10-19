@@ -99,7 +99,7 @@ local function removeUntouchedInstances( instances )
     end -- for instanceName, instanceDetails in next, instances
 end -- removeUntouchedInstances()
 
-function Lockedout_BuildInstanceLockout( realmName, charNdx, playerData )
+function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     local instances = {}; -- initialize instance table;
     
     ---[[
@@ -134,5 +134,5 @@ function Lockedout_BuildInstanceLockout( realmName, charNdx, playerData )
     --]]
     
     removeUntouchedInstances( instances );
-    playerData.instances = instances;
+    LockoutDb[ realmName ][ charNdx ].instances = instances;
 end -- Lockedout_BuildInstanceLockout()

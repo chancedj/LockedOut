@@ -40,7 +40,7 @@ local function getCharIndex( characters, search_charName )
 end -- getCharIndex()
 
 local function clearExpiredLockouts( dataTable )
-    if( dataTable == ni ) then return; end
+    if( dataTable == nil ) then return; end
     local currentServerTime = GetServerTime();
     
     for key, data in next, dataTable do
@@ -51,32 +51,17 @@ local function clearExpiredLockouts( dataTable )
 end -- clearExpiredLockouts()
 
 local function clearCurrencyQuests( dataTable )
-    if( dataTable == ni ) then return; end
+    if( dataTable == nil ) then return; end
     local currentServerTime = GetServerTime();
 
     for _, currData in next, dataTable do
-        if( currData.resetDate ~= nil ) and ( currData.resetDate < currentServerTime ) then
-            currData.displayTextAddl = "(0)";
+        currData.displayText = nil;
+        currData.displayAddlText = nil;
+        if( currData.resetDate ~= nil) and ( currData.resetDate < currentServerTime ) then
+            currData.bonus = {};
         end
     end
 end
-
-local function allCleared( ... )
-    local arg = { ... };
-
-    for i, v in ipairs( arg ) do
-        if( v ~= nil ) then
-            -- if this returns data, we still have data that's not expired
-            local key, data = next(v);
-            
-            if( data ~= nil ) then
-                return false;
-            end -- if( data ~= nil )
-        end;
-    end -- for i, v in ipairs( arg )
-
-    return true;
-end -- allCleared( arg, ... )
 
 local function checkExpiredLockouts()
     -- if we add a new element, it will be empty for the charData
@@ -85,24 +70,29 @@ local function checkExpiredLockouts()
     
     for realmName, characters in next, LockoutDb do
         for charNdx, charData in next, characters do
-            for instanceName, instanceData in next, charData.instances do
-                clearExpiredLockouts( instanceData );
-                
-                -- if the data expired and emptys our table, clear the instance table
-                local key = next(instanceData);
-                if( key == nil ) then
-                    charData.instances[ instanceName ] = nil;
+            -- initialize data if necessary
+            charData.instances      = charData.instances or {};
+            charData.worldBosses    = charData.worldBosses or {};
+            charData.emissaries     = charData.emissaries or {};
+            charData.currency       = charData.currency or {};
+            charData.weeklyQuests   = charData.weeklyQuests or {};
+
+            if( charData.instances ~= nil ) then
+                for instanceName, instanceData in next, charData.instances do
+                    clearExpiredLockouts( instanceData );
+                    
+                    -- if the data expired and emptys our table, clear the instance table
+                    local key = next(instanceData);
+                    if( key == nil ) then
+                        charData.instances[ instanceName ] = nil;
+                    end
                 end
             end
             
             clearExpiredLockouts( charData.worldBosses );
-            
-            local emptySet = allCleared( charData.instances,
-                                         charData.worldBosses );
-            
+            clearExpiredLockouts( charData.emissaries );
+            clearExpiredLockouts( charData.weeklyQuests );
             clearCurrencyQuests( charData.currency );
-            
-            if( emptySet ) then characters[ charNdx ] = nil; end
         end -- for charNdx, charData in next, characters
     end -- for realmName, charData in next, LockoutDb
 end -- checkExpiredLockouts()
@@ -120,7 +110,7 @@ function addon:Lockedout_GetCurrentCharData()
     local charName = UnitName( "player" );
     local _, className = UnitClass( "player" );
     local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
-    local playerData = {};
+    local playerData = LockoutDb[ realmName ][ charNdx ] or {};
     local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
 
     playerData.charName = charName
@@ -133,7 +123,13 @@ function addon:Lockedout_GetCurrentCharData()
     
     LockoutDb[ realmName ][ charNdx ] = playerData;            -- initialize playerDb if not already initialized
 
+    self:Lockedout_BuildInstanceLockout( realmName, charNdx );
+    self:Lockedout_BuildWorldBoss( realmName, charNdx );
+    self:Lockedout_BuildCurrencyList( realmName, charNdx );
+    self:Lockedout_BuildEmissary( realmName, charNdx );
+    self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
+    
     table.sort( LockoutDb ); -- sort the realms alphabetically
     
-    return realmName, charName, charNdx;
+    return realmName, charNdx, playerData;
 end -- Lockedout_GetCurrentCharData()

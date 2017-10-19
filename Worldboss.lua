@@ -1,6 +1,5 @@
 --[[
-    This file is to deal with the code to generate the lockout table/vector and
-    to handle the refresh of data and deletion of stale data
+    This file handles world boss information.
 --]]
 local addonName, _ = ...;
 
@@ -14,9 +13,9 @@ local next = -- variables
 
 -- cache blizzard function/globals
 local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
-        READY_CHECK_READY_TEXTURE, IsQuestActive =    -- variables 
+        READY_CHECK_READY_TEXTURE, IsQuestActive =          -- variables 
       EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
-        READY_CHECK_READY_TEXTURE, C_TaskQuest.IsActive    -- blizzard api
+        READY_CHECK_READY_TEXTURE, C_TaskQuest.IsActive     -- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
 local WORLD_BOSS_LIST = {
@@ -45,7 +44,7 @@ local WORLD_BOSS_LIST = {
     [1770] = { instanceId=822, questId=42819, bossName="Humongris" },
     [1774] = { instanceId=822, questId=43193, bossName="Calamir" },
     [1783] = { instanceId=822, questId=43513, bossName="Na'zak the Fiend" },
-    [1789] = { instanceId=822, questId=43448, bossName="Drugon the Frostblood"    },
+    [1789] = { instanceId=822, questId=43448, bossName="Drugon the Frostblood" },
     [1790] = { instanceId=822, questId=43512, bossName="Ana-Mouz" },
     [1795] = { instanceId=822, questId=43985, bossName="Flotsam" },
     [1796] = { instanceId=822, questId=44287, bossName="Withered J'im" },
@@ -108,7 +107,7 @@ function CheckForMissingMappings()
 end -- CheckForMissingMappings()
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
-function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
+function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
     local worldBosses = {}; -- initialize world boss table;
     
     local calculatedResetDate = addon:getWeeklyLockoutDate();
@@ -126,5 +125,5 @@ function Lockedout_BuildWorldBoss( realmName, charNdx, playerData )
         end -- if( bossData.questId )
     end -- for bossId, bossData in next, WORLD_BOSS_LIST
     
-    playerData.worldBosses = worldBosses;
+    LockoutDb[ realmName ][ charNdx ].worldBosses = worldBosses;
 end -- Lockedout_BuildInstanceLockout()

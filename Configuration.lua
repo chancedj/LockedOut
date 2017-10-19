@@ -9,11 +9,43 @@ local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory =    -- variables
-      InterfaceOptionsFrame_OpenToCategory      -- lua functions
-
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetMacroIcons =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetMacroIcons      -- lua functions
+      
 function addon:getConfigOptions()
-	local configOptions = {
+    --[[
+    local iconList = GetMacroIcons( nil );
+
+    local iconDb = {};
+    for ndx, textureId in next, iconList do
+        iconDb[ textureId ] = "|T" .. textureId .. ":0|t"
+    end
+    --]]
+    
+    local currencyOptions = {
+                                ["short"] = L["Short"],
+                                ["long"] = L["Long"]
+                            };
+    
+    local currencySortOptions = {};
+
+    for key, data in next, addon:getCurrencyOptions() do
+        currencySortOptions[ key ] = data.description;
+    end
+    
+    local currencyList = { };
+
+    for ndx, currencyData in next, addon:getCurrencyList() do
+        if( currencyData.show ) then
+            if( currencyData.icon == nil ) then
+                _, _, currencyData.icon = GetCurrencyInfo( currencyData.currencyID );
+            end
+
+            currencyList[ currencyData.currencyID ] = currencyData.icon .. currencyData.name;
+        end
+    end
+    
+    local configOptions = {
 		type = "group",
 		name = addonName,
 		args = {
@@ -40,8 +72,16 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.currentRealm = val; end,
 			  get = function(info) return self.config.profile.general.currentRealm end
 			},
-			showMinimapIcon = {
+            showRealmHeader = {
 			  order = 12,
+			  name = L["Show Realm"],
+			  desc = L["Show the realm header"],
+			  type = "toggle",
+			  set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
+			  get = function(info) return self.config.profile.general.showRealmHeader end
+			},
+			showMinimapIcon = {
+			  order = 13,
 			  name = L["Hide Icon"],
 			  desc = L["Show Minimap Icon"],
 			  type = "toggle",
@@ -55,6 +95,15 @@ function addon:getConfigOptions()
                     end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
+            --[[
+            minimapIconList = {
+                order = 13,
+                name = "Choose Icon",
+                desc = "Choose icon for addon",
+                type = "select",
+                values = iconList
+            },
+            --]]
 			dungeonHeader={
 			  order = 20,
 			  name = L["Instance Options"],
@@ -102,19 +151,74 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.worldBoss.showKilledOnly = val; end,
 			  get = function(info) return self.config.profile.worldBoss.showKilledOnly end
             },
-			currencyHeader={
+            emissaryHeader={
 			  order = 50,
+			  name = L["Emissary Options"],
+			  type = "header",
+            },
+            emissaryShow = {
+			  order = 51,
+			  name = L["Show"],
+			  desc = L["Show Emissary Information"],
+			  type = "toggle",
+			  set = function(info,val) self.config.profile.emissary.show = val; end,
+			  get = function(info) return self.config.profile.emissary.show end
+            },
+            weeklyQuestHeader={
+			  order = 60,
+			  name = L["Repeatable Quest Options"],
+			  type = "header",
+            },
+            weeklyQuestShow = {
+			  order = 61,
+			  name = L["Show"],
+			  desc = L["Show repeatable quest information"],
+			  type = "toggle",
+			  set = function(info,val) self.config.profile.weeklyQuest.show = val; end,
+			  get = function(info) return self.config.profile.weeklyQuest.show end
+            },
+			currencyHeader={
+			  order = 100,
 			  name = L["Currency Options"],
 			  type = "header",
 			},
 			currencyShow = {
-			  order = 51,
+			  order = 101,
 			  name = L["Show"],
 			  desc = L["Show currency information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.currency.show = val; end,
 			  get = function(info) return self.config.profile.currency.show end
 			},
+			currencyShorten = {
+			  order = 102,
+			  name = L["Currency Display"],
+			  desc = L["Configures currency display"],
+			  type = "select",
+              style = "dropdown",
+              values = currencyOptions,
+			  set = function(info,val) self.config.profile.currency.display = val; end,
+			  get = function(info) return self.config.profile.currency.display end
+			},
+            currencySort = {
+			  order = 102,
+			  name = L["Sort By"],
+			  desc = L["Configure how currency is sorted"],
+			  type = "select",
+              style = "dropdown",
+              values = currencySortOptions,
+			  set = function(info,val) self.config.profile.currency.sortBy = val; end,
+			  get = function(info) return self.config.profile.currency.sortBy end
+            },
+            currencyVisible = {
+                order = 103,
+                name = L["Visible Currencies"],
+                desc = L["Select which currencies you'd like to see"],
+                type = "multiselect",
+                values = currencyList,
+                set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
+                get = function(info,key) return self.config.profile.currency.displayList[key] end
+            }
 		}
 	};
 	
@@ -122,6 +226,16 @@ function addon:getConfigOptions()
 end
 
 function addon:getDefaultOptions()
+
+    local currencyListDefaults = {};
+    for _, currencyData in next, addon:getCurrencyList() do
+        if( currencyData.show ) then
+            currencyListDefaults[ currencyData.currencyID ] = (currencyData.expansionLevel == 6);
+        else
+            currencyListDefaults[ currencyData.currencyID ] = nil; -- if improperly flagged, remove from list
+        end
+    end
+
 	local defaultOptions = {
 		global = {
 			enabled = true
@@ -131,7 +245,8 @@ function addon:getDefaultOptions()
 				hide = false
 			},
 			general = {
-				currentRealm = false
+				currentRealm = false,
+                showRealmHeader = true
 			},
 			dungeon = {
 				show = true
@@ -144,8 +259,17 @@ function addon:getDefaultOptions()
                 showKilledOnly = true
 			},
 			currency = {
-				show = true
-			}
+				show = true,
+                display = "long",
+                displayList = currencyListDefaults,
+                sortBy = "en"
+			},
+            emissary = {
+                show = true
+            },
+            weeklyQuest = {
+                show = true
+            }
 		}
 	}
 	
@@ -174,6 +298,11 @@ function addon:OnInitialize()
     self.optionFrame.default = function() self:ResetDefaults() end;
 	self:RegisterChatCommand( "lo", "ChatCommand" );
 	self:RegisterChatCommand( "lockedout", "ChatCommand" );
+
+    -- events
+    self:RegisterEvent( "PLAYER_ENTERING_WORLD", "FullCharacterRefresh" );
+    self:RegisterEvent( "BOSS_KILL", "FullCharacterRefresh" );
+    self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "FullCharacterRefresh" );
 end
 
 function addon:ChatCommand()
@@ -192,4 +321,18 @@ function addon:OpenConfigDialog( button )
 		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #1
 		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
 	end
+    
+    --[[ this helps to build the currency table
+    for ndx=1, 2000 do
+        local name = GetCurrencyInfo( ndx );
+        
+        if( name ~= nil ) and ( name ~= "" ) then
+            print( "{ [" .. ndx .. "] = { currencyID=" .. ndx .. ", getName=function() return '' end, expansionLevel=1 } }, -- " .. name );
+        end
+    end
+    --]]
+end
+
+function addon:FullCharacterRefresh()
+    self:Lockedout_GetCurrentCharData();
 end
