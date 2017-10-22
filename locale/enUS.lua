@@ -79,6 +79,7 @@ L["L"]  = "L";
 -- quest.lua mappings
 L["Blingtron"]          = "Blingtron";
 L["Instant Complete"]   = "Instant Complete";
+L["Dalaran Weekly"]     = "Dalaran Weekly";
 
 -- expansion abbreviations
 L["Van"]    = "Van";
