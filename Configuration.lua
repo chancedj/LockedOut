@@ -77,7 +77,7 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.currentRealm = val; end,
 			  get = function(info) return self.config.profile.general.currentRealm end
 			},
-            showRealmHeader = {
+                        showRealmHeader = {
 			  order = 12,
 			  name = L["Show Realm"],
 			  desc = L["Show the realm header"],
@@ -91,34 +91,34 @@ function addon:getConfigOptions()
 			  desc = L["Show Minimap Icon"],
 			  type = "toggle",
 			  set = function(info,val)
-                        self.config.profile.minimap.hide = val;
-                        if( self.config.profile.minimap.hide ) then
-                            self.icon:Hide( addonName );
-                        else
-                            self.icon:Show( addonName );
-                        end
-                    end,
+                                    self.config.profile.minimap.hide = val;
+                                    if( self.config.profile.minimap.hide ) then
+                                        self.icon:Hide( addonName );
+                                    else
+                                        self.icon:Show( addonName );
+                                    end
+                                end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
-            setAnchorPoint = {
+                        setAnchorPoint = {
 			  order = 14,
 			  name = L["Anchor To"],
 			  desc = L["Choose where hover tooltip displays"],
 			  type = "select",
-              style = "dropdown",
-              values = anchorOptions,
+			  style = "dropdown",
+			  values = anchorOptions,
 			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
 			  get = function(info) return self.config.profile.general.anchorPoint end
-            },
-            --[[
-            minimapIconList = {
-                order = 19,
-                name = "Choose Icon",
-                desc = "Choose icon for addon",
-                type = "select",
-                values = iconList
-            },
-            --]]
+			},
+			--[[
+			minimapIconList = {
+			  order = 19,
+			  name = "Choose Icon",
+			  desc = "Choose icon for addon",
+			  type = "select",
+			  values = iconList
+			},
+			--]]
 			dungeonHeader={
 			  order = 20,
 			  name = L["Instance Options"],
@@ -158,40 +158,40 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.worldBoss.show = val; end,
 			  get = function(info) return self.config.profile.worldBoss.show end
 			},
-            worldBossOnlyDead = {
-              order = 42,
-              name = L["Show when dead"],
-              desc = L["Show in list only when killed"],
-              type = "toggle",
+			worldBossOnlyDead = {
+			  order = 42,
+			  name = L["Show when dead"],
+			  desc = L["Show in list only when killed"],
+			  type = "toggle",
 			  set = function(info,val) self.config.profile.worldBoss.showKilledOnly = val; end,
 			  get = function(info) return self.config.profile.worldBoss.showKilledOnly end
-            },
-            emissaryHeader={
+			},
+			emissaryHeader={
 			  order = 50,
 			  name = L["Emissary Options"],
 			  type = "header",
-            },
-            emissaryShow = {
+			},
+			emissaryShow = {
 			  order = 51,
 			  name = L["Show"],
 			  desc = L["Show Emissary Information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.emissary.show = val; end,
 			  get = function(info) return self.config.profile.emissary.show end
-            },
-            weeklyQuestHeader={
+			},
+			weeklyQuestHeader={
 			  order = 60,
 			  name = L["Repeatable Quest Options"],
 			  type = "header",
-            },
-            weeklyQuestShow = {
+			},
+			weeklyQuestShow = {
 			  order = 61,
 			  name = L["Show"],
 			  desc = L["Show repeatable quest information"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.weeklyQuest.show = val; end,
 			  get = function(info) return self.config.profile.weeklyQuest.show end
-            },
+			},
 			currencyHeader={
 			  order = 100,
 			  name = L["Currency Options"],
@@ -210,30 +210,30 @@ function addon:getConfigOptions()
 			  name = L["Currency Display"],
 			  desc = L["Configures currency display"],
 			  type = "select",
-              style = "dropdown",
-              values = currencyOptions,
+			  style = "dropdown",
+			  values = currencyOptions,
 			  set = function(info,val) self.config.profile.currency.display = val; end,
 			  get = function(info) return self.config.profile.currency.display end
 			},
-            currencySort = {
+			currencySort = {
 			  order = 102,
 			  name = L["Sort By"],
 			  desc = L["Configure how currency is sorted"],
 			  type = "select",
-              style = "dropdown",
-              values = currencySortOptions,
+			  style = "dropdown",
+			  values = currencySortOptions,
 			  set = function(info,val) self.config.profile.currency.sortBy = val; end,
 			  get = function(info) return self.config.profile.currency.sortBy end
-            },
-            currencyVisible = {
-                order = 103,
-                name = L["Visible Currencies"],
-                desc = L["Select which currencies you'd like to see"],
-                type = "multiselect",
-                values = currencyList,
-                set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
-                get = function(info,key) return self.config.profile.currency.displayList[key] end
-            }
+			},
+			currencyVisible = {
+			  order = 103,
+			  name = L["Visible Currencies"],
+			  desc = L["Select which currencies you'd like to see"],
+			  type = "multiselect",
+			  values = currencyList,
+			  set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
+			  get = function(info,key) return self.config.profile.currency.displayList[key] end
+			}
 		}
 	};
 	
