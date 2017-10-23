@@ -55,17 +55,28 @@ end
 local function emptyFunction()
 end
 
+local function setAnchorToTooltip( tooltip, linenum, cellnum )
+    local parentTT = LibQTip:Acquire( "LockedoutTooltip" );
+    
+    if( false ) then
+        tooltip:SmartAnchorTo( parentTT );
+    else
+        tooltip:SmartAnchorTo( parentTT.lines[ linenum ].cells[ cellnum ] );
+    end
+    
+    addPopupColorBanding( tooltip );
+end
+
 local function displayReset( self )
     local ttName = self.anchor:getTTName();
-    local tt = LibQTip:Acquire( "LockedoutTooltip" );
     local tooltip = LibQTip:Acquire( ttName );
     
     tooltip:SetColumnLayout( 2 );
     local ln = tooltip:AddLine( );
     tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
     tooltip:SetCell( ln, 2, "|cFFFF0000" .. SecondsToTime( self.anchor.data.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
-    
-    tooltip:SmartAnchorTo( tt.lines[ self.anchor.lineNum ].cells[ self.anchor.cellNum ] );
+
+    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
     addPopupColorBanding( tooltip );
     tooltip:Show();
 end -- function( data )
@@ -101,7 +112,6 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                 instanceDisplay.displayTT = function( self )
                                                 local ttName = self.anchor:getTTName();
-                                                local tt = LibQTip:Acquire( "LockedoutTooltip" );
                                                 local tooltip = LibQTip:Acquire( ttName );
                                                 
                                                 local col = 2;
@@ -142,8 +152,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                     end -- for bossName, bossData in next, instanceData.bossData
                                                 end -- for difficulty, instanceDetails in next, instances
                                                 
-                                                tooltip:SmartAnchorTo( tt.lines[ self.anchor.lineNum ].cells[ self.anchor.cellNum ] );
-                                                addPopupColorBanding( tooltip );
+                                                setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                                 tooltip:Show();
                                             end -- function( data )
                 instanceDisplay.deleteTT = closeTT;
@@ -448,7 +457,6 @@ function addon:ShowInfo( frame )
                                     end
 
                                     local ttName = self.anchor:getTTName();
-                                    local tt = LibQTip:Acquire( "LockedoutTooltip" );
                                     local tooltip = LibQTip:Acquire( ttName );
                                     tooltip:SetColumnLayout( 2 );
                                     local line = tooltip:AddHeader( "" );
@@ -458,8 +466,7 @@ function addon:ShowInfo( frame )
                                         tooltip:AddLine( k, p );
                                     end -- for k, p in next, charData.iLevel
 
-                                    tooltip:SmartAnchorTo( tt.lines[ self.anchor.lineNum ].cells[ self.anchor.cellNum ] );
-                                    addPopupColorBanding( tooltip );
+                                    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )
         charDisplay.deleteTT = closeTT;
