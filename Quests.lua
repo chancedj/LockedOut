@@ -71,7 +71,16 @@ end
 
 local QUEST_LIBRARY = {
     ["blingtron"]       = {name=L["Blingtron"],         resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=true,  checkIDs={40753,34774,31752} },
-    ["instantquest"]    = {name=L["Instant Complete"],  resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221597,221557} },
+    --[[
+    spellID's for the below instance quests
+    Death Knight: Frost Wyrm -- 221557
+    Demon Hunter: Fel Hammer's Wrath -- 221561
+    Mage: Might of Dalaran -- 221602
+    Paladin: Grand Crusade -- 221587
+    Warlock: Unleash Infernal -- 219540
+    Warrior: Val'kyr Call -- 221597
+    --]]
+    ["instantquest"]    = {name=L["Instant Complete"],  resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
     ["dalaranweekly"]   = {name=L["Dalaran Weekly"],    resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} }
 };
 
