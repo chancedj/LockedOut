@@ -22,6 +22,11 @@ function addon:getConfigOptions()
     end
     --]]
     
+    local anchorOptions = {
+        ["cell"] = L["At cursor location"],
+        ["parent"] = L["At bottom of frame"]
+    }
+    
     local currencyOptions = {
                                 ["short"] = L["Short"],
                                 ["long"] = L["Long"]
@@ -95,9 +100,19 @@ function addon:getConfigOptions()
                     end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
+            setAnchorPoint = {
+			  order = 14,
+			  name = L["Anchor To"],
+			  desc = L["Choose where hover tooltip displays"],
+			  type = "select",
+              style = "dropdown",
+              values = anchorOptions,
+			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
+			  get = function(info) return self.config.profile.general.anchorPoint end
+            },
             --[[
             minimapIconList = {
-                order = 13,
+                order = 19,
                 name = "Choose Icon",
                 desc = "Choose icon for addon",
                 type = "select",
@@ -246,7 +261,8 @@ function addon:getDefaultOptions()
 			},
 			general = {
 				currentRealm = false,
-                showRealmHeader = true
+                showRealmHeader = true,
+                anchorPoint = "cell"
 			},
 			dungeon = {
 				show = true

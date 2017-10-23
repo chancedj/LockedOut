@@ -58,7 +58,7 @@ end
 local function setAnchorToTooltip( tooltip, linenum, cellnum )
     local parentTT = LibQTip:Acquire( "LockedoutTooltip" );
     
-    if( false ) then
+    if( addon.config.profile.general.anchorPoint == "parent" ) then
         tooltip:SmartAnchorTo( parentTT );
     else
         tooltip:SmartAnchorTo( parentTT.lines[ linenum ].cells[ cellnum ] );

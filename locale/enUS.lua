@@ -37,6 +37,8 @@ L["Short"]                      = "Short";
 L["Long"]                       = "Long";
 L["Expansion then Name"]        = "Expansion then Name";
 L["Name then Expansion"]        = "Name then Expansion";
+L["At cursor location"]         = "At cursor location";
+L["At bottom of frame"]         = "At bottom of frame";
 
 -- * labels
 L["Enable"]             = "Enable";
@@ -45,6 +47,7 @@ L["Hide Icon"]          = "Hide Icon";
 L["Show when dead"]     = "Show when dead";
 L["Sort By"]            = "Sort By";
 L["Visible Currencies"] = "Visible Currencies";
+L["Anchor To"]          = "Anchor To";
 
 -- * label descriptions
 L["Enables / disables the addon"]               = "Enables / disables the addon";
@@ -61,6 +64,7 @@ L["Show Emissary Information"]                  = "Show Emissary Information";
 L["Show repeatable quest information"]          = "Show repeatable quest information";
 L["Configure how currency is sorted"]           = "Configure how currency is sorted";
 L["Select which currencies you'd like to see"]  = "Select which currencies you'd like to see";
+L["Choose where hover tooltip displays"]        = "Choose where hover tooltip displays";
 
 -- difficulty mapping full
 L["Unknown"]    = "Unknown";
