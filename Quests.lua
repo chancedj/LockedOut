@@ -50,7 +50,7 @@ local function checkSpellStatus( self )
         
         for ndx, data in next, tree do
             if( data.selected ) then
-                for _, spellId in next, self.checkIds do
+                for _, spellId in next, self.checkIDs do
                     if( data.perkSpellID == spellId ) then
                         local start, duration, enabled = GetSpellCooldown( spellId );
                         
