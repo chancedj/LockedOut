@@ -347,6 +347,8 @@ function addon:ShowInfo( frame )
     local CURRENCY_LIST_MAP = addon:getCurrencyListMap();
     
     -- get list of characters and realms for the horizontal
+    local dailyLockout = addon:getDailyLockoutDate();
+
     for realmName, characters in next, LockoutDb do
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
