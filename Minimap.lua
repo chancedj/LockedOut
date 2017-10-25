@@ -55,37 +55,55 @@ end
 local function emptyFunction()
 end
 
+local function aquireEmptyTooltip( ttName )
+    local tooltip = LibQTip:Acquire( ttName );
+    
+    if( #tooltip.lines > 0 ) then
+        LibQTip:Release( tooltip );
+        
+        tooltip = LibQTip:Acquire( ttName );
+    end
+    
+    return tooltip
+end
+
 local function setAnchorToTooltip( tooltip, linenum, cellnum )
     local parentTT = LibQTip:Acquire( "LockedoutTooltip" );
+    
+    tooltip:SetFrameLevel( parentTT:GetFrameLevel() + 1 );
     
     if( addon.config.profile.general.anchorPoint == "parent" ) then
         tooltip:SmartAnchorTo( parentTT );
     else
         tooltip:SmartAnchorTo( parentTT.lines[ linenum ].cells[ cellnum ] );
     end
+
+    tooltip:SetAutoHideDelay( 0.1, parentTT.lines[ linenum ].cells[ cellnum ] );
     
     addPopupColorBanding( tooltip );
 end
 
 local function displayReset( self )
     local ttName = self.anchor:getTTName();
-    local tooltip = LibQTip:Acquire( ttName );
+    local tooltip = aquireEmptyTooltip( ttName );
     
     tooltip:SetColumnLayout( 2 );
     local ln = tooltip:AddLine( );
     tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
     tooltip:SetCell( ln, 2, "|cFFFF0000" .. SecondsToTime( self.anchor.data.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
+    tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
 
     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
     addPopupColorBanding( tooltip );
+    
     tooltip:Show();
 end -- function( data )
 
 local function closeTT( self )
-    local ttName = self.anchor:getTTName();
-    local tt = LibQTip:Acquire( ttName );
+    --local ttName = self.anchor:getTTName();
+    --local tt = LibQTip:Acquire( ttName );
 
-    LibQTip:Release( tt );
+    --LibQTip:Release( tt );
 end -- function( data )
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
@@ -112,7 +130,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                 instanceDisplay.displayTT = function( self )
                                                 local ttName = self.anchor:getTTName();
-                                                local tooltip = LibQTip:Acquire( ttName );
+                                                local tooltip = aquireEmptyTooltip( ttName );
                                                 
                                                 local col = 2;
                                                 
@@ -123,10 +141,11 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                                                     local ln = 1;
                                                     tooltip:SetCell( ln, col, difficulty, nil, "CENTER" );
-                                                    tooltip:SetLineColor( ln, 1, 1, 1, 1 );
+                                                    tooltip:SetLineColor( ln, 1, 1, 1, 0.1 );
                                                     
                                                     if( col == 2 ) then
                                                         ln = tooltip:AddLine( );
+                                                        tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                                     else
                                                         ln = ln + 1;
                                                     end
@@ -457,13 +476,14 @@ function addon:ShowInfo( frame )
                                     end
 
                                     local ttName = self.anchor:getTTName();
-                                    local tooltip = LibQTip:Acquire( ttName );
+                                    local tooltip = aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
                                     local line = tooltip:AddHeader( "" );
-                                    tooltip:SetLineColor( line, 1, 1, 1, 1 );
+                                    tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
                                     tooltip:SetCell( line, 1, L["Character iLevels"], 2 );
                                     for k, p in next, self.anchor.data.iLevel do
-                                        tooltip:AddLine( k, p );
+                                        line = tooltip:AddLine( k, p );
+                                        tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end -- for k, p in next, charData.iLevel
 
                                     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
