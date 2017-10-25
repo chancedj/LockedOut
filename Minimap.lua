@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local next, table, SecondsToTime, tsort =       -- variables
-      next, table, SecondsToTime, table.sort    -- lua functions
+local next, table, SecondsToTime, tsort, mfloor =           -- variables
+      next, table, SecondsToTime, table.sort, math.floor    -- lua functions
 
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
@@ -375,6 +375,7 @@ function addon:ShowInfo( frame )
     local CURRENCY_LIST_MAP = addon:getCurrencyListMap();
     
     -- get list of characters and realms for the horizontal
+    local dailyLockout = addon:getDailyLockoutDate();
     for realmName, characters in next, LockoutDb do
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
@@ -417,8 +418,9 @@ function addon:ShowInfo( frame )
                 ---[[
                 for questID, emData in next, charData.emissaries do
                     if( emData.name ~= nil ) then
-                        emissaryList[ emData.day + 1 ] = {
-                            displayName = "(+" .. emData.day .. " Day) " .. emData.name,
+                        local day = mfloor( ( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
+                        emissaryList[ day + 1 ] = {
+                            displayName = "(+" .. day .. " Day) " .. emData.name,
                             name = emData.name,
                             questID = questID
                         }
