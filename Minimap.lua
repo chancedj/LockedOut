@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local next, table, SecondsToTime, tsort, mfloor =           -- variables
-      next, table, SecondsToTime, table.sort, math.floor    -- lua functions
+local next, table, SecondsToTime, tsort, mfloor, abs =           -- variables
+      next, table, SecondsToTime, table.sort, math.floor, math.abs    -- lua functions
 
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
@@ -418,7 +418,7 @@ function addon:ShowInfo( frame )
                 ---[[
                 for questID, emData in next, charData.emissaries do
                     if( emData.name ~= nil ) then
-                        local day = mfloor( ( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
+                        local day = mfloor( abs( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
                         emissaryList[ day + 1 ] = {
                             displayName = "(+" .. day .. " Day) " .. emData.name,
                             name = emData.name,
