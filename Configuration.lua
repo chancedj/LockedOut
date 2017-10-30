@@ -9,8 +9,8 @@ local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetMacroIcons =    -- variables
-      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetMacroIcons      -- lua functions
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons      -- lua functions
       
 function addon:getConfigOptions()
     --[[
@@ -43,7 +43,11 @@ function addon:getConfigOptions()
     for ndx, currencyData in next, addon:getCurrencyList() do
         if( currencyData.show ) then
             if( currencyData.icon == nil ) then
-                _, _, currencyData.icon = GetCurrencyInfo( currencyData.ID );
+                if( currencyData.type == "C" ) then
+                    _, _, currencyData.icon = GetCurrencyInfo( currencyData.ID );
+                else
+                    _, _, _, _, _, _, _, _, _, currencyData.icon = GetItemInfo( currencyData.ID );
+                end;
             end
 
             currencyList[ currencyData.ID ] = currencyData.icon .. currencyData.name;
