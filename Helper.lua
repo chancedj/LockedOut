@@ -258,7 +258,7 @@ function addon:getWeeklyLockoutDate()
     local daysLefToReset    = weekdayRemap[ serverResetDay ][ date( "*t", currentServerTime ).wday ];
 
     local currentServerTime = GetServerTime();
-    local weeklyResetTime   = addon:getDailyLockoutDate();
+    local weeklyResetTime   = self:getDailyLockoutDate();
 
     -- handle reset on day of reset (before vs after server reset)
     if( daysLefToReset == 6 ) then
