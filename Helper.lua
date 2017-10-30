@@ -12,8 +12,8 @@ local print, type =                                -- variables
       print, type                                  -- lua functions
 
 -- cache blizzard function/globals
-local GetCurrentRegion, GetServerTime, GetQuestResetTime, RAID_CLASS_COLORS =                        -- variables
-      GetCurrentRegion, GetServerTime, GetQuestResetTime, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
+local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo, RAID_CLASS_COLORS =                        -- variables
+      GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
 
 addon.ExpansionAbbr = {
     [0] = L["Van"],
@@ -169,7 +169,10 @@ local CURRENCY_LIST = {
     { ID=1501, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Writhing Essence
     { ID=1506, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Argus Waystone
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
-    { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true }  -- Veiled Argunite
+    { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
+    
+    -- currency item
+    { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true }  -- Pet charms
 };
 
 local currencySortOptions = {
@@ -197,7 +200,11 @@ local currencySortOptions = {
 
 local function resolveCurrencyInfo( )
     for _, currency in next, CURRENCY_LIST do
-        currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
+        if( currency.type == "C" ) then
+            currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
+        else
+            currency.name, _, _, _, _, _, _, _, _, currency.icon = GetItemInfo( currency.ID );
+        end;
         
         if( currency.icon ) then
             currency.icon = "|T" .. currency.icon .. ":0|t"

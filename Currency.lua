@@ -13,8 +13,8 @@ local next, strfmt =            -- variables
       next, string.format       -- lua functions
 
 -- cache blizzard function/globals
-local GetCurrencyInfo, IsQuestFlaggedCompleted =    -- variables
-      GetCurrencyInfo, IsQuestFlaggedCompleted      -- blizzard api
+local GetCurrencyInfo, GetItemCount, IsQuestFlaggedCompleted =    -- variables
+      GetCurrencyInfo, GetItemCount, IsQuestFlaggedCompleted      -- blizzard api
 
 ---[[
 local BONUS_ROLL_QUESTID = {
@@ -76,7 +76,14 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
 
     for ndx, currencyData in next, addon:getCurrencyList() do
         if( currencyData.show ) then
-            local name, count, icon, _, _, maximum, discovered = GetCurrencyInfo( currencyData.ID );
+            local count, maximum, discovered;
+            if( currencyData.type == "C" ) then
+                _, count, _, _, _, maximum, discovered = GetCurrencyInfo( currencyData.ID );
+            else
+                count = GetItemCount( currencyData.ID, true, false );
+                discovered = (count > 0);
+                maximum = 0;
+            end;
 
             local data;
             if( discovered ) then
