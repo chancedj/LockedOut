@@ -20,8 +20,8 @@ local UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexB
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 
 local function checkQuestStatus( self )
-    for _, questId in next, self.checkIDs do
-        if ( IsQuestFlaggedCompleted( questId ) ) then
+    for _, questID in next, self.checkIDs do
+        if ( IsQuestFlaggedCompleted( questID ) ) then
             local resetDate;
             if( self.resetForm == "daily" ) then
                 resetDate = addon:getDailyLockoutDate();
@@ -29,7 +29,7 @@ local function checkQuestStatus( self )
                 resetDate = addon:getWeeklyLockoutDate();
             else
                 resetDate = nil
-                print( "improper resetForm for questId: .. " .. questId );
+                print( "improper resetForm for questID: .. " .. questID );
             end
             
             return resetDate, true, BOSS_KILL_TEXT;

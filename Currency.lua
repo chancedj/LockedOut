@@ -97,14 +97,14 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
                 if( questList ~= nil ) then
                     bonus = {};
                     for _, questGroup in next, questList do
-                        local bonusCompleted = 0;
-                        for _, questId in next, questGroup do
-                            if( IsQuestFlaggedCompleted( questId ) ) then
-                                bonusCompleted = bonusCompleted + 1;
+                        for _, questID in next, questGroup do
+                            addon:getQuestTitleByID( questID ); -- call now to cache the data for later
+                            addon:debug( "checking: " .. questID );
+                            if( IsQuestFlaggedCompleted( questID ) ) then
+                                addon:debug( "complete: " .. questID );
+                                bonus[ #bonus + 1 ] = questID;
                             end
                         end
-
-                        bonus[ #bonus + 1 ] = bonusCompleted;
                     end
                 end
                 

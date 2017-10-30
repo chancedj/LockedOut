@@ -209,6 +209,25 @@ local function resolveCurrencyInfo( )
     end
 end
 
+local MyScanningTooltip = CreateFrame("GameTooltip", "MyScanningTooltip", UIParent, "GameTooltipTemplate")
+
+local QuestTitleFromID = setmetatable({}, { __index = function(t, id)
+	MyScanningTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	MyScanningTooltip:SetHyperlink("quest:"..id)
+	local title = MyScanningTooltipTextLeft1:GetText()
+	MyScanningTooltip:Hide()
+	if title and title ~= RETRIEVING_DATA then
+		t[id] = title
+		return title
+	end
+end })
+
+function addon:getQuestTitleByID( questID )
+    -- example pulled from below
+    -- http://www.wowinterface.com/forums/showthread.php?t=46934
+    return QuestTitleFromID[ questID ];
+end
+
 function addon:debug( msg )
     if( false ) then
         print( msg );

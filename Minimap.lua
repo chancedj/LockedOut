@@ -114,13 +114,6 @@ local function displayReset( self )
     tooltip:Show();
 end -- function( data )
 
-local function closeTT( self )
-    --local ttName = self.anchor:getTTName();
-    --local tt = LibQTip:Acquire( ttName );
-
-    --LibQTip:Release( tt );
-end -- function( data )
-
 local function populateInstanceData( header, tooltip, charList, instanceList )
     -- make sure it's not empty
     if ( next( instanceList ) == nil ) then return; end
@@ -189,7 +182,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                                 tooltip:Show();
                                             end -- function( data )
-                instanceDisplay.deleteTT = closeTT;
+                instanceDisplay.deleteTT = emptyFunction;
                 instanceDisplay.anchor = getAnchorPkt( "in", instanceName, instances, lineNum, colNdx + 1 );
 
                 tooltip:SetCell( lineNum, colNdx + 1, addon:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
@@ -223,7 +216,7 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
 
                 local bossDisplay = {};
                 bossDisplay.displayTT  = displayReset;
-                bossDisplay.deleteTT   = closeTT;
+                bossDisplay.deleteTT   = emptyFunction;
                 bossDisplay.anchor     = getAnchorPkt( "wb", bossName, bossData, lineNum, colNdx + 1 );
 
                 tooltip:SetCell( lineNum, colNdx + 1, bossData.displayText, nil, "CENTER" );
@@ -260,7 +253,7 @@ local function populateWeeklyQuestData( header, tooltip, charList, weeklyQuestLi
                 if( questData.resetDate ~= nil ) then
                     questDisplay.anchor = getAnchorPkt( "ql", questAbbr, questData, lineNum, colNdx + 1 );
                     questDisplay.displayTT = displayReset;
-                    questDisplay.deleteTT  = closeTT;
+                    questDisplay.deleteTT  = emptyFunction;
                 else
                     -- display nothing if no resetdate is found.
                     questDisplay.anchor = {};
@@ -302,6 +295,11 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
                 local currData = LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.ID ];
 
                 local displayText = "";
+                local currDisplay = {};
+                currDisplay.anchor = {};
+                currDisplay.displayTT = emptyFunction;
+                currDisplay.deleteTT = emptyFunction;
+
                 if( currData.count ~= nil ) then
                     displayText = addon:shortenAmount( currData.count );
                     if( currData.maximum > 0 ) then
@@ -315,12 +313,37 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
                     end
                     
                     if( currData.bonus ~= nil ) then
-                        displayText = displayText .. "(" .. table.concat( currData.bonus, "/" ) .. ")";
+                        ---[[
+                        currDisplay.anchor = getAnchorPkt( "cr", currencyData.ID, currData, lineNum, colNdx + 1 );
+                        currDisplay.displayTT = function( self )
+                                                    local ttName = self.anchor:getTTName();
+                                                    local tooltip = addon:aquireEmptyTooltip( ttName );
+                                                    
+                                                    tooltip:SetColumnLayout( 1 );
+                                                    tooltip:AddHeader( "Quest Name" );
+                                                    for ndx, questID in next, self.anchor.data.bonus do
+                                                        addon:debug( "questID: " .. questID );
+                                                        if( questID > 3 ) then
+                                                            local title = addon:getQuestTitleByID( questID );
+                                                            
+                                                            if( title ) then
+                                                                tooltip:AddLine( "|cffffff00|Hquest:" .. questID .. "|h[" .. title .. "]|h|r" );
+                                                            end
+                                                        end
+                                                    end
+
+                                                    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
+                                                    tooltip:Show();
+                                                end
+                        --]]
+                        displayText = displayText .. "(" .. #currData.bonus .. ")";
                     end
                 end
+
                 tooltip:SetCell( lineNum, colNdx + 1, displayText, nil, "CENTER" );
-                tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", emptyFunction );    -- close out tooltip when leaving
-                tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", emptyFunction );    -- open tooltip with info when entering cell.
+
+                tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() currDisplay:displayTT( ); end );    -- close out tooltip when leaving
+                tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() currDisplay:deleteTT( ); end );    -- open tooltip with info when entering cell.
                 tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
             end -- if (LockoutDb[ charData.realmName ] ~= nil) and .....
         end -- for colNdx, charData in next, charList
@@ -511,7 +534,7 @@ function addon:ShowInfo( frame )
                                     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )
-        charDisplay.deleteTT = closeTT;
+        charDisplay.deleteTT = emptyFunction;
         charDisplay.deleteChar =    function( self )
                                         LockoutDb[ char.realmName ][ char.charNdx ] = nil;
 
