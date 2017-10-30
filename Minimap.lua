@@ -7,10 +7,14 @@ local addonName, _ = ...;
 local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
--- cache lua functions
-local next, table, SecondsToTime, tsort, mfloor, abs =           -- variables
-      next, table, SecondsToTime, table.sort, math.floor, math.abs    -- lua functions
+-- Upvalues
+local next, table, tsort, mfloor, abs =           -- variables
+      next, table, table.sort, math.floor, math.abs    -- lua functions
 
+-- cache blizzard function/globals
+local SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE  =    -- variables
+      SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE       -- blizzard api
+      
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
 
@@ -327,6 +331,7 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
 end -- populateInstanceData
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
+local CHAR_DELETE_TEXT = "|T" .. READY_CHECK_NOT_READY_TEXTURE .. ":0|t";
 local function populateEmissaryData( header, tooltip, charList, emissaryList )
     -- make sure it's not empty
     if ( next( emissaryList ) == nil ) then return; end
@@ -470,15 +475,18 @@ function addon:ShowInfo( frame )
     tooltip:SetColumnLayout( #charList + 1 );
 
     -- Add a header filling only the first columns in the first 2 rows (Realm, Character)
+    local deleteLineNum;
     local realmLineNum;
     local charLineNum;
     
+    deleteLineNum = tooltip:AddHeader( "" ); -- delete column
     if( realmCount > 1 ) and ( self.config.profile.general.showRealmHeader ) then -- show realm only when multiple are involved
         realmLineNum = tooltip:AddHeader( L[ "Realm" ] ); -- realm column
     end
     charLineNum  = tooltip:AddHeader( L[ "Character" ] ); -- char column
     -- add the characters and realms across the header
     for colNdx, char in next, charList do
+        tooltip:SetCell( deleteLineNum, colNdx + 1, CHAR_DELETE_TEXT, nil, "CENTER" );
         if( realmCount > 1 ) and ( self.config.profile.general.showRealmHeader ) then -- show realm only when multiple are involved
             tooltip:SetCell( realmLineNum, colNdx + 1, addon:colorizeString( char.className, char.realmName ), nil, "CENTER" );
         end
@@ -504,10 +512,17 @@ function addon:ShowInfo( frame )
                                     tooltip:Show();
                                 end -- function( data )
         charDisplay.deleteTT = closeTT;
+        charDisplay.deleteChar =    function( self )
+                                        LockoutDb[ char.realmName ][ char.charNdx ] = nil;
+
+                                        local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
+                                        LibQTip:Release( tooltip );
+                                    end
         charDisplay.anchor = getAnchorPkt( "ch", charData.charName, charData, charLineNum, colNdx + 1 );
 
         tooltip:SetCell( charLineNum, colNdx + 1, addon:colorizeString( char.className, char.charName ), nil, "CENTER" );
 
+        tooltip:SetCellScript( deleteLineNum, colNdx + 1, "OnMouseDown", function() charDisplay:deleteChar( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charDisplay:displayTT( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charDisplay:deleteTT( ); end );     -- close out tooltip when leaving
     end -- for colNdx, char in next, charList
