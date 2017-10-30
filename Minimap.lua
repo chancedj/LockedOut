@@ -55,15 +55,26 @@ end
 local function emptyFunction()
 end
 
-local function aquireEmptyTooltip( ttName )
+function addon:aquireEmptyTooltip( ttName )
+    self.openSubTooltips = self.openSubTooltips or {};
+    if( #self.openSubTooltips > 0 ) then
+        -- close all open sub tooltips.
+        for ndx, openTTName in next, self.openSubTooltips do
+            local tt = LibQTip:Acquire( openTTName );
+            LibQTip:Release( tt );
+            self.openSubTooltips[ ndx ] = nil;
+        end
+    end
+    
     local tooltip = LibQTip:Acquire( ttName );
+
+    self.openSubTooltips[ #self.openSubTooltips + 1 ] = ttName;
     
     if( #tooltip.lines > 0 ) then
         LibQTip:Release( tooltip );
-        
         tooltip = LibQTip:Acquire( ttName );
     end
-    
+
     return tooltip
 end
 
@@ -85,7 +96,7 @@ end
 
 local function displayReset( self )
     local ttName = self.anchor:getTTName();
-    local tooltip = aquireEmptyTooltip( ttName );
+    local tooltip = addon:aquireEmptyTooltip( ttName );
     
     tooltip:SetColumnLayout( 2 );
     local ln = tooltip:AddLine( );
@@ -130,7 +141,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                 instanceDisplay.displayTT = function( self )
                                                 local ttName = self.anchor:getTTName();
-                                                local tooltip = aquireEmptyTooltip( ttName );
+                                                local tooltip = addon:aquireEmptyTooltip( ttName );
                                                 
                                                 local col = 2;
                                                 
@@ -479,7 +490,7 @@ function addon:ShowInfo( frame )
                                     end
 
                                     local ttName = self.anchor:getTTName();
-                                    local tooltip = aquireEmptyTooltip( ttName );
+                                    local tooltip = addon:aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
                                     local line = tooltip:AddHeader( "" );
                                     tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
