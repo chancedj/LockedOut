@@ -349,5 +349,8 @@ function addon:OpenConfigDialog( button )
 end
 
 function addon:FullCharacterRefresh( event )
+    addon:debug( "event fired: " .. event );
+    addon:debug( "Reset: ", GetQuestResetTime() );
+    addon:debug( "Quest Reset: ", self:getDailyLockoutDate() );
     self:Lockedout_GetCurrentCharData();
 end

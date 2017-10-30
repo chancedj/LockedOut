@@ -15,25 +15,6 @@ local print, type =                                -- variables
 local GetCurrentRegion, GetServerTime, GetQuestResetTime, RAID_CLASS_COLORS =                        -- variables
       GetCurrentRegion, GetServerTime, GetQuestResetTime, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
 
-function addon:colorizeString( className, value )
-    if( className == nil ) then return value; end
-
-    local sStart, sTail, classColor = "|c", "|r", RAID_CLASS_COLORS[ className ].colorStr;
-
-    return sStart .. classColor .. value .. sTail;
-end -- addon:colorizeString
-
-function addon:destroyDb()
-    if( LockoutDb == nil ) then return; end
-
-    local _, charData = next( LockoutDb );
-    if( charData == nil ) then LockoutDb = nil; return; end
-
-    local key = next( charData );
-    -- if the char ndx is not a number, we have the old style so destroy db
-    if( type( key ) ~= "number" ) then LockoutDb = nil; end;
-end -- destroyDb
-
 addon.ExpansionAbbr = {
     [0] = L["Van"],
     [1] = L["BC"],
@@ -222,6 +203,31 @@ local function resolveCurrencyInfo( )
         end
     end
 end
+
+function addon:debug( msg )
+    if( false ) then
+        print( msg );
+    end;
+end
+
+function addon:colorizeString( className, value )
+    if( className == nil ) then return value; end
+
+    local sStart, sTail, classColor = "|c", "|r", RAID_CLASS_COLORS[ className ].colorStr;
+
+    return sStart .. classColor .. value .. sTail;
+end -- addon:colorizeString
+
+function addon:destroyDb()
+    if( LockoutDb == nil ) then return; end
+
+    local _, charData = next( LockoutDb );
+    if( charData == nil ) then LockoutDb = nil; return; end
+
+    local key = next( charData );
+    -- if the char ndx is not a number, we have the old style so destroy db
+    if( type( key ) ~= "number" ) then LockoutDb = nil; end;
+end -- destroyDb
 
 function addon:getCurrencyOptions()
     return currencySortOptions;
