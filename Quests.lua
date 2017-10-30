@@ -81,7 +81,8 @@ local QUEST_LIBRARY = {
     Warrior: Val'kyr Call -- 221597
     --]]
     ["instantquest"]    = {name=L["Instant Complete"],  resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
-    ["dalaranweekly"]   = {name=L["Dalaran Weekly"],    resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} }
+    ["dalaranweekly"]   = {name=L["Dalaran Weekly"],    resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
+    ["seals"]           = {name=L["Seal of Fate"],      resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43510} },
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )

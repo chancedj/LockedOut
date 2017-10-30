@@ -29,7 +29,7 @@ local BONUS_ROLL_QUESTID = {
             47851,  -- marks of honor
             47864,  -- marks of honor
             47865,  -- marks of honor
-            43510,  -- class hall
+            --43510,  -- class hall
             47040,  -- broken shore
             47045,  -- broken shore
             47054   -- broken shore

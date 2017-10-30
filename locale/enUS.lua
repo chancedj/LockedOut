@@ -84,6 +84,7 @@ L["L"]  = "L";
 L["Blingtron"]          = "Blingtron";
 L["Instant Complete"]   = "Instant Complete";
 L["Dalaran Weekly"]     = "Dalaran Weekly";
+L["Seal of Fate"]       = "Seal of Fate";
 
 -- expansion abbreviations
 L["Van"]    = "Van";
