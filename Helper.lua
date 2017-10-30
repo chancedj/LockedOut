@@ -169,10 +169,7 @@ local CURRENCY_LIST = {
     { ID=1501, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Writhing Essence
     { ID=1506, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Argus Waystone
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
-    { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
-    
-    -- currency item
-    { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true }  -- Pet charms
+    { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true }  -- Veiled Argunite
 };
 
 local currencySortOptions = {
