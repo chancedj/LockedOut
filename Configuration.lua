@@ -43,10 +43,10 @@ function addon:getConfigOptions()
     for ndx, currencyData in next, addon:getCurrencyList() do
         if( currencyData.show ) then
             if( currencyData.icon == nil ) then
-                _, _, currencyData.icon = GetCurrencyInfo( currencyData.currencyID );
+                _, _, currencyData.icon = GetCurrencyInfo( currencyData.ID );
             end
 
-            currencyList[ currencyData.currencyID ] = currencyData.icon .. currencyData.name;
+            currencyList[ currencyData.ID ] = currencyData.icon .. currencyData.name;
         end
     end
     
@@ -245,9 +245,9 @@ function addon:getDefaultOptions()
     local currencyListDefaults = {};
     for _, currencyData in next, addon:getCurrencyList() do
         if( currencyData.show ) then
-            currencyListDefaults[ currencyData.currencyID ] = (currencyData.expansionLevel == 6);
+            currencyListDefaults[ currencyData.ID ] = (currencyData.expansionLevel == 6);
         else
-            currencyListDefaults[ currencyData.currencyID ] = nil; -- if improperly flagged, remove from list
+            currencyListDefaults[ currencyData.ID ] = nil; -- if improperly flagged, remove from list
         end
     end
 
@@ -342,7 +342,7 @@ function addon:OpenConfigDialog( button )
         local name = GetCurrencyInfo( ndx );
         
         if( name ~= nil ) and ( name ~= "" ) then
-            print( "{ [" .. ndx .. "] = { currencyID=" .. ndx .. ", getName=function() return '' end, expansionLevel=1 } }, -- " .. name );
+            print( "{ [" .. ndx .. "] = { ID=" .. ndx .. ", getName=function() return '' end, expansionLevel=1 } }, -- " .. name );
         end
     end
     --]]

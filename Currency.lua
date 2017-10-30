@@ -76,7 +76,7 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
 
     for ndx, currencyData in next, addon:getCurrencyList() do
         if( currencyData.show ) then
-            local name, count, icon, _, _, maximum, discovered = GetCurrencyInfo( currencyData.currencyID );
+            local name, count, icon, _, _, maximum, discovered = GetCurrencyInfo( currencyData.ID );
 
             local data;
             if( discovered ) then
@@ -85,7 +85,7 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
                     maximum = maximum
                 }
                 
-                local questList = BONUS_ROLL_QUESTID[ currencyData.currencyID ];
+                local questList = BONUS_ROLL_QUESTID[ currencyData.ID ];
                 local bonus;
                 if( questList ~= nil ) then
                     bonus = {};
@@ -106,7 +106,7 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
                 data = nil;
             end
             
-            currency[ currencyData.currencyID ] = data;
+            currency[ currencyData.ID ] = data;
         end
     end
 

@@ -283,8 +283,8 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
         for colNdx, charData in next, charList do
             if (LockoutDb[ charData.realmName ] ~= nil) and
                (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-               (LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.currencyID ] ~= nil) then
-                local currData = LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.currencyID ];
+               (LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.ID ] ~= nil) then
+                local currData = LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.ID ];
 
                 local displayText = "";
                 if( currData.count ~= nil ) then
