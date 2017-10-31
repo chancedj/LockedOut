@@ -53,7 +53,15 @@ function addon:getConfigOptions()
             currencyList[ currencyData.ID ] = currencyData.icon .. currencyData.name;
         end
     end
+
+    local charList = {};
     
+    for realmName, characters in next, LockoutDb do
+        for charNdx, charData in next, characters do
+            charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
+        end
+    end
+
     local configOptions = {
 		type = "group",
 		name = addonName,
@@ -81,7 +89,7 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.currentRealm = val; end,
 			  get = function(info) return self.config.profile.general.currentRealm end
 			},
-                        showRealmHeader = {
+            showRealmHeader = {
 			  order = 12,
 			  name = L["Show Realm"],
 			  desc = L["Show the realm header"],
@@ -104,7 +112,7 @@ function addon:getConfigOptions()
                                 end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
-                        setAnchorPoint = {
+            setAnchorPoint = {
 			  order = 14,
 			  name = L["Anchor To"],
 			  desc = L["Choose where hover tooltip displays"],
@@ -113,6 +121,15 @@ function addon:getConfigOptions()
 			  values = anchorOptions,
 			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
 			  get = function(info) return self.config.profile.general.anchorPoint end
+			},
+			charVisible = {
+			  order = 15,
+			  name = "Visible Characters",
+			  desc = "Which characters should show in menu",
+			  type = "multiselect",
+			  values = charList,
+			  set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
+			  get = function(info,key) return self.config.profile.general.showCharList[key] end
 			},
 			--[[
 			minimapIconList = {
@@ -255,6 +272,14 @@ function addon:getDefaultOptions()
         end
     end
 
+    local charList = {};
+    
+    for realmName, characters in next, LockoutDb do
+        for charNdx, charData in next, characters do
+            charList[ realmName .. "." .. charData.charName ] = true;
+        end
+    end
+
 	local defaultOptions = {
 		global = {
 			enabled = true
@@ -266,7 +291,8 @@ function addon:getDefaultOptions()
 			general = {
 				currentRealm = false,
                 showRealmHeader = true,
-                anchorPoint = "cell"
+                anchorPoint = "cell",
+                showCharList = charList
 			},
 			dungeon = {
 				show = true

@@ -419,54 +419,54 @@ function addon:ShowInfo( frame )
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
-                local tblNdx = #charList + 1;
-                charList[ tblNdx ] = {}
-                charList[ tblNdx ].charNdx = charNdx;
-                charList[ tblNdx ].realmName = realmName;
-                charList[ tblNdx ].charName = charData.charName;
-                charList[ tblNdx ].className = charData.className;
+                if( self.config.profile.general.showCharList[ realmName .. "." .. charData.charName ] ) then
+                    local tblNdx = #charList + 1;
+                    charList[ tblNdx ] = {}
+                    charList[ tblNdx ].charNdx = charNdx;
+                    charList[ tblNdx ].realmName = realmName;
+                    charList[ tblNdx ].charName = charData.charName;
+                    charList[ tblNdx ].className = charData.className;
 
-                -- the get a list of all instances across characters for vertical
-                for instanceName, details in next, charData.instances do
-                    local key, data = next( details );
+                    -- the get a list of all instances across characters for vertical
+                    for instanceName, details in next, charData.instances do
+                        local key, data = next( details );
+                        
+                        if ( data.isRaid ) then
+                            raidList[ instanceName ] = "set";
+                        else
+                            dungeonList[ instanceName ] = "set";
+                        end -- if ( data.isRaid )
+                    end -- for instanceName, _ in next, instances
                     
-                    if ( data.isRaid ) then
-                        raidList[ instanceName ] = "set";
-                    else
-                        dungeonList[ instanceName ] = "set";
-                    end -- if ( data.isRaid )
-                end -- for instanceName, _ in next, instances
-                
-                for bossName, _ in next, charData.worldBosses do
-                    worldBossList[ bossName ] = "set"
-                end -- for bossName, _ in next, charData.worldBosses
-                
-                for currID, currData in next, charData.currency do
-                    local currNdx = CURRENCY_LIST_MAP[ currID ];
-                    local curr = CURRENCY_LIST[ currNdx ];
+                    for bossName, _ in next, charData.worldBosses do
+                        worldBossList[ bossName ] = "set"
+                    end -- for bossName, _ in next, charData.worldBosses
                     
-                    if( curr ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
-                        currencyList[ currID ] = currNdx;
+                    for currID, currData in next, charData.currency do
+                        local currNdx = CURRENCY_LIST_MAP[ currID ];
+                        local curr = CURRENCY_LIST[ currNdx ];
+                        
+                        if( curr ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
+                            currencyList[ currID ] = currNdx;
+                        end
+                    end -- for currName, _ in next, charData.currency
+                    
+                    for questAbbr, questData in next, charData.weeklyQuests do
+                        weeklyQuestList[ questAbbr ] = questData.name;
                     end
-                end -- for currName, _ in next, charData.currency
-                
-                for questAbbr, questData in next, charData.weeklyQuests do
-                    weeklyQuestList[ questAbbr ] = questData.name;
-                end
-                
-                ---[[
-                for questID, emData in next, charData.emissaries do
-                    if( emData.name ~= nil ) then
-                        local day = mfloor( abs( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
-                        addon:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day + 1 );
-                        emissaryList[ day + 1 ] = {
-                            displayName = "(+" .. day .. " Day) " .. emData.name,
-                            name = emData.name,
-                            questID = questID
-                        }
+                    
+                    for questID, emData in next, charData.emissaries do
+                        if( emData.name ~= nil ) then
+                            local day = mfloor( abs( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
+                            addon:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day + 1 );
+                            emissaryList[ day + 1 ] = {
+                                displayName = "(+" .. day .. " Day) " .. emData.name,
+                                name = emData.name,
+                                questID = questID
+                            }
+                        end
                     end
                 end
-                --]]
             end -- for charName, instances in next, characters
         end
     end -- for realmName, characters in next, LockoutDb
