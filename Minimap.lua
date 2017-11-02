@@ -457,8 +457,9 @@ function addon:ShowInfo( frame )
                     
                     for questID, emData in next, charData.emissaries do
                         if( emData.name ~= nil ) then
-                            local day = mfloor( abs( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
-                            addon:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day + 1 );
+                            -- add a 10 second buffer - things get a little off when the reset date ends up short by a second or two..
+                            local day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
+                            addon:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day .. " resetDate: " .. emData.resetDate );
                             emissaryList[ day + 1 ] = {
                                 displayName = "(+" .. day .. " Day) " .. emData.name,
                                 name = emData.name,
