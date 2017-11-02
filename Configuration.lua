@@ -8,6 +8,10 @@ local addonName, _ = ...;
 local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "AceEvent-3.0" );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
+-- Upvalues
+local next, tostring =
+      next, tostring;
+
 -- cache lua functions
 local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons =    -- variables
       InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons      -- lua functions
@@ -348,7 +352,7 @@ function addon:OnInitialize()
     -- events
     self:RegisterEvent( "PLAYER_ENTERING_WORLD", "FullCharacterRefresh" );
     self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "FullCharacterRefresh" );
-    self:RegisterEvent( "UNIT_SPELLCAST_SUCCEEDED", "FullCharacterRefresh" );
+    self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "FullCharacterRefresh" );
 end
 
 function addon:ChatCommand()
@@ -379,26 +383,7 @@ function addon:OpenConfigDialog( button )
     --]]
 end
 
-local InstantComplete = {
-    ["219540"] = true,
-    ["221557"] = true,
-    ["221561"] = true,
-    ["221587"] = true,
-    ["221597"] = true,
-    ["221602"] = true
-}
-
-function addon:FullCharacterRefresh( event, unitID, spell, rank, lineID, spellID )
-    addon:debug( "event fired: " .. event );
-    addon:debug( "Reset: ", GetQuestResetTime() );
-    addon:debug( "Quest Reset: ", self:getDailyLockoutDate() );
-    if( event ~= "UNIT_SPELLCAST_SUCCEEDED" ) then
-        self:Lockedout_GetCurrentCharData();
-    elseif( event == "UNIT_SPELLCAST_SUCCEEDED" ) then
-        local status = InstantComplete[ spellID ];
-        if(  status ~= nil ) and ( status ) then
-            print( "spell - refreshing: " .. spell .. " - " .. spellID );
-            self:Lockedout_GetCurrentCharData();
-        end
-    end
+function addon:FullCharacterRefresh( event )
+    print( "char refresh triggered on event: " .. event );
+    self:Lockedout_GetCurrentCharData();
 end
