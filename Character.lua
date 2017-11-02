@@ -10,8 +10,8 @@ local L         = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 local LibQTip   = LibStub( "LibQTip-1.0" )
 
 -- cache blizzard function/globals
-local GetRealmName, UnitName, UnitClass, GetAverageItemLevel =  -- variables 
-      GetRealmName, UnitName, UnitClass, GetAverageItemLevel;   -- blizzard api
+local GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime =  -- variables 
+      GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
 
 --[[
     this will generate the saved data for characters and realms
@@ -98,6 +98,13 @@ local function checkExpiredLockouts()
 end -- checkExpiredLockouts()
 
 function addon:Lockedout_GetCurrentCharData()
+    local timeTilResets = GetQuestResetTime();
+    
+    if( timeTilResets > 24 * 60 * 60 ) then
+        print( "GetQuestResetTime() returned invalid value, exiting and attempting later." );
+        return;
+    end
+
     addon:destroyDb();
     checkExpiredLockouts();
     
