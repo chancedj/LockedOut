@@ -384,11 +384,11 @@ function addon:OpenConfigDialog( button )
 end
 
 function addon:EVENT_ResetExpiredData( event )
-    print( "char refresh triggered on event: " .. event );
+    addon:debug( "char refresh triggered on event: " .. event );
     addon:checkExpiredLockouts( );
 end
 
 function addon:EVENT_FullCharacterRefresh( event )
-    print( "char refresh triggered on event: " .. event );
+    addon:debug( "char refresh triggered on event: " .. event );
     self:Lockedout_GetCurrentCharData();
 end
