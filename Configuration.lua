@@ -353,6 +353,7 @@ function addon:OnInitialize()
     self:RegisterEvent( "PLAYER_ENTERING_WORLD", "EVENT_ResetExpiredData" );
     self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
+    self:RegisterEvent( "ENCOUNTER_END", "EVENT_SaveToInstance" );
 end
 
 function addon:ChatCommand()
@@ -381,6 +382,13 @@ function addon:OpenConfigDialog( button )
         end
     end
     --]]
+end
+
+function addon:EVENT_SaveToInstance( event, encounterID, encounterName, difficultyID, raidSize, endStatus )
+    -- end status == 1 means success
+    if( endStatus == 1 ) then
+        self:EVENT_FullCharacterRefresh( event );
+    end
 end
 
 function addon:EVENT_ResetExpiredData( event )
