@@ -63,7 +63,7 @@ local function clearCurrencyQuests( dataTable )
     end
 end
 
-local function checkExpiredLockouts()
+function addon:checkExpiredLockouts()
     -- if we add a new element, it will be empty for the charData
     -- take care of this by exiting.
     if( LockoutDb == nil ) then return; end
@@ -105,8 +105,8 @@ function addon:Lockedout_GetCurrentCharData()
         return;
     end
 
-    addon:destroyDb();
-    checkExpiredLockouts();
+    self:destroyDb();
+    self:checkExpiredLockouts();
     
     -- get and initialize realm data
     local realmName = GetRealmName();

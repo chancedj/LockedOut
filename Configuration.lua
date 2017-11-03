@@ -350,9 +350,9 @@ function addon:OnInitialize()
 	self:RegisterChatCommand( "lockedout", "ChatCommand" );
 
     -- events
-    self:RegisterEvent( "PLAYER_ENTERING_WORLD", "FullCharacterRefresh" );
-    self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "FullCharacterRefresh" );
-    self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "FullCharacterRefresh" );
+    self:RegisterEvent( "PLAYER_ENTERING_WORLD", "EVENT_ResetExpiredData" );
+    self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "EVENT_FullCharacterRefresh" );
+    self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
 end
 
 function addon:ChatCommand()
@@ -383,7 +383,12 @@ function addon:OpenConfigDialog( button )
     --]]
 end
 
-function addon:FullCharacterRefresh( event )
+function addon:EVENT_ResetExpiredData( event )
+    print( "char refresh triggered on event: " .. event );
+    addon:checkExpiredLockouts( );
+end
+
+function addon:EVENT_FullCharacterRefresh( event )
     print( "char refresh triggered on event: " .. event );
     self:Lockedout_GetCurrentCharData();
 end
