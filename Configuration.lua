@@ -38,13 +38,13 @@ function addon:getConfigOptions()
     
     local currencySortOptions = {};
 
-    for key, data in next, addon:getCurrencyOptions() do
+    for key, data in next, self:getCurrencyOptions() do
         currencySortOptions[ key ] = data.description;
     end
     
     local currencyList = { };
 
-    for ndx, currencyData in next, addon:getCurrencyList() do
+    for ndx, currencyData in next, self:getCurrencyList() do
         if( currencyData.show ) then
             if( currencyData.icon == nil ) then
                 if( currencyData.type == "C" ) then
@@ -126,8 +126,17 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
 			  get = function(info) return self.config.profile.general.anchorPoint end
 			},
+			--[[
+			minimapIconList = {
+			  order = 18,
+			  name = "Choose Icon",
+			  desc = "Choose icon for addon",
+			  type = "select",
+			  values = iconList
+			},
+			--]]
 			charVisible = {
-			  order = 15,
+			  order = 19,
 			  name = "Visible Characters",
 			  desc = "Which characters should show in menu",
 			  type = "multiselect",
@@ -135,15 +144,6 @@ function addon:getConfigOptions()
 			  set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
 			  get = function(info,key) return self.config.profile.general.showCharList[key] end
 			},
-			--[[
-			minimapIconList = {
-			  order = 19,
-			  name = "Choose Icon",
-			  desc = "Choose icon for addon",
-			  type = "select",
-			  values = iconList
-			},
-			--]]
 			dungeonHeader={
 			  order = 20,
 			  name = L["Instance Options"],
@@ -268,7 +268,7 @@ end
 function addon:getDefaultOptions()
 
     local currencyListDefaults = {};
-    for _, currencyData in next, addon:getCurrencyList() do
+    for _, currencyData in next, self:getCurrencyList() do
         if( currencyData.show ) then
             currencyListDefaults[ currencyData.ID ] = (currencyData.expansionLevel == 6);
         else
@@ -367,6 +367,8 @@ function addon:ResetDefaults()
 end
 
 function addon:OpenConfigDialog( button )
+    LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( self.optionFrameName, self:getConfigOptions() );
+
 	if( button == nil) or ( button == "RightButton" ) then
 		-- this command is buggy, open it twice to fix the bug.
 		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #1
@@ -392,11 +394,11 @@ function addon:EVENT_SaveToInstance( event, encounterID, encounterName, difficul
 end
 
 function addon:EVENT_ResetExpiredData( event )
-    addon:debug( "char refresh triggered on event: " .. event );
-    addon:checkExpiredLockouts( );
+    self:debug( "char refresh triggered on event: " .. event );
+    self:checkExpiredLockouts( );
 end
 
 function addon:EVENT_FullCharacterRefresh( event )
-    addon:debug( "char refresh triggered on event: " .. event );
+    self:debug( "char refresh triggered on event: " .. event );
     self:Lockedout_GetCurrentCharData();
 end
