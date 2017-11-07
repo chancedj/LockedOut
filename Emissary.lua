@@ -66,7 +66,7 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
             emissaryData.fullfilled = emissaryData.fullfilled or 0;
             emissaryData.required   = emissaryData.fullfilled or 0;
             emissaryData.isComplete = true;
-            emissaryData.resetDate  = timeleft or addon:getDailyLockoutDate();
+            emissaryData.resetDate  = timeleft or emissaryData.resetDate or addon:getDailyLockoutDate();
             
             emissaries[ questID ] = emissaryData;
         end
