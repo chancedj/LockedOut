@@ -101,8 +101,16 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
 			  get = function(info) return self.config.profile.general.showRealmHeader end
 			},
-			showMinimapIcon = {
+            showCharFirst = {
 			  order = 13,
+			  name = L["Show Active First"],
+			  desc = L["Show logged in char first"],
+			  type = "toggle",
+			  set = function(info,val) self.config.profile.general.loggedInFirst = val; end,
+			  get = function(info) return self.config.profile.general.loggedInFirst end
+			},
+			showMinimapIcon = {
+			  order = 14,
 			  name = L["Hide Icon"],
 			  desc = L["Show Minimap Icon"],
 			  type = "toggle",
@@ -117,7 +125,7 @@ function addon:getConfigOptions()
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
             setAnchorPoint = {
-			  order = 14,
+			  order = 15,
 			  name = L["Anchor To"],
 			  desc = L["Choose where hover tooltip displays"],
 			  type = "select",
@@ -295,6 +303,7 @@ function addon:getDefaultOptions()
 			general = {
 				currentRealm = false,
                 showRealmHeader = true,
+                loggedInFirst = true,
                 anchorPoint = "cell",
                 showCharList = charList
 			},
@@ -367,6 +376,7 @@ function addon:ResetDefaults()
 end
 
 function addon:OpenConfigDialog( button )
+    self.config:RegisterDefaults( self:getDefaultOptions() );
     LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( self.optionFrameName, self:getConfigOptions() );
 
 	if( button == nil) or ( button == "RightButton" ) then

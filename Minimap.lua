@@ -427,6 +427,14 @@ function addon:ShowInfo( frame )
                     charList[ tblNdx ].charName = charData.charName;
                     charList[ tblNdx ].className = charData.className;
 
+                    if( self.config.profile.general.loggedInFirst ) and
+                      ( realmName == currRealmName ) and 
+                      (currCharNdx == charNdx) then
+                        charList[ tblNdx ].priority = 0;
+                    else
+                        charList[ tblNdx ].priority = 1;
+                    end
+                    
                     -- the get a list of all instances across characters for vertical
                     for instanceName, details in next, charData.instances do
                         local key, data = next( details );
@@ -474,6 +482,10 @@ function addon:ShowInfo( frame )
     
     -- sort list by realm then character
     tsort( charList, function(l, r)
+                            if (l.priority ~= r.priority) then
+                                return l.priority < r.priority;
+                            end
+                            
                             if (l.realmName ~= r.realmName) then
                                 return l.realmName < r.realmName;
                             end
