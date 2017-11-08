@@ -195,6 +195,37 @@ local currencySortOptions = {
     }
 }
 
+local characterSortOptions = {
+    ["rc"] = {
+        description = L["Realm then Name"],
+        sortFunction =  function(l, r)
+                            if (l.priority ~= r.priority) then
+                                return l.priority < r.priority;
+                            end
+                            
+                            if (l.realmName ~= r.realmName) then
+                                return l.realmName < r.realmName;
+                            end
+                            
+                            return l.charName < r.charName;
+                         end
+    },
+    ["cr"] = {
+        description = L["Name then Realm"],
+        sortFunction =  function(l, r)
+                            if (l.priority ~= r.priority) then
+                                return l.priority < r.priority;
+                            end
+                            
+                            if (l.charName ~= r.charName) then
+                                return l.charName < r.charName;
+                            end
+                            
+                            return l.realmName < r.realmName;
+                        end
+    }
+}
+
 local function resolveCurrencyInfo( )
     for _, currency in next, CURRENCY_LIST do
         if( currency.type == "C" ) then
@@ -255,6 +286,10 @@ end -- destroyDb
 
 function addon:getCurrencyOptions()
     return currencySortOptions;
+end
+
+function addon:getCharSortOptions()
+    return characterSortOptions;
 end
 
 function addon:getCurrencyListMap()

@@ -37,13 +37,16 @@ function addon:getConfigOptions()
                             };
     
     local currencySortOptions = {};
-
     for key, data in next, self:getCurrencyOptions() do
         currencySortOptions[ key ] = data.description;
     end
     
+    local characterSortOptions = {}
+    for key, data in next, self:getCharSortOptions() do
+        characterSortOptions[ key ] = data.description;
+    end
+    
     local currencyList = { };
-
     for ndx, currencyData in next, self:getCurrencyList() do
         if( currencyData.show ) then
             if( currencyData.icon == nil ) then
@@ -124,8 +127,20 @@ function addon:getConfigOptions()
                                 end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
-            setAnchorPoint = {
+            ---[[
+            characterSort = {
 			  order = 15,
+			  name = L["Sort Chars By"],
+			  desc = L["Configure how characters are sorted in the list"],
+			  type = "select",
+			  style = "dropdown",
+			  values = characterSortOptions,
+			  set = function(info,val) self.config.profile.general.charSortBy = val; end,
+			  get = function(info) return self.config.profile.general.charSortBy end
+			},
+            --]]
+            setAnchorPoint = {
+			  order = 16,
 			  name = L["Anchor To"],
 			  desc = L["Choose where hover tooltip displays"],
 			  type = "select",
@@ -305,7 +320,8 @@ function addon:getDefaultOptions()
                 showRealmHeader = true,
                 loggedInFirst = true,
                 anchorPoint = "cell",
-                showCharList = charList
+                showCharList = charList,
+                charSortBy = "rc"
 			},
 			dungeon = {
 				show = true

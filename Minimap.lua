@@ -481,18 +481,8 @@ function addon:ShowInfo( frame )
     end -- for realmName, characters in next, LockoutDb
     
     -- sort list by realm then character
-    tsort( charList, function(l, r)
-                            if (l.priority ~= r.priority) then
-                                return l.priority < r.priority;
-                            end
-                            
-                            if (l.realmName ~= r.realmName) then
-                                return l.realmName < r.realmName;
-                            end
-                            
-                            return l.charName < r.charName;
-                          end
-    );
+    local charSort = self:getCharSortOptions();
+    tsort( charList, charSort[ self.config.profile.general.charSortBy ].sortFunction );
 
     local currencyDisplayList = {};
     
@@ -504,8 +494,8 @@ function addon:ShowInfo( frame )
     tsort( dungeonList );
     tsort( raidList );
     tsort( worldBossList );
-    local so = self:getCurrencyOptions();
-    tsort( currencyDisplayList, so[ self.config.profile.currency.sortBy ].sortFunction );
+    local currSort = self:getCurrencyOptions();
+    tsort( currencyDisplayList, currSort[ self.config.profile.currency.sortBy ].sortFunction );
     
     -- initialize the column count going forward
     tooltip:SetColumnLayout( #charList + 1 );
