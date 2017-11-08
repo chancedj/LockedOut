@@ -422,6 +422,9 @@ end
 function addon:EVENT_ResetExpiredData( event )
     self:debug( "char refresh triggered on event: " .. event );
     self:checkExpiredLockouts( );
+    
+    self:InitCharDB()
+    self.config:RegisterDefaults( self:getDefaultOptions() );
 end
 
 function addon:EVENT_FullCharacterRefresh( event )

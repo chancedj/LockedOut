@@ -97,17 +97,7 @@ function addon:checkExpiredLockouts()
     end -- for realmName, charData in next, LockoutDb
 end -- checkExpiredLockouts()
 
-function addon:Lockedout_GetCurrentCharData()
-    local timeTilResets = GetQuestResetTime();
-    
-    if( timeTilResets > 24 * 60 * 60 ) then
-        print( "GetQuestResetTime() returned invalid value, exiting and attempting later." );
-        return;
-    end
-
-    self:destroyDb();
-    self:checkExpiredLockouts();
-    
+function addon:InitCharDB()
     -- get and initialize realm data
     local realmName = GetRealmName();
     LockoutDb = LockoutDb or {};                            -- initialize database if not already initialized
@@ -129,6 +119,22 @@ function addon:Lockedout_GetCurrentCharData()
     playerData.iLevel[ "pvp" ]      = pvp_ilevel;
     
     LockoutDb[ realmName ][ charNdx ] = playerData;            -- initialize playerDb if not already initialized
+    
+    return playerData, realmName, charNdx;
+end
+
+function addon:Lockedout_GetCurrentCharData()
+    local timeTilResets = GetQuestResetTime();
+    
+    if( timeTilResets > 24 * 60 * 60 ) then
+        print( "GetQuestResetTime() returned invalid value, exiting and attempting later." );
+        return;
+    end
+
+    self:destroyDb();
+    self:checkExpiredLockouts();
+    
+    local playerData, realmName, charNdx = self:InitCharDB();
 
     self:Lockedout_BuildInstanceLockout( realmName, charNdx );
     self:Lockedout_BuildWorldBoss( realmName, charNdx );
