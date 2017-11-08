@@ -395,7 +395,7 @@ function addon:ShowInfo( frame )
         self.tooltip = nil;
     end -- if ( self.tooltip ~= nil )
 
-    local currRealmName, currCharNdx, playerData = addon:Lockedout_GetCurrentCharData();
+    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData();
 
     -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
     local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
@@ -410,11 +410,11 @@ function addon:ShowInfo( frame )
     local emissaryList = { {}, {}, {} }; -- initialize with 3
     local weeklyQuestList = {};
 
-    local CURRENCY_LIST = addon:getCurrencyList();
-    local CURRENCY_LIST_MAP = addon:getCurrencyListMap();
+    local CURRENCY_LIST = self:getCurrencyList();
+    local CURRENCY_LIST_MAP = self:getCurrencyListMap();
     
     -- get list of characters and realms for the horizontal
-    local dailyLockout = addon:getDailyLockoutDate();
+    local dailyLockout = self:getDailyLockoutDate();
     for realmName, characters in next, LockoutDb do
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
@@ -467,7 +467,7 @@ function addon:ShowInfo( frame )
                         if( emData.name ~= nil ) then
                             -- add a 10 second buffer - things get a little off when the reset date ends up short by a second or two..
                             local day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
-                            addon:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+                            self:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day .. " resetDate: " .. emData.resetDate );
                             emissaryList[ day + 1 ] = {
                                 displayName = "(+" .. day .. " Day) " .. emData.name,
                                 name = emData.name,
@@ -504,7 +504,7 @@ function addon:ShowInfo( frame )
     tsort( dungeonList );
     tsort( raidList );
     tsort( worldBossList );
-    local so = addon:getCurrencyOptions();
+    local so = self:getCurrencyOptions();
     tsort( currencyDisplayList, so[ self.config.profile.currency.sortBy ].sortFunction );
     
     -- initialize the column count going forward
@@ -524,7 +524,7 @@ function addon:ShowInfo( frame )
     for colNdx, char in next, charList do
         tooltip:SetCell( deleteLineNum, colNdx + 1, CHAR_DELETE_TEXT, nil, "CENTER" );
         if( realmCount > 1 ) and ( self.config.profile.general.showRealmHeader ) then -- show realm only when multiple are involved
-            tooltip:SetCell( realmLineNum, colNdx + 1, addon:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+            tooltip:SetCell( realmLineNum, colNdx + 1, self:colorizeString( char.className, char.realmName ), nil, "CENTER" );
         end
         local charData = LockoutDb[ char.realmName ][ char.charNdx ];
         local charDisplay = {};
@@ -534,7 +534,7 @@ function addon:ShowInfo( frame )
                                     end
 
                                     local ttName = self.anchor:getTTName();
-                                    local tooltip = addon:aquireEmptyTooltip( ttName );
+                                    local tooltip = self:aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
                                     local line = tooltip:AddHeader( "" );
                                     tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
@@ -556,7 +556,7 @@ function addon:ShowInfo( frame )
                                     end
         charDisplay.anchor = getAnchorPkt( "ch", charData.charName, charData, charLineNum, colNdx + 1 );
 
-        tooltip:SetCell( charLineNum, colNdx + 1, addon:colorizeString( char.className, char.charName ), nil, "CENTER" );
+        tooltip:SetCell( charLineNum, colNdx + 1, self:colorizeString( char.className, char.charName ), nil, "CENTER" );
 
         tooltip:SetCellScript( deleteLineNum, colNdx + 1, "OnMouseDown", function() charDisplay:deleteChar( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charDisplay:displayTT( ); end ); -- close out tooltip when leaving
