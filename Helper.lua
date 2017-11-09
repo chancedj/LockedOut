@@ -25,6 +25,24 @@ addon.ExpansionAbbr = {
     [6] = L["Leg"],    
 }
 
+local iconTextures = {
+    ["134244"]  = "|T" .. "134244" .. ":0|t",
+    ["237446"]  = "|T" .. "237446" .. ":0|t",
+    ["1397630"] = "|T" .. "1397630" .. ":0|t",
+    ["132998"]  = "|T" .. "132998" .. ":0|t",
+    ["133278"]  = "|T" .. "133278" .. ":0|t",
+    ["1500867"] = "|T" .. "1500867" .. ":0|t",
+    ["133413"]  = "|T" .. "133413" .. ":0|t",
+    ["134245"]  = "|T" .. "134245" .. ":0|t",
+    ["132761"]  = "|T" .. "132761" .. ":0|t",
+    ["237284"]  = "|T" .. "237284" .. ":0|t",
+    ["237285"]  = "|T" .. "237285" .. ":0|t",
+    ["134532"]  = "|T" .. "134532" .. ":0|t",
+    ["237379"]  = "|T" .. "237379" .. ":0|t",
+    ["1508506"] = "|T" .. "1508506" .. ":0|t",
+    ["1516058"] = "|T" .. "1516058" .. ":0|t"
+}
+
 -- tues for US, Wed for rest?
 local MapRegionReset = {
     [1] = 3, -- US
@@ -290,6 +308,10 @@ end
 
 function addon:getCharSortOptions()
     return characterSortOptions;
+end
+
+function addon:getIconOptions()
+    return iconTextures;
 end
 
 function addon:getCurrencyListMap()

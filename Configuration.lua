@@ -19,15 +19,7 @@ local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMac
       InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons      -- lua functions
       
 function addon:getConfigOptions()
-    --[[
-    local iconList = GetMacroIcons( nil );
 
-    local iconDb = {};
-    for ndx, textureId in next, iconList do
-        iconDb[ textureId ] = "|T" .. textureId .. ":0|t"
-    end
-    --]]
-    
     local anchorOptions = {
         ["cell"] = L["At cursor location"],
         ["parent"] = L["At bottom of frame"]
@@ -151,13 +143,15 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
 			  get = function(info) return self.config.profile.general.anchorPoint end
 			},
-			--[[
+			---[[
 			minimapIconList = {
 			  order = 18,
-			  name = "Choose Icon",
-			  desc = "Choose icon for addon",
+			  name = L["Choose Icon (reload ui)"],
+			  desc = L["Choose icon for addon - requires ui refresh or login/logout"],
 			  type = "select",
-			  values = iconList
+			  values = addon:getIconOptions(),
+			  set = function(info,val) self.config.profile.general.addonIcon = val; end,
+			  get = function(info) return self.config.profile.general.addonIcon end
 			},
 			--]]
 			charVisible = {
@@ -323,7 +317,8 @@ function addon:getDefaultOptions()
                 loggedInFirst = true,
                 anchorPoint = "cell",
                 showCharList = charList,
-                charSortBy = "rc"
+                charSortBy = "rc",
+                addonIcon = "134244"
 			},
 			dungeon = {
 				show = true
@@ -354,17 +349,17 @@ function addon:getDefaultOptions()
 end
 
 function addon:OnInitialize()
-    local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
-        type = "data source",
-        text = L[ "Locked Out" ],
-        icon = "Interface\\Icons\\Inv_misc_key_10",
-        OnClick = function( frame, button ) self:OpenConfigDialog( button ) end,
-        OnEnter = function( frame ) self:ShowInfo( frame ) end,
-    } ); -- local LockedoutMo
-
 	local defaultOptions = self:getDefaultOptions();
     self.config = LibStub( "AceDB-3.0" ):New( "LockedOutConfig", defaultOptions, true );
     self.config:RegisterDefaults( defaultOptions );
+
+    local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
+        type = "data source",
+        text = L[ "Locked Out" ],
+        icon = self.config.profile.general.addonIcon,
+        OnClick = function( frame, button ) self:OpenConfigDialog( button ) end,
+        OnEnter = function( frame ) self:ShowInfo( frame ) end,
+    } ); -- local LockedoutMo
 
     self.icon = LibStub( "LibDBIcon-1.0" );
     self.icon:Register(addonName, LockedoutMo, self.config.profile.minimap)
