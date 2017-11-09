@@ -524,7 +524,7 @@ function addon:ShowInfo( frame )
                                     end
 
                                     local ttName = self.anchor:getTTName();
-                                    local tooltip = self:aquireEmptyTooltip( ttName );
+                                    local tooltip = addon:aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
                                     local line = tooltip:AddHeader( "" );
                                     tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
