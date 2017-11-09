@@ -7,10 +7,14 @@ local addonName, _ = ...;
 local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
--- cache lua functions
-local next, table, SecondsToTime, tsort, mfloor, abs =                -- variables
-      next, table, SecondsToTime, table.sort, math.floor, math.abs    -- lua functions
+-- Upvalues
+local next, table, tsort, mfloor, abs =           -- variables
+      next, table, table.sort, math.floor, math.abs    -- lua functions
 
+-- cache blizzard function/globals
+local SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE  =    -- variables
+      SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE       -- blizzard api
+      
 -- Get a reference to the lib
 local LibQTip = LibStub( "LibQTip-1.0" )
 
@@ -55,26 +59,59 @@ end
 local function emptyFunction()
 end
 
+function addon:aquireEmptyTooltip( ttName )
+    self.openSubTooltips = self.openSubTooltips or {};
+    if( #self.openSubTooltips > 0 ) then
+        -- close all open sub tooltips.
+        for ndx, openTTName in next, self.openSubTooltips do
+            local tt = LibQTip:Acquire( openTTName );
+            LibQTip:Release( tt );
+            self.openSubTooltips[ ndx ] = nil;
+        end
+    end
+    
+    local tooltip = LibQTip:Acquire( ttName );
+
+    self.openSubTooltips[ #self.openSubTooltips + 1 ] = ttName;
+    
+    if( #tooltip.lines > 0 ) then
+        LibQTip:Release( tooltip );
+        tooltip = LibQTip:Acquire( ttName );
+    end
+
+    return tooltip
+end
+
+local function setAnchorToTooltip( tooltip, linenum, cellnum )
+    local parentTT = LibQTip:Acquire( "LockedoutTooltip" );
+    
+    tooltip:SetFrameLevel( parentTT:GetFrameLevel() + 1 );
+    
+    if( addon.config.profile.general.anchorPoint == "parent" ) then
+        tooltip:SmartAnchorTo( parentTT );
+    else
+        tooltip:SmartAnchorTo( parentTT.lines[ linenum ].cells[ cellnum ] );
+    end
+
+    tooltip:SetAutoHideDelay( 0.1, parentTT.lines[ linenum ].cells[ cellnum ] );
+    
+    addPopupColorBanding( tooltip );
+end
+
 local function displayReset( self )
     local ttName = self.anchor:getTTName();
-    local tt = LibQTip:Acquire( "LockedoutTooltip" );
-    local tooltip = LibQTip:Acquire( ttName );
+    local tooltip = addon:aquireEmptyTooltip( ttName );
     
     tooltip:SetColumnLayout( 2 );
     local ln = tooltip:AddLine( );
     tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
     tooltip:SetCell( ln, 2, "|cFFFF0000" .. SecondsToTime( self.anchor.data.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
-    
-    tooltip:SmartAnchorTo( tt.lines[ self.anchor.lineNum ].cells[ self.anchor.cellNum ] );
+    tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+
+    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
     addPopupColorBanding( tooltip );
+    
     tooltip:Show();
-end -- function( data )
-
-local function closeTT( self )
-    local ttName = self.anchor:getTTName();
-    local tt = LibQTip:Acquire( ttName );
-
-    LibQTip:Release( tt );
 end -- function( data )
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
@@ -101,8 +138,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                 instanceDisplay.displayTT = function( self )
                                                 local ttName = self.anchor:getTTName();
-                                                local tt = LibQTip:Acquire( "LockedoutTooltip" );
-                                                local tooltip = LibQTip:Acquire( ttName );
+                                                local tooltip = addon:aquireEmptyTooltip( ttName );
                                                 
                                                 local col = 2;
                                                 
@@ -113,10 +149,11 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                                                     local ln = 1;
                                                     tooltip:SetCell( ln, col, difficulty, nil, "CENTER" );
-                                                    tooltip:SetLineColor( ln, 1, 1, 1, 1 );
+                                                    tooltip:SetLineColor( ln, 1, 1, 1, 0.1 );
                                                     
                                                     if( col == 2 ) then
                                                         ln = tooltip:AddLine( );
+                                                        tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                                     else
                                                         ln = ln + 1;
                                                     end
@@ -142,11 +179,10 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                     end -- for bossName, bossData in next, instanceData.bossData
                                                 end -- for difficulty, instanceDetails in next, instances
                                                 
-                                                tooltip:SmartAnchorTo( tt.lines[ self.anchor.lineNum ].cells[ self.anchor.cellNum ] );
-                                                addPopupColorBanding( tooltip );
+                                                setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                                 tooltip:Show();
                                             end -- function( data )
-                instanceDisplay.deleteTT = closeTT;
+                instanceDisplay.deleteTT = emptyFunction;
                 instanceDisplay.anchor = getAnchorPkt( "in", instanceName, instances, lineNum, colNdx + 1 );
 
                 tooltip:SetCell( lineNum, colNdx + 1, addon:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
@@ -180,7 +216,7 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
 
                 local bossDisplay = {};
                 bossDisplay.displayTT  = displayReset;
-                bossDisplay.deleteTT   = closeTT;
+                bossDisplay.deleteTT   = emptyFunction;
                 bossDisplay.anchor     = getAnchorPkt( "wb", bossName, bossData, lineNum, colNdx + 1 );
 
                 tooltip:SetCell( lineNum, colNdx + 1, bossData.displayText, nil, "CENTER" );
@@ -217,7 +253,7 @@ local function populateWeeklyQuestData( header, tooltip, charList, weeklyQuestLi
                 if( questData.resetDate ~= nil ) then
                     questDisplay.anchor = getAnchorPkt( "ql", questAbbr, questData, lineNum, colNdx + 1 );
                     questDisplay.displayTT = displayReset;
-                    questDisplay.deleteTT  = closeTT;
+                    questDisplay.deleteTT  = emptyFunction;
                 else
                     -- display nothing if no resetdate is found.
                     questDisplay.anchor = {};
@@ -255,10 +291,15 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
         for colNdx, charData in next, charList do
             if (LockoutDb[ charData.realmName ] ~= nil) and
                (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-               (LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.currencyID ] ~= nil) then
-                local currData = LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.currencyID ];
+               (LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.ID ] ~= nil) then
+                local currData = LockoutDb[ charData.realmName ][ charData.charNdx ].currency[ currencyData.ID ];
 
                 local displayText = "";
+                local currDisplay = {};
+                currDisplay.anchor = {};
+                currDisplay.displayTT = emptyFunction;
+                currDisplay.deleteTT = emptyFunction;
+
                 if( currData.count ~= nil ) then
                     displayText = addon:shortenAmount( currData.count );
                     if( currData.maximum > 0 ) then
@@ -272,12 +313,37 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
                     end
                     
                     if( currData.bonus ~= nil ) then
-                        displayText = displayText .. "(" .. table.concat( currData.bonus, "/" ) .. ")";
+                        ---[[
+                        currDisplay.anchor = getAnchorPkt( "cr", currencyData.ID, currData, lineNum, colNdx + 1 );
+                        currDisplay.displayTT = function( self )
+                                                    local ttName = self.anchor:getTTName();
+                                                    local tooltip = addon:aquireEmptyTooltip( ttName );
+                                                    
+                                                    tooltip:SetColumnLayout( 1 );
+                                                    tooltip:AddHeader( "Quest Name" );
+                                                    for ndx, questID in next, self.anchor.data.bonus do
+                                                        addon:debug( "questID: " .. questID );
+                                                        if( questID > 3 ) then
+                                                            local title = addon:getQuestTitleByID( questID );
+                                                            
+                                                            if( title ) then
+                                                                tooltip:AddLine( "|cffffff00|Hquest:" .. questID .. "|h[" .. title .. "]|h|r" );
+                                                            end
+                                                        end
+                                                    end
+
+                                                    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
+                                                    tooltip:Show();
+                                                end
+                        --]]
+                        displayText = displayText .. "(" .. #currData.bonus .. ")";
                     end
                 end
+
                 tooltip:SetCell( lineNum, colNdx + 1, displayText, nil, "CENTER" );
-                tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", emptyFunction );    -- close out tooltip when leaving
-                tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", emptyFunction );    -- open tooltip with info when entering cell.
+
+                tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() currDisplay:displayTT( ); end );    -- close out tooltip when leaving
+                tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() currDisplay:deleteTT( ); end );    -- open tooltip with info when entering cell.
                 tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
             end -- if (LockoutDb[ charData.realmName ] ~= nil) and .....
         end -- for colNdx, charData in next, charList
@@ -288,6 +354,7 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
 end -- populateInstanceData
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
+local CHAR_DELETE_TEXT = "|T" .. READY_CHECK_NOT_READY_TEXTURE .. ":0|t";
 local function populateEmissaryData( header, tooltip, charList, emissaryList )
     -- make sure it's not empty
     if ( next( emissaryList ) == nil ) then return; end
@@ -322,13 +389,22 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
     tooltip:AddSeparator( );
 end
 
-function addon:ShowInfo( frame )
+function addon:ShowInfo( frame, manualToggle )
+    if( manualToggle ~= nil ) then
+        if( not manualToggle ) then
+            LibQTip:Release( self.tooltip );
+            self.tooltip = nil;
+
+            return;
+        end
+    end
+
     if ( self.tooltip ~= nil ) then
         LibQTip:Release( self.tooltip );
         self.tooltip = nil;
     end -- if ( self.tooltip ~= nil )
-
-    local currRealmName, currCharNdx, playerData = addon:Lockedout_GetCurrentCharData();
+    
+    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData();
 
     -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
     local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
@@ -343,76 +419,79 @@ function addon:ShowInfo( frame )
     local emissaryList = { {}, {}, {} }; -- initialize with 3
     local weeklyQuestList = {};
 
-    local CURRENCY_LIST = addon:getCurrencyList();
-    local CURRENCY_LIST_MAP = addon:getCurrencyListMap();
+    local CURRENCY_LIST = self:getCurrencyList();
+    local CURRENCY_LIST_MAP = self:getCurrencyListMap();
     
     -- get list of characters and realms for the horizontal
-    local dailyLockout = addon:getDailyLockoutDate();
-
+    local dailyLockout = self:getDailyLockoutDate();
     for realmName, characters in next, LockoutDb do
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
-                local tblNdx = #charList + 1;
-                charList[ tblNdx ] = {}
-                charList[ tblNdx ].charNdx = charNdx;
-                charList[ tblNdx ].realmName = realmName;
-                charList[ tblNdx ].charName = charData.charName;
-                charList[ tblNdx ].className = charData.className;
+                if( self.config.profile.general.showCharList[ realmName .. "." .. charData.charName ] ) then
+                    local tblNdx = #charList + 1;
+                    charList[ tblNdx ] = {}
+                    charList[ tblNdx ].charNdx = charNdx;
+                    charList[ tblNdx ].realmName = realmName;
+                    charList[ tblNdx ].charName = charData.charName;
+                    charList[ tblNdx ].className = charData.className;
 
-                -- the get a list of all instances across characters for vertical
-                for instanceName, details in next, charData.instances do
-                    local key, data = next( details );
-                    
-                    if ( data.isRaid ) then
-                        raidList[ instanceName ] = "set";
+                    if( self.config.profile.general.loggedInFirst ) and
+                      ( realmName == currRealmName ) and 
+                      (currCharNdx == charNdx) then
+                        charList[ tblNdx ].priority = 0;
                     else
-                        dungeonList[ instanceName ] = "set";
-                    end -- if ( data.isRaid )
-                end -- for instanceName, _ in next, instances
-                
-                for bossName, _ in next, charData.worldBosses do
-                    worldBossList[ bossName ] = "set"
-                end -- for bossName, _ in next, charData.worldBosses
-                
-                for currID, currData in next, charData.currency do
-                    local currNdx = CURRENCY_LIST_MAP[ currID ];
-                    local curr = CURRENCY_LIST[ currNdx ];
+                        charList[ tblNdx ].priority = 1;
+                    end
                     
-                    if( curr ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
-                        currencyList[ currID ] = currNdx;
+                    -- the get a list of all instances across characters for vertical
+                    for instanceName, details in next, charData.instances do
+                        local key, data = next( details );
+                        
+                        if ( data.isRaid ) then
+                            raidList[ instanceName ] = "set";
+                        else
+                            dungeonList[ instanceName ] = "set";
+                        end -- if ( data.isRaid )
+                    end -- for instanceName, _ in next, instances
+                    
+                    for bossName, _ in next, charData.worldBosses do
+                        worldBossList[ bossName ] = "set"
+                    end -- for bossName, _ in next, charData.worldBosses
+                    
+                    for currID, currData in next, charData.currency do
+                        local currNdx = CURRENCY_LIST_MAP[ currID ];
+                        local curr = CURRENCY_LIST[ currNdx ];
+                        
+                        if( curr ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
+                            currencyList[ currID ] = currNdx;
+                        end
+                    end -- for currName, _ in next, charData.currency
+                    
+                    for questAbbr, questData in next, charData.weeklyQuests do
+                        weeklyQuestList[ questAbbr ] = questData.name;
                     end
-                end -- for currName, _ in next, charData.currency
-                
-                for questAbbr, questData in next, charData.weeklyQuests do
-                    weeklyQuestList[ questAbbr ] = questData.name;
-                end
-                
-                ---[[
-                for questID, emData in next, charData.emissaries do
-                    if( emData.name ~= nil ) then
-                        local day = mfloor( abs( emData.resetDate - dailyLockout ) / (24 * 60 * 60) );
-                        emissaryList[ day + 1 ] = {
-                            displayName = "(+" .. day .. " Day) " .. emData.name,
-                            name = emData.name,
-                            questID = questID
-                        }
+                    
+                    for questID, emData in next, charData.emissaries do
+                        if( emData.name ~= nil ) then
+                            -- add a 10 second buffer - things get a little off when the reset date ends up short by a second or two..
+                            local day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
+                            self:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+                            emissaryList[ day + 1 ] = {
+                                displayName = "(+" .. day .. " Day) " .. emData.name,
+                                name = emData.name,
+                                questID = questID
+                            }
+                        end
                     end
                 end
-                --]]
             end -- for charName, instances in next, characters
         end
     end -- for realmName, characters in next, LockoutDb
     
     -- sort list by realm then character
-    tsort( charList, function(l, r)
-                            if (l.realmName ~= r.realmName) then
-                                return l.realmName < r.realmName;
-                            end
-                            
-                            return l.charName < r.charName;
-                          end
-    );
+    local charSort = self:getCharSortOptions();
+    tsort( charList, charSort[ self.config.profile.general.charSortBy ].sortFunction );
 
     local currencyDisplayList = {};
     
@@ -424,24 +503,27 @@ function addon:ShowInfo( frame )
     tsort( dungeonList );
     tsort( raidList );
     tsort( worldBossList );
-    local so = addon:getCurrencyOptions();
-    tsort( currencyDisplayList, so[ self.config.profile.currency.sortBy ].sortFunction );
+    local currSort = self:getCurrencyOptions();
+    tsort( currencyDisplayList, currSort[ self.config.profile.currency.sortBy ].sortFunction );
     
     -- initialize the column count going forward
     tooltip:SetColumnLayout( #charList + 1 );
 
     -- Add a header filling only the first columns in the first 2 rows (Realm, Character)
+    local deleteLineNum;
     local realmLineNum;
     local charLineNum;
     
+    deleteLineNum = tooltip:AddHeader( "" ); -- delete column
     if( realmCount > 1 ) and ( self.config.profile.general.showRealmHeader ) then -- show realm only when multiple are involved
         realmLineNum = tooltip:AddHeader( L[ "Realm" ] ); -- realm column
     end
     charLineNum  = tooltip:AddHeader( L[ "Character" ] ); -- char column
     -- add the characters and realms across the header
     for colNdx, char in next, charList do
+        tooltip:SetCell( deleteLineNum, colNdx + 1, CHAR_DELETE_TEXT, nil, "CENTER" );
         if( realmCount > 1 ) and ( self.config.profile.general.showRealmHeader ) then -- show realm only when multiple are involved
-            tooltip:SetCell( realmLineNum, colNdx + 1, addon:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+            tooltip:SetCell( realmLineNum, colNdx + 1, self:colorizeString( char.className, char.realmName ), nil, "CENTER" );
         end
         local charData = LockoutDb[ char.realmName ][ char.charNdx ];
         local charDisplay = {};
@@ -451,25 +533,31 @@ function addon:ShowInfo( frame )
                                     end
 
                                     local ttName = self.anchor:getTTName();
-                                    local tt = LibQTip:Acquire( "LockedoutTooltip" );
-                                    local tooltip = LibQTip:Acquire( ttName );
+                                    local tooltip = addon:aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
                                     local line = tooltip:AddHeader( "" );
-                                    tooltip:SetLineColor( line, 1, 1, 1, 1 );
+                                    tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
                                     tooltip:SetCell( line, 1, L["Character iLevels"], 2 );
                                     for k, p in next, self.anchor.data.iLevel do
-                                        tooltip:AddLine( k, p );
+                                        line = tooltip:AddLine( k, p );
+                                        tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end -- for k, p in next, charData.iLevel
 
-                                    tooltip:SmartAnchorTo( tt.lines[ self.anchor.lineNum ].cells[ self.anchor.cellNum ] );
-                                    addPopupColorBanding( tooltip );
+                                    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )
-        charDisplay.deleteTT = closeTT;
+        charDisplay.deleteTT = emptyFunction;
+        charDisplay.deleteChar =    function( self )
+                                        LockoutDb[ char.realmName ][ char.charNdx ] = nil;
+
+                                        local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
+                                        LibQTip:Release( tooltip );
+                                    end
         charDisplay.anchor = getAnchorPkt( "ch", charData.charName, charData, charLineNum, colNdx + 1 );
 
-        tooltip:SetCell( charLineNum, colNdx + 1, addon:colorizeString( char.className, char.charName ), nil, "CENTER" );
+        tooltip:SetCell( charLineNum, colNdx + 1, self:colorizeString( char.className, char.charName ), nil, "CENTER" );
 
+        tooltip:SetCellScript( deleteLineNum, colNdx + 1, "OnMouseDown", function() charDisplay:deleteChar( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charDisplay:displayTT( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charDisplay:deleteTT( ); end );     -- close out tooltip when leaving
     end -- for colNdx, char in next, charList
@@ -502,7 +590,9 @@ function addon:ShowInfo( frame )
     
     -- Use smart anchoring code to anchor the tooltip to our frame
     tooltip:SmartAnchorTo( frame );
-    tooltip:SetAutoHideDelay( 0.25, frame );
+    if( manualToggle == nil ) then
+        tooltip:SetAutoHideDelay( 0.25, frame );
+    end
 
     addMainColorBanding( tooltip );
     

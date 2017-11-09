@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="LOCKEDOUT" header="LOCKEDOUT" category="ADDONS">
+    LockedOut_ToggleMinimap();
+  </Binding>
+</Bindings>

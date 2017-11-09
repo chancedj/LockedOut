@@ -13,8 +13,8 @@ local next, strfmt =            -- variables
       next, string.format       -- lua functions
 
 -- cache blizzard function/globals
-local GetCurrencyInfo, IsQuestFlaggedCompleted =    -- variables
-      GetCurrencyInfo, IsQuestFlaggedCompleted      -- blizzard api
+local GetCurrencyInfo, GetItemCount, IsQuestFlaggedCompleted =    -- variables
+      GetCurrencyInfo, GetItemCount, IsQuestFlaggedCompleted      -- blizzard api
 
 ---[[
 local BONUS_ROLL_QUESTID = {
@@ -29,7 +29,7 @@ local BONUS_ROLL_QUESTID = {
             47851,  -- marks of honor
             47864,  -- marks of honor
             47865,  -- marks of honor
-            43510,  -- class hall
+            --43510,  -- class hall
             47040,  -- broken shore
             47045,  -- broken shore
             47054   -- broken shore
@@ -76,7 +76,14 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
 
     for ndx, currencyData in next, addon:getCurrencyList() do
         if( currencyData.show ) then
-            local name, count, icon, _, _, maximum, discovered = GetCurrencyInfo( currencyData.currencyID );
+            local count, maximum, discovered;
+            if( currencyData.type == "C" ) then
+                _, count, _, _, _, maximum, discovered = GetCurrencyInfo( currencyData.ID );
+            else
+                count = GetItemCount( currencyData.ID, true, false );
+                discovered = (count > 0);
+                maximum = 0;
+            end;
 
             local data;
             if( discovered ) then
@@ -85,19 +92,20 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
                     maximum = maximum
                 }
                 
-                local questList = BONUS_ROLL_QUESTID[ currencyData.currencyID ];
+                local questList = BONUS_ROLL_QUESTID[ currencyData.ID ];
                 local bonus;
                 if( questList ~= nil ) then
+                    data.resetDate = self:WeeklyLockoutDate();
                     bonus = {};
                     for _, questGroup in next, questList do
-                        local bonusCompleted = 0;
-                        for _, questId in next, questGroup do
-                            if( IsQuestFlaggedCompleted( questId ) ) then
-                                bonusCompleted = bonusCompleted + 1;
+                        for _, questID in next, questGroup do
+                            addon:getQuestTitleByID( questID ); -- call now to cache the data for later
+                            addon:debug( "checking: " .. questID );
+                            if( IsQuestFlaggedCompleted( questID ) ) then
+                                addon:debug( "complete: " .. questID );
+                                bonus[ #bonus + 1 ] = questID;
                             end
                         end
-
-                        bonus[ #bonus + 1 ] = bonusCompleted;
                     end
                 end
                 
@@ -106,7 +114,7 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
                 data = nil;
             end
             
-            currency[ currencyData.currencyID ] = data;
+            currency[ currencyData.ID ] = data;
         end
     end
 

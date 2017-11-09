@@ -10,8 +10,8 @@ local L         = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 local LibQTip   = LibStub( "LibQTip-1.0" )
 
 -- cache blizzard function/globals
-local GetRealmName, UnitName, UnitClass, GetAverageItemLevel =  -- variables 
-      GetRealmName, UnitName, UnitClass, GetAverageItemLevel;   -- blizzard api
+local GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime =  -- variables 
+      GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
 
 --[[
     this will generate the saved data for characters and realms
@@ -63,7 +63,7 @@ local function clearCurrencyQuests( dataTable )
     end
 end
 
-local function checkExpiredLockouts()
+function addon:checkExpiredLockouts()
     -- if we add a new element, it will be empty for the charData
     -- take care of this by exiting.
     if( LockoutDb == nil ) then return; end
@@ -97,10 +97,7 @@ local function checkExpiredLockouts()
     end -- for realmName, charData in next, LockoutDb
 end -- checkExpiredLockouts()
 
-function addon:Lockedout_GetCurrentCharData()
-    addon:destroyDb();
-    checkExpiredLockouts();
-    
+function addon:InitCharDB()
     -- get and initialize realm data
     local realmName = GetRealmName();
     LockoutDb = LockoutDb or {};                            -- initialize database if not already initialized
@@ -122,6 +119,22 @@ function addon:Lockedout_GetCurrentCharData()
     playerData.iLevel[ "pvp" ]      = pvp_ilevel;
     
     LockoutDb[ realmName ][ charNdx ] = playerData;            -- initialize playerDb if not already initialized
+    
+    return playerData, realmName, charNdx;
+end
+
+function addon:Lockedout_GetCurrentCharData()
+    local timeTilResets = GetQuestResetTime();
+    
+    if( timeTilResets > 24 * 60 * 60 ) then
+        print( "GetQuestResetTime() returned invalid value, exiting and attempting later." );
+        return;
+    end
+
+    self:destroyDb();
+    self:checkExpiredLockouts();
+    
+    local playerData, realmName, charNdx = self:InitCharDB();
 
     self:Lockedout_BuildInstanceLockout( realmName, charNdx );
     self:Lockedout_BuildWorldBoss( realmName, charNdx );
