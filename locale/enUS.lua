@@ -6,6 +6,7 @@ local L = LibStub( "AceLocale-3.0" ):NewLocale( addonName, "enUS", true );
 L["Locked Out"] = "Locked Out";
 
 -- tooltip labels and headers
+L["Show/Hide the LockedOut tooltip"]    = "Show/Hide the LockedOut tooltip";
 L["Realm"]                              = "Realm";
 L["Character"]                          = "Character";
 L["Dungeon"]                            = "Dungeon";
@@ -42,7 +43,7 @@ L["Name then Expansion"]        = "Name then Expansion";
 L["At cursor location"]         = "At cursor location";
 L["At bottom of frame"]         = "At bottom of frame";
 L["Realm then Name"]            = "Realm then Name";
-L["Name then Realm"]        = "Name then Realm";
+L["Name then Realm"]            = "Name then Realm";
 
 -- * labels
 L["Enable"]             = "Enable";

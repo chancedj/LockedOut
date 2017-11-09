@@ -8,6 +8,8 @@ local addonName, _ = ...;
 local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "AceEvent-3.0" );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
+--_G.LockedOut = addon;
+
 -- Upvalues
 local next =
       next;
@@ -379,10 +381,21 @@ function addon:OnInitialize()
     self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "ENCOUNTER_END", "EVENT_SaveToInstance" );
+    
+    self.toolTipShowing = false;
 end
 
-function addon:ChatCommand()
-	self:OpenConfigDialog();
+BINDING_NAME_LOCKEDOUT = L["Show/Hide the LockedOut tooltip"]
+BINDING_HEADER_LOCKEDOUT = L["Locked Out"]
+
+function LockedOut_ToggleMinimap( )
+    self = addon;
+    self.toolTipShowing = not self.toolTipShowing;
+    self:ShowInfo( self.icon.objects[addonName], self.toolTipShowing );
+end
+
+function addon:ChatCommand( )
+    self:OpenConfigDialog();
 end
 
 function addon:ResetDefaults()

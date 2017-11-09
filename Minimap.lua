@@ -389,12 +389,21 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
     tooltip:AddSeparator( );
 end
 
-function addon:ShowInfo( frame )
+function addon:ShowInfo( frame, manualToggle )
+    if( manualToggle ~= nil ) then
+        if( not manualToggle ) then
+            LibQTip:Release( self.tooltip );
+            self.tooltip = nil;
+
+            return;
+        end
+    end
+
     if ( self.tooltip ~= nil ) then
         LibQTip:Release( self.tooltip );
         self.tooltip = nil;
     end -- if ( self.tooltip ~= nil )
-
+    
     local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData();
 
     -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
@@ -581,7 +590,9 @@ function addon:ShowInfo( frame )
     
     -- Use smart anchoring code to anchor the tooltip to our frame
     tooltip:SmartAnchorTo( frame );
-    tooltip:SetAutoHideDelay( 0.25, frame );
+    if( manualToggle == nil ) then
+        tooltip:SetAutoHideDelay( 0.25, frame );
+    end
 
     addMainColorBanding( tooltip );
     
