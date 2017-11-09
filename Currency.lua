@@ -95,6 +95,7 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
                 local questList = BONUS_ROLL_QUESTID[ currencyData.ID ];
                 local bonus;
                 if( questList ~= nil ) then
+                    data.resetDate = self:WeeklyLockoutDate();
                     bonus = {};
                     for _, questGroup in next, questList do
                         for _, questID in next, questGroup do
