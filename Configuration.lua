@@ -56,12 +56,10 @@ function addon:getConfigOptions()
     end
 
     local charList = {};
-    
-    for realmName, characters in next, LockoutDb do
-        for charNdx, charData in next, characters do
-            charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
-        end
+    for key, value in next, addon:getCharacterList() do
+        charList[ key ] = value;
     end
+
 
     local configOptions = {
 		type = "group",
@@ -296,11 +294,8 @@ function addon:getDefaultOptions()
     end
 
     local charList = {};
-    
-    for realmName, characters in next, LockoutDb do
-        for charNdx, charData in next, characters do
-            charList[ realmName .. "." .. charData.charName ] = true;
-        end
+    for key, _ in next, addon:getCharacterList() do
+        charList[ key ] = true;
     end
 
 	local defaultOptions = {
@@ -429,9 +424,9 @@ end
 
 function addon:EVENT_ResetExpiredData( event )
     self:debug( "char refresh triggered on event: " .. event );
+    self:InitCharDB()
     self:checkExpiredLockouts( );
     
-    self:InitCharDB()
     self.config:RegisterDefaults( self:getDefaultOptions() );
 end
 

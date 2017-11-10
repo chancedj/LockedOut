@@ -302,6 +302,20 @@ function addon:destroyDb()
     if( type( key ) ~= "number" ) then LockoutDb = nil; end;
 end -- destroyDb
 
+function addon:getCharacterList()
+    local charList = {};
+    
+    if( LockoutDb == nil ) then return charList; end;
+    
+    for realmName, characters in next, LockoutDb do
+        for charNdx, charData in next, characters do
+            charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
+        end
+    end
+
+    return charList;
+end
+
 function addon:getCurrencyOptions()
     return currencySortOptions;
 end
