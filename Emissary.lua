@@ -13,9 +13,9 @@ local next, mfloor =    -- variables
 
 -- cache blizzard function/globals
 local GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID,
-        GetQuestResetTime, GetServerTime =                               -- variables 
+        GetQuestResetTime, GetServerTime, GetQuestObjectiveInfo, GetQuestTimeLeftMinutes =                               -- variables 
       GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID,
-        GetQuestResetTime, GetServerTime                                 -- blizzard api
+        GetQuestResetTime, GetServerTime, GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes                     -- blizzard api
 
 local EMISSARY_MAP_ID = 1014;
 local EMISSARY_LIST = {
@@ -44,7 +44,7 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
 
     for _, questID in next, EMISSARY_LIST do
         ---[[
-        local timeleft = C_TaskQuest.GetQuestTimeLeftMinutes( questID );
+        local timeleft = GetQuestTimeLeftMinutes( questID );
         local _, _, finished, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, 1, false );
         if( timeleft ~= nil ) and ( timeleft > 0 ) and ( numRequired ~= nil ) then
             local day = mfloor( timeleft * 60 / dayCalc );

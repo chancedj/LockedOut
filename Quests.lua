@@ -13,9 +13,11 @@ local next = -- variables
 
 -- cache blizzard function/globals
 local UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID =                       -- variables 
+        , GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID
+        , GetQuestObjectiveInfo =                                                                           -- variables 
       UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID   -- blizzard api
+        , GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID
+        , GetQuestObjectiveInfo                                                                             -- blizzard api
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 
