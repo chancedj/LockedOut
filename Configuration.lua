@@ -416,8 +416,12 @@ function addon:OpenConfigDialog( button )
     --]]
 end
 
-function addon:EVENT_CoinUpdate( event, arg1, arg2 )
-    self:debug( event .. " triggered with id: " .. arg1 or nil );
+function addon:EVENT_CoinUpdate( event, currencyID, amount )
+    local message = event .. " triggered";
+    if( currencyID ~= nil ) then
+        message = message .. " with id: " .. currencyID;
+    end
+    addon:debug( message );
     self:EVENT_FullCharacterRefresh( event );
 end
 
