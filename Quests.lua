@@ -33,6 +33,12 @@ local function checkQuestStatus( self )
             end
             
             return resetDate, true, BOSS_KILL_TEXT;
+        else
+            local _, _, finished, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, 1, false );
+            
+            if( numFulfilled ~= nil ) and ( numFulfilled > 0 ) then
+                return resetDate, true, numFulfilled .. "/" .. numRequired;
+            end
         end
     end
     
