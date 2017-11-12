@@ -371,6 +371,7 @@ function addon:OnInitialize()
     self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "ENCOUNTER_END", "EVENT_SaveToInstance" );
+    self:RegisterEvent( "CURRENCY_DISPLAY_UPDATE", "EVENT_CoinUpdate" );
     
     self.toolTipShowing = false;
 end
@@ -415,6 +416,11 @@ function addon:OpenConfigDialog( button )
     --]]
 end
 
+function addon:EVENT_CoinUpdate( event, arg1, arg2 )
+    self:debug( event .. " triggered with id: " .. arg1 or nil );
+    self:EVENT_FullCharacterRefresh( event );
+end
+
 function addon:EVENT_SaveToInstance( event, encounterID, encounterName, difficultyID, raidSize, endStatus )
     -- end status == 1 means success
     if( endStatus == 1 ) then
@@ -423,7 +429,6 @@ function addon:EVENT_SaveToInstance( event, encounterID, encounterName, difficul
 end
 
 function addon:EVENT_ResetExpiredData( event )
-    self:debug( "char refresh triggered on event: " .. event );
     self:InitCharDB()
     self:checkExpiredLockouts( );
     
