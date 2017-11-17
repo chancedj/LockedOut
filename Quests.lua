@@ -36,16 +36,13 @@ local function checkQuestStatus( self )
         else
             local ndx = 1;
             local totalFullfilled, totalRequired = 0, 0;
-            while( true ) do
-                local _, _, finished, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, ndx, false );
+            -- quick hack to fix blizzards mess.
+            for ndx=self.startNdx, self.endNdx do
+                local _, _, _, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, ndx, false );
                 if( numFulfilled ~= nil ) then
                     totalFullfilled = totalFullfilled + numFulfilled;
                     totalRequired   = totalRequired + numRequired;
-                else
-                    break;
                 end
-                
-                ndx = ndx + 1;
             end
             
             if( totalFullfilled > 0 ) and (totalRequired > 0 ) then
@@ -99,11 +96,11 @@ local QUEST_LIBRARY = {
     Warlock: Unleash Infernal -- 219540
     Warrior: Val'kyr Call -- 221597
     --]]
-    ["instantquest"]    = {name=L["Instant Complete"],      resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
-    ["dalaranweekly"]   = {name=L["Dalaran Weekly"],        resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
-    ["seals"]           = {name=L["Seal of Fate"],          resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43510} },
-    ["aniversary13"]    = {name=L["WoW 13th - Bosses"],     resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={47254,47253} },
-    ["loredaily"]       = {name=L["WoW 13th - Lore."],      resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43323,43461} },
+    ["instantquest"]    = {name=L["Instant Complete"],  startNdx=1, endNdx=1, resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
+    ["dalaranweekly"]   = {name=L["Dalaran Weekly"],    startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
+    ["seals"]           = {name=L["Seal of Fate"],      startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43510} },
+    ["aniversary13"]    = {name=L["WoW 13th - Bosses"], startNdx=1, endNdx=3, resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={47254,47253} },
+    ["loredaily"]       = {name=L["WoW 13th - Lore."],  startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43323,43461} },
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
