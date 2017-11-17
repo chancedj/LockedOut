@@ -13,34 +13,45 @@ local next = -- variables
 
 -- cache blizzard function/globals
 local UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID
-        , GetQuestObjectiveInfo =                                                                           -- variables 
+        , GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID =                       -- variables 
       UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID
-        , GetQuestObjectiveInfo                                                                             -- blizzard api
+        , GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID   -- blizzard api
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 
 local function checkQuestStatus( self )
     for _, questID in next, self.checkIDs do
+        local resetDate;
+        if( self.resetForm == "daily" ) then
+            resetDate = addon:getDailyLockoutDate();
+        elseif( self.resetForm == "weekly" ) then
+            resetDate = addon:getWeeklyLockoutDate();
+        else
+            resetDate = nil
+            print( "improper resetForm for questID: .. " .. questID );
+        end
+
         if ( IsQuestFlaggedCompleted( questID ) ) then
-            local resetDate;
-            if( self.resetForm == "daily" ) then
-                resetDate = addon:getDailyLockoutDate();
-            elseif( self.resetForm == "weekly" ) then
-                resetDate = addon:getWeeklyLockoutDate();
-            else
-                resetDate = nil
-                print( "improper resetForm for questID: .. " .. questID );
-            end
-            
             return resetDate, true, BOSS_KILL_TEXT;
         else
-            local _, _, finished, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, 1, false );
-            
-            if( numFulfilled ~= nil ) and ( numFulfilled > 0 ) then
-                return resetDate, true, numFulfilled .. "/" .. numRequired;
+            local ndx = 1;
+            local totalFullfilled, totalRequired = 0, 0;
+            while( true ) do
+                local _, _, finished, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, ndx, false );
+                if( numFulfilled ~= nil ) then
+                    totalFullfilled = totalFullfilled + numFulfilled;
+                    totalRequired   = totalRequired + numRequired;
+                else
+                    break;
+                end
+                
+                ndx = ndx + 1;
             end
+            
+            if( totalFullfilled > 0 ) and (totalRequired > 0 ) then
+                return resetDate, true, totalFullfilled .. "/" .. totalRequired;
+            end
+            
         end
     end
     
@@ -88,9 +99,11 @@ local QUEST_LIBRARY = {
     Warlock: Unleash Infernal -- 219540
     Warrior: Val'kyr Call -- 221597
     --]]
-    ["instantquest"]    = {name=L["Instant Complete"],  resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
-    ["dalaranweekly"]   = {name=L["Dalaran Weekly"],    resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
-    ["seals"]           = {name=L["Seal of Fate"],      resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43510} },
+    ["instantquest"]    = {name=L["Instant Complete"],      resetForm="custom", checkStatus=checkSpellStatus, copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
+    ["dalaranweekly"]   = {name=L["Dalaran Weekly"],        resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
+    ["seals"]           = {name=L["Seal of Fate"],          resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43510} },
+    ["aniversary13"]    = {name=L["WoW 13th - Bosses"],     resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={47254,47253} },
+    ["loredaily"]       = {name=L["WoW 13th - Lore."],      resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43323} },
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
