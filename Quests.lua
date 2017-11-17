@@ -103,7 +103,7 @@ local QUEST_LIBRARY = {
     ["dalaranweekly"]   = {name=L["Dalaran Weekly"],        resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
     ["seals"]           = {name=L["Seal of Fate"],          resetForm="weekly", checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43510} },
     ["aniversary13"]    = {name=L["WoW 13th - Bosses"],     resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={47254,47253} },
-    ["loredaily"]       = {name=L["WoW 13th - Lore."],      resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43323} },
+    ["loredaily"]       = {name=L["WoW 13th - Lore."],      resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=false, checkIDs={43323,43461} },
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
