@@ -19,6 +19,7 @@ local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterIn
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
 local WORLD_BOSS_LIST = {
+--[[
     -- Pandaria
     [691]  = { instanceId=322, questId=32099, bossName="Sha of Anger", },
     [725]  = { instanceId=322, questId=32098, bossName="Salyis's Warband" },
@@ -60,6 +61,53 @@ local WORLD_BOSS_LIST = {
     [2013] = { instanceId=959, questId=49170, bossName="Occularus" },
     [2014] = { instanceId=959, questId=49171, bossName="Sotanathor" },
     [2015] = { instanceId=959, questId=49168, bossName="Pit Lord Vilemus" }
+--]]
+    -- Pandaria
+    [1]  = { questId=32099, bossName="Sha of Anger", },
+    [2]  = { questId=32098, bossName="Salyis's Warband" },
+    [3]  = { questId=32518, bossName="Nalak, The Storm Lord", },
+    [4]  = { questId=32519, bossName="Oondasta",  },
+    [5]  = { questId=33117, bossName="Celestials" }, -- bossName="Chi-Ji, The Red Crane", }, remapped name
+    [6]  = { questId=0,     bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
+    [7]  = { questId=0,     bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
+    [8]  = { questId=0,     bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
+    [9]  = { questId=33118, bossName="Ordos, Fire-God of the Yaungol", },
+    
+    -- Draenor
+    [10] = { questId=37462, bossName="Tarlna the Ageless" },
+    [11] = { questId=37464, bossName="Rukhmar" },
+    [12] = { questId=37462, bossName="Drov the Ruiner" },
+    [13] = { questId=39380, bossName="Supreme Lord Kazzak" },
+
+    -- Broken Isles
+    [14] = { questId=42270, bossName="Nithogg" },
+    [15] = { questId=42269, bossName="The Soultakers" },
+    [16] = { questId=42779, bossName="Shar'thos" },
+    [17] = { questId=43192, bossName="Levantus" },
+    [18] = { questId=42819, bossName="Humongris" },
+    [19] = { questId=43193, bossName="Calamir" },
+    [20] = { questId=43513, bossName="Na'zak the Fiend" },
+    [21] = { questId=43448, bossName="Drugon the Frostblood" },
+    [22] = { questId=43512, bossName="Ana-Mouz" },
+    [23] = { questId=43985, bossName="Flotsam" },
+    [24] = { questId=44287, bossName="Withered J'im" },
+    [25] = { questId=46947, bossName="Brutallus" },
+    [26] = { questId=46948, bossName="Malificus" },
+    [27] = { questId=46945, bossName="Si'vash" },
+    [28] = { questId=47061, bossName="Apocron" },
+
+    -- Argus
+    [29] = { questId=49169, bossName="Matron Folnuna" },
+    [30] = { questId=49167, bossName="Mistress Alluradel" },
+    [31] = { questId=49166, bossName="Inquisitor Meto" },
+    [32] = { questId=49170, bossName="Occularus" },
+    [33] = { questId=49171, bossName="Sotanathor" },
+    [34] = { questId=49168, bossName="Pit Lord Vilemus" },
+
+    -- WoW 13th Anniversary Bosses
+    [35] = { questId=47461, bossName="Lord Kazzak (13)" },
+    [36] = { questId=47462, bossName="Azuregos (13)" },
+    [37] = { questId=47463, bossName="Dragon of Nightmare (13)" },
 }
 
 function CheckForMissingMappings()
@@ -114,11 +162,11 @@ function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
     for bossId, bossData in next, WORLD_BOSS_LIST do
         if( bossData.questId ) then
             if ( IsQuestFlaggedCompleted( bossData.questId ) ) then
-                worldBosses[ bossData.bossName ] = {}
+                worldBosses[ bossData.bossName ] = {};
                 worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
                 worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
             elseif( IsQuestActive( bossData.questId ) ) and ( not addon.config.profile.worldBoss.showKilledOnly ) then -- add option later on to show unkilled bosses
-                worldBosses[ bossData.bossName ] = {}
+                worldBosses[ bossData.bossName ] = {};
                 worldBosses[ bossData.bossName ].displayText = " ";
                 worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
             end -- if ( IsQuestFlaggedCompleted( bossData.questId ) )
