@@ -86,7 +86,7 @@ local function checkSpellStatus( self )
 end
 
 local QUEST_LIBRARY = {
-    ["blingtron"]       = {name=L["Blingtron"],         resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=true,  checkIDs={40753,34774,31752} },
+    ["blingtron"]       = {name=L["Blingtron"],         startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=true,  checkIDs={40753,34774,31752} },
     --[[
     spellID's for the below instance quests
     Death Knight: Frost Wyrm -- 221557
