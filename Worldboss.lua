@@ -161,7 +161,7 @@ function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
     for bossId, bossData in next, WORLD_BOSS_LIST do
         if( bossData.questId ) then
             local calculatedResetDate = addon:getWeeklyLockoutDate();
-            if( bossData.resetType ~= nil ) and ( bossData.rbossData.resetType == "daily" ) then
+            if( bossData.resetType ~= nil ) and ( bossData.resetType == "daily" ) then
                 calculatedResetDate = self:getDailyLockoutDate();
             end
             if ( IsQuestFlaggedCompleted( bossData.questId ) ) then
