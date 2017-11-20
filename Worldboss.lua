@@ -105,9 +105,9 @@ local WORLD_BOSS_LIST = {
     [34] = { questId=49168, bossName="Pit Lord Vilemus" },
 
     -- WoW 13th Anniversary Bosses
-    [35] = { questId=47461, bossName="Lord Kazzak (13)" },
-    [36] = { questId=47462, bossName="Azuregos (13)" },
-    [37] = { questId=47463, bossName="Dragon of Nightmare (13)" },
+    [35] = { questId=47461, resetType="daily", bossName="Lord Kazzak (13)" },
+    [36] = { questId=47462, resetType="daily", bossName="Azuregos (13)" },
+    [37] = { questId=47463, resetType="daily", bossName="Dragon of Nightmare (13)" },
 }
 
 function CheckForMissingMappings()
@@ -158,9 +158,12 @@ local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
     local worldBosses = {}; -- initialize world boss table;
     
-    local calculatedResetDate = addon:getWeeklyLockoutDate();
     for bossId, bossData in next, WORLD_BOSS_LIST do
         if( bossData.questId ) then
+            local calculatedResetDate = addon:getWeeklyLockoutDate();
+            if( bossData.resetType ~= nil ) and ( bossData.rbossData.resetType == "daily" ) then
+                calculatedResetDate = self:getDailyLockoutDate();
+            end
             if ( IsQuestFlaggedCompleted( bossData.questId ) ) then
                 worldBosses[ bossData.bossName ] = {};
                 worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
