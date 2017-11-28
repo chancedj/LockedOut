@@ -406,11 +406,24 @@ function addon:OpenConfigDialog( button )
 	end
     
     --[[ this helps to build the currency table
+    local currList = self:getCurrencyList();
     for ndx=1, 2000 do
         local name = GetCurrencyInfo( ndx );
         
         if( name ~= nil ) and ( name ~= "" ) then
-            print( "{ [" .. ndx .. "] = { ID=" .. ndx .. ", getName=function() return '' end, expansionLevel=1 } }, -- " .. name );
+            local found = false;
+        
+            for _, data in next, currList do
+                if( data.ID == ndx ) then
+                    found = true;
+                    break;
+                end
+            end
+        
+            if( found == false ) then
+                --print( "{ [" .. ndx .. "] = { ID=" .. ndx .. ", name=nil, expansionLevel=6 } }, -- " .. name );
+                print( '{ ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- ' .. name );
+            end
         end
     end
     --]]
@@ -421,7 +434,7 @@ function addon:EVENT_CoinUpdate( event, currencyID, amount )
     if( currencyID ~= nil ) then
         message = message .. " with id: " .. currencyID;
     end
-    addon:debug( message );
+    self:debug( message );
     self:EVENT_FullCharacterRefresh( event );
 end
 
