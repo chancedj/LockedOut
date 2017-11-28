@@ -304,7 +304,8 @@ function addon:getDefaultOptions()
 		},
 		profile = {
 			minimap = {
-				hide = false
+				hide = false,
+                minimapPos = 0
 			},
 			general = {
 				currentRealm = false,
