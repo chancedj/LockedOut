@@ -90,12 +90,14 @@ L["M"]  = "M";
 L["L"]  = "L";
 
 -- quest.lua mappings
-L["Blingtron"]          = "Blingtron";
-L["Instant Complete"]   = "Instant Complete";
-L["Dalaran Weekly"]     = "Dalaran Weekly";
-L["Seal of Fate"]       = "Seal of Fate";
-L["WoW 13th - Bosses"]  = "WoW 13th - Bosses";
-L["WoW 13th - Lore."]   = "WoW 13th - Lore.";
+L["Blingtron"]                  = "Blingtron";
+L["Instant Complete"]           = "Instant Complete";
+L["Dalaran Weekly"]             = "Dalaran Weekly";
+L["Seal of Fate"]               = "Seal of Fate";
+L["WoW 13th - Bosses"]          = "WoW 13th - Bosses";
+L["WoW 13th - Lore."]           = "WoW 13th - Lore.";
+L["Argus - Pristine Argunite"]  = "Argus - Pristine Argunite";
+L["Argus - Invasions"],         = "Argus - Invasions";
 
 -- expansion abbreviations
 L["Van"]    = "Van";
