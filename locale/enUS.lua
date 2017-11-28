@@ -97,7 +97,7 @@ L["Seal of Fate"]               = "Seal of Fate";
 L["WoW 13th - Bosses"]          = "WoW 13th - Bosses";
 L["WoW 13th - Lore."]           = "WoW 13th - Lore.";
 L["Argus - Pristine Argunite"]  = "Argus - Pristine Argunite";
-L["Argus - Invasions"],         = "Argus - Invasions";
+L["Argus - Invasions"]          = "Argus - Invasions";
 
 -- expansion abbreviations
 L["Van"]    = "Van";
