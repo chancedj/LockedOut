@@ -148,8 +148,8 @@ function addon:getConfigOptions()
 			  desc = L["Choose icon for addon - requires ui refresh or login/logout"],
 			  type = "select",
 			  values = addon:getIconOptions(),
-			  set = function(info,val) self.config.profile.general.addonIcon = val; end,
-			  get = function(info) return self.config.profile.general.addonIcon end
+			  set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
+			  get = function(info) return self.config.profile.minimap.addonIcon end
 			},
 			--]]
 			charVisible = {
@@ -304,8 +304,14 @@ function addon:getDefaultOptions()
 		},
 		profile = {
 			minimap = {
-				hide = false,
-                minimapPos = 0
+                --[[
+                     position can only be >= 0
+                     so use this to fix the position saving issue
+                     by forcing it to 0 later on if it == -1
+                --]]
+                minimapPos = -1,
+                hide = false,
+                addonIcon = "134244",
 			},
 			general = {
 				currentRealm = false,
@@ -313,8 +319,7 @@ function addon:getDefaultOptions()
                 loggedInFirst = true,
                 anchorPoint = "cell",
                 showCharList = charList,
-                charSortBy = "rc",
-                addonIcon = "134244"
+                charSortBy = "rc"
 			},
 			dungeon = {
 				show = true
@@ -344,6 +349,16 @@ function addon:getDefaultOptions()
 	return defaultOptions;
 end
 
+--[[
+    libdbicon doesn't trigger the update for some reason. so lets force the update outside first since
+     -1 is an invalid value.  change it to a correct default of 0 - this fixes the issue with minimap position not saving
+--]]
+local function minimapPositionFix( self )
+    if( self.config.profile.minimap.minimapPos == -1 ) then
+        self.config.profile.minimap.minimapPos = 0;
+    end
+end
+
 function addon:OnInitialize()
 	local defaultOptions = self:getDefaultOptions();
     self.config = LibStub( "AceDB-3.0" ):New( "LockedOutConfig", defaultOptions, true );
@@ -352,12 +367,13 @@ function addon:OnInitialize()
     local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
         type = "data source",
         text = L[ "Locked Out" ],
-        icon = self.config.profile.general.addonIcon,
+        icon = self.config.profile.minimap.addonIcon,
         OnClick = function( frame, button ) self:OpenConfigDialog( button ) end,
         OnEnter = function( frame ) self:ShowInfo( frame ) end,
     } ); -- local LockedoutMo
 
     self.icon = LibStub( "LibDBIcon-1.0" );
+    minimapPositionFix( self );
     self.icon:Register(addonName, LockedoutMo, self.config.profile.minimap)
 
     self.optionFrameName = addonName .. "OptionPanel"
@@ -393,6 +409,8 @@ end
 function addon:ResetDefaults()
     -- reset database here.
     self.config:ResetProfile();
+    minimapPositionFix( self );
+    self.icon:Refresh( addonName, self.config.profile.minimap );
     LibStub("AceConfigRegistry-3.0"):NotifyChange( self.optionFrameName );
 end
 
