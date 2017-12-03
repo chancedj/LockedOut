@@ -19,16 +19,16 @@ local GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID,
 
 local EMISSARY_MAP_ID = 1014;
 local EMISSARY_LIST = {
-    "48642", -- argussian reach
-    "48641", -- armies of the legionfall
-    "48639", -- armies of the light
-    "42420", -- court of farondis
-    "42233", -- highmountain tribes
-    "42170", -- the dreamweavers
-    "43179", -- kirin tor of dalaran
-    "42421", -- the nightfallen
-    "42234", -- the valajar   
-    "42422" -- the wardens
+    { questID = "48642", numRequired=4 }, -- argussian reach
+    { questID = "48641", numRequired=4 }, -- armies of the legionfall
+    { questID = "48639", numRequired=4 }, -- armies of the light
+    { questID = "42420", numRequired=4 }, -- court of farondis
+    { questID = "42233", numRequired=4 }, -- highmountain tribes
+    { questID = "42170", numRequired=4 }, -- the dreamweavers
+    { questID = "43179", numRequired=3 }, -- kirin tor of dalaran
+    { questID = "42421", numRequired=4 }, -- the nightfallen
+    { questID = "42234", numRequired=4 }, -- the valajar   
+    { questID = "42422", numRequired=4 } -- the wardens
 }
 
 local function copyEmissaryData( from, to )
@@ -42,8 +42,9 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
     local emissaries = LockoutDb[ realmName ][ charNdx ].emissaries or {}; -- initialize world boss table;
     local dayCalc = 24 * 60 * 60;
 
-    for _, questID in next, EMISSARY_LIST do
+    for _, emData in next, EMISSARY_LIST do
         ---[[
+        local questID = emData.questID;
         local timeleft = GetQuestTimeLeftMinutes( questID );
         local _, _, finished, numFulfilled, numRequired = GetQuestObjectiveInfo( questID, 1, false );
         if( timeleft ~= nil ) and ( timeleft > 0 ) and ( numRequired ~= nil ) then
@@ -57,49 +58,21 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
             emissaryData.isComplete = finished;
             emissaryData.resetDate  = addon:getDailyLockoutDate() + (day * dayCalc);
             
+            print( "In Process: " .. addon:getQuestTitleByID( questID ) );
             emissaries[ questID ] = emissaryData;
-        elseif( IsQuestFlaggedCompleted( questID ) ) and 
-              ( ( emissaries[ questID ] == nil ) or ( emissaries[ questID ].isComplete ~= true ) ) then
+        elseif( IsQuestFlaggedCompleted( questID ) ) then
             local emissaryData = emissaries[ questID ] or {};
+            local title = GetQuestLogTitle( GetQuestLogIndexByID( questID ) );
 
-            emissaryData.name       = emissaryData.name or nil;
-            emissaryData.fullfilled = emissaryData.fullfilled or 0;
-            emissaryData.required   = emissaryData.fullfilled or 0;
+            emissaryData.name       = title;
+            emissaryData.fullfilled = emData.numRequired;
+            emissaryData.required   = emData.numRequired;
             emissaryData.isComplete = true;
             emissaryData.resetDate  = timeleft or emissaryData.resetDate or addon:getDailyLockoutDate();
             
             emissaries[ questID ] = emissaryData;
         end
         --]]
-    end
-
-    -- fix data that cannot be filled in on characters missing the emissary data
-    -- copy it from other characters that know the current status of the quests.
-    for questID, emissaryData in next, emissaries do
-        local updated = false;
-
-        -- update across empty buckets
-        for rk, r in next, LockoutDb do
-            for ck, c in next, r do
-                -- skip yourself!
-                if( realmName ~= rk ) and ( ck ~= charNdx ) then
-                    if( emissaryData.name == nil ) then
-                        if( c.emissaries ~= nil ) and ( c.emissaries[ questID ] ~= nil) and ( c.emissaries[ questID ].name ~= nil ) then
-                            local copyFrom  = c.emissaries[ questID ];
-                            copyEmissaryData( copyFrom, emissaryData );
-                            updated = true;
-                            break;
-                        end
-                    elseif ( c.emissaries ~= nil ) and ( c.emissaries[ questID ] ~= nil) and ( c.emissaries[ questID ].name == nil ) then
-                        local copyTo  = c.emissaries[ questID ];
-                        copyEmissaryData( emissaryData, copyTo );
-                        updated = true;
-                        break;
-                    end
-                end
-            end
-            if updated then break; end;
-        end
     end
     
     LockoutDb[ realmName ][ charNdx ].emissaries = emissaries;
