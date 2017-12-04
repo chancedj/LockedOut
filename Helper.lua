@@ -12,8 +12,10 @@ local print, type =                                -- variables
       print, type                                  -- lua functions
 
 -- cache blizzard function/globals
-local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo, RAID_CLASS_COLORS =                        -- variables
-      GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
+local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
+        EJ_SelectInstance, EJ_GetEncounterInfoByIndex, RAID_CLASS_COLORS =                          -- variables
+      GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
+        EJ_SelectInstance, EJ_GetEncounterInfoByIndex, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS;    -- blizzard global table
 
 addon.ExpansionAbbr = {
     [0] = L["Van"],
@@ -278,6 +280,23 @@ function addon:getQuestTitleByID( questID )
     -- example pulled from below
     -- http://www.wowinterface.com/forums/showthread.php?t=46934
     return QuestTitleFromID[ questID ];
+end
+
+function addon:getWorldBossName( lkpInstanceID, lkpBossID )
+    EJ_SelectInstance( lkpInstanceID );
+
+    local bossNdx = 1;
+    local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
+    while bossID do
+        if( bossID == lkpBossID ) then
+            return bossName
+        end
+        
+        bossNdx = bossNdx + 1;
+        bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
+    end
+    
+    return "unknown";
 end
 
 function addon:debug( msg )
