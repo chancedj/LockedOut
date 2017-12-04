@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, table, tsort, mfloor, abs =           -- variables
-      next, table, table.sort, math.floor, math.abs    -- lua functions
+local next, table, strsplit, tsort, mfloor, abs =           -- variables
+      next, table, strsplit, table.sort, math.floor, math.abs    -- lua functions
 
 -- cache blizzard function/globals
 local SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE  =    -- variables
@@ -73,7 +73,7 @@ function addon:aquireEmptyTooltip( ttName )
     local tooltip = LibQTip:Acquire( ttName );
 
     self.openSubTooltips[ #self.openSubTooltips + 1 ] = ttName;
-    
+
     if( #tooltip.lines > 0 ) then
         LibQTip:Release( tooltip );
         tooltip = LibQTip:Acquire( ttName );
@@ -205,15 +205,15 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
     local lineNum = tooltip:AddLine( );
     tooltip.lines[ lineNum ].is_header = true;
     tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
-    for bossName, _ in next, worldBossList do
+    for bossKey, bossName in next, worldBossList do
         lineNum = tooltip:AddLine( bossName );
         
         for colNdx, charData in next, charList do
             if (LockoutDb[ charData.realmName ] ~= nil) and
                (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-               (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ] ~= nil) then
-                local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ];
-
+               (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossKey ] ~= nil) then
+                local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossKey ];
+                
                 local bossDisplay = {};
                 bossDisplay.displayTT  = displayReset;
                 bossDisplay.deleteTT   = emptyFunction;
@@ -455,8 +455,12 @@ function addon:ShowInfo( frame, manualToggle )
                         end -- if ( data.isRaid )
                     end -- for instanceName, _ in next, instances
                     
-                    for bossName, _ in next, charData.worldBosses do
-                        worldBossList[ bossName ] = "set"
+                    for bossKey, bossData in next, charData.worldBosses do
+                        local instanceID, bossID = strsplit( "|", bossKey );
+
+                        if( instanceID ~= nil ) and ( bossID ~= nil ) then
+                            worldBossList[ bossKey ] = addon:getWorldBossName( instanceID, bossID );
+                        end
                     end -- for bossName, _ in next, charData.worldBosses
                     
                     for currID, currData in next, charData.currency do

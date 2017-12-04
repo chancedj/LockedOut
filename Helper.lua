@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local print, type =                                -- variables
-      print, type                                  -- lua functions
+local print, type, tonumber =                      -- variables
+      print, type, tonumber                        -- lua functions
 
 -- cache blizzard function/globals
 local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
@@ -282,13 +282,16 @@ function addon:getQuestTitleByID( questID )
     return QuestTitleFromID[ questID ];
 end
 
-function addon:getWorldBossName( lkpInstanceID, lkpBossID )
-    EJ_SelectInstance( lkpInstanceID );
+function addon:getWorldBossName( sInstanceID, sBossID )
+    local iInstanceID = tonumber( sInstanceID );
+    local iBossID = tonumber( sBossID );
+
+    EJ_SelectInstance( iInstanceID );
 
     local bossNdx = 1;
     local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
     while bossID do
-        if( bossID == lkpBossID ) then
+        if( bossID == iBossID ) then
             return bossName
         end
         

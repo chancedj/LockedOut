@@ -26,9 +26,9 @@ local WORLD_BOSS_LIST = {
     { instanceID=322, bossID=814,  questID=32518, bossName="Nalak, The Storm Lord", },
     { instanceID=322, bossID=826,  questID=32519, bossName="Oondasta",  },
     { instanceID=322, bossID=857,  questID=33117, bossName="Celestials" }, -- bossName="Chi-Ji, The Red Crane", }, remapped name
-    --{ instanceID=322, bossID=858,  questID=33117, bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
-    --{ instanceID=322, bossID=859,  questID=33117, bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
-    --{ instanceID=322, bossID=860,  questID=33117, bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
+    { instanceID=322, bossID=858,  questID=33117, bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
+    { instanceID=322, bossID=859,  questID=33117, bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
+    { instanceID=322, bossID=860,  questID=33117, bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
     { instanceID=322, bossID=861,  questID=33118, bossName="Ordos, Fire-God of the Yaungol", },
     
     -- Draenor
@@ -109,44 +109,22 @@ function CheckForMissingMappings()
 end -- CheckForMissingMappings()
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
-function addon:testNewMethod( realmName, charNdx )
+function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
     local worldBosses = {};
 
     local calculatedResetDate = self:getWeeklyLockoutDate();
     for _, bossData in next, WORLD_BOSS_LIST do
         if( IsQuestFlaggedCompleted( bossData.questID ) ) or
           ( IsQuestActive( bossData.questID ) ) and ( not self.config.profile.worldBoss.showKilledOnly ) then
-            worldBosses[ #worldBosses + 1] = {
+            worldBosses[ bossData.instanceID .. "|" .. bossData.bossID ] = {
                                                 questID = bossData.questID,
-                                                instanceID = bossData.instanceID, 
-                                                bossID = bossData.bossID,
+                                                displayText = BOSS_KILL_TEXT,
                                                 resetDate = calculatedResetDate
                                              }
             self:debug( "adding: ", self:getWorldBossName( bossData.instanceID, bossData.bossID ) );
         end
     end
 
-end
-
-function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
-    local worldBosses = {}; -- initialize world boss table;
-
-    self:testNewMethod( realmName, charNdx );
-   
-    local calculatedResetDate = addon:getWeeklyLockoutDate();
-    for bossId, bossData in next, WORLD_BOSS_LIST do
-        if( bossData.questID ) then
-            if ( IsQuestFlaggedCompleted( bossData.questID ) ) then
-                worldBosses[ bossData.bossName ] = {};
-                worldBosses[ bossData.bossName ].displayText = BOSS_KILL_TEXT;
-                worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
-            elseif( IsQuestActive( bossData.questID ) ) and ( not addon.config.profile.worldBoss.showKilledOnly ) then -- add option later on to show unkilled bosses
-                worldBosses[ bossData.bossName ] = {};
-                worldBosses[ bossData.bossName ].displayText = " ";
-                worldBosses[ bossData.bossName ].resetDate = calculatedResetDate;
-            end -- if ( IsQuestFlaggedCompleted( bossData.questID ) )
-        end -- if( bossData.questID )
-    end -- for bossId, bossData in next, WORLD_BOSS_LIST
-    
     LockoutDb[ realmName ][ charNdx ].worldBosses = worldBosses;
 end -- Lockedout_BuildInstanceLockout()
+
