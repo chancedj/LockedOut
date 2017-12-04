@@ -473,13 +473,13 @@ function addon:ShowInfo( frame, manualToggle )
                     end
                     
                     for questID, emData in next, charData.emissaries do
-                        if( emData.name ~= nil ) then
+                        local title = addon:getQuestTitleByID( questID );
+                        if( title ~= nil ) then
                             -- add a 10 second buffer - things get a little off when the reset date ends up short by a second or two..
                             local day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
-                            self:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
                             emissaryList[ day + 1 ] = {
-                                displayName = "(+" .. day .. " Day) " .. emData.name,
-                                name = emData.name,
+                                displayName = "(+" .. day .. " Day) " .. title,
                                 questID = questID
                             }
                         end

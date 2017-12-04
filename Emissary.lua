@@ -12,10 +12,8 @@ local next, mfloor =    -- variables
       next, math.floor  -- lua functions
 
 -- cache blizzard function/globals
-local GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID,
-        GetQuestResetTime, GetServerTime, GetQuestObjectiveInfo, GetQuestTimeLeftMinutes =                               -- variables 
-      GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID,
-        GetQuestResetTime, GetServerTime, GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes                     -- blizzard api
+local GetQuestObjectiveInfo, GetQuestTimeLeftMinutes =                               -- variables 
+      GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes                     -- blizzard api
 
 local EMISSARY_MAP_ID = 1014;
 local EMISSARY_LIST = {
@@ -51,19 +49,16 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
         if( timeleft ~= nil ) and ( timeleft > 0 ) and ( numRequired ~= nil ) then
             local day = mfloor( timeleft * 60 / dayCalc );
             local emissaryData = emissaries[ questID ] or {};
-            local title = self:getQuestTitleByID( questID );
             
-            emissaryData.name       = title;
             emissaryData.fullfilled = numFulfilled or 0;
             emissaryData.required   = numRequired or 0;
             emissaryData.isComplete = finished;
             emissaryData.resetDate  = dailyResetDate + (day * dayCalc);
             
-            addon:debug( "In Process: ", title );
+            self:debug( "In Process: ", questID );
             emissaries[ questID ] = emissaryData;
         elseif( IsQuestFlaggedCompleted( questID ) ) then
             local emissaryData = emissaries[ questID ] or {};
-            local title = self:getQuestTitleByID( questID );
             local resetDate = emissaryData.resetDate or dailyResetDate;
             
             if( timeleft ~= nil) and (timeleft > 0 ) then
@@ -71,13 +66,12 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
                 resetDate = dailyResetDate + (day * dayCalc)
             end
             
-            emissaryData.name       = title;
             emissaryData.fullfilled = emData.numRequired;
             emissaryData.required   = emData.numRequired;
             emissaryData.isComplete = true;
             emissaryData.resetDate  = resetDate;
             
-            addon:debug( "Completed: resetDate: ", emissaryData.resetDate, "timeleft: ", timeleft, " - ", title );
+            self:debug( "Completed: resetDate: ", emissaryData.resetDate, "timeleft: ", timeleft, " - ", questID );
             emissaries[ questID ] = emissaryData;
         else
             emissaries[ questID ] = nil;
@@ -91,10 +85,10 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
             for questID, emissaryData in next, emissaries do
                 if( charEmissaries[ questID ] ~= nil ) then
                     if( charEmissaries[ questID ].resetDate < emissaries[ questID ].resetDate ) then
-                        addon:debug( "updating: ", realmName, " - ", charData.charName );
+                        self:debug( "updating: ", realmName, " - ", charData.charName );
                         charEmissaries[ questID ].resetDate = emissaries[ questID ].resetDate;
                     elseif( charEmissaries[ questID ].resetDate > emissaries[ questID ].resetDate ) then
-                        addon:debug( "using: ", realmName, " - ", charData.charName );
+                        self:debug( "using: ", realmName, " - ", charData.charName );
                         emissaries[ questID ].resetDate = charEmissaries[ questID ].resetDate;
                     end
                 end               
