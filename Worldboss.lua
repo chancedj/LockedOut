@@ -122,7 +122,7 @@ function addon:testNewMethod( realmName, charNdx )
                                                 bossID = bossData.bossID,
                                                 resetDate = calculatedResetDate
                                              }
-            print( "adding: ", self:getWorldBossName( bossData.instanceID, bossData.bossID ) );
+            self:debug( "adding: ", self:getWorldBossName( bossData.instanceID, bossData.bossID ) );
         end
     end
 
