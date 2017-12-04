@@ -54,10 +54,8 @@ end -- getBossData()
 local function populateBossData( bossData, encounterId, numEncounters, fnEncounter  )
     for encounterNdx = 1, numEncounters do
         local bossName, _, isKilled = fnEncounter( encounterId, encounterNdx );
-    
-        bossData[ bossName ] = {};
-        bossData[ bossName ].bossName = bossName;
-        bossData[ bossName ].isKilled = isKilled;
+        
+        bossData[ #bossData + 1 ] = { bossName = bossName, isKilled = isKilled };
     end -- for encounterNdx = 1, numEncounters
     
     return bosses;
@@ -127,12 +125,29 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             local resetDate = GetServerTime() + reset;
             local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, locked, isRaid, resetDate);
 
-            instanceData.bossData = instanceData.bossData or {};
+            instanceData.bossData = {};
             populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
         end -- if( reset > 0 )
     end -- for lockId = 1, lockCount
     --]]
     
+    --[[
+    for bagID = 0, NUM_BAG_SLOTS do
+        for slotID = 1, GetContainerNumSlots(bagID) do
+            local link = GetContainerItemLink( bagID, slotID );
+            
+            if link and string.find( link, "Keystone: " ) then
+                local _, mapID, level = strsplit( ":", link );
+                local mapName = C_ChallengeMode.GetMapInfo( mapID );
+                print( "keystone found: link: " .. tostring( link ) );
+                print( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
+                
+                break;
+            end
+        end
+    end
+    --]]
+
     removeUntouchedInstances( instances );
     LockoutDb[ realmName ][ charNdx ].instances = instances;
 end -- Lockedout_BuildInstanceLockout()
