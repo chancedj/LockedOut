@@ -83,6 +83,7 @@ local weekdayRemap = {
 }
 
 local CURRENCY_LIST = {
+    -- currency
     { ID=1,    name=nil, icon=nil, expansionLevel=1, type="C", show=false }, -- Currency Token Test Token 4
     { ID=2,    name=nil, icon=nil, expansionLevel=1, type="C", show=false }, -- Currency Token Test Token 2
     { ID=4,    name=nil, icon=nil, expansionLevel=1, type="C", show=false }, -- Currency Token Test Token 5
@@ -188,6 +189,8 @@ local CURRENCY_LIST = {
     { ID=1506, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Argus Waystone
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
     { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true }  -- Wakening Essence
+    
+    -- items
 };
 
 local currencySortOptions = {
