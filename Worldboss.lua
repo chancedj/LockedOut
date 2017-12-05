@@ -114,11 +114,14 @@ function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
 
     local calculatedResetDate = self:getWeeklyLockoutDate();
     for _, bossData in next, WORLD_BOSS_LIST do
-        if( IsQuestFlaggedCompleted( bossData.questID ) ) or
-          ( IsQuestActive( bossData.questID ) ) and ( not self.config.profile.worldBoss.showKilledOnly ) then
+        local questCompleted = IsQuestFlaggedCompleted( bossData.questID );
+        local questShowUncompleted = ( IsQuestActive( bossData.questID ) ) and ( not self.config.profile.worldBoss.showKilledOnly );
+        if( questCompleted ) or ( questShowUncompleted ) then
+            local displayText = questCompleted and BOSS_KILL_TEXT or "";
+
             worldBosses[ bossData.instanceID .. "|" .. bossData.bossID ] = {
                                                 questID = bossData.questID,
-                                                displayText = BOSS_KILL_TEXT,
+                                                displayText = displayText,
                                                 resetDate = calculatedResetDate
                                              }
             self:debug( "adding: ", self:getWorldBossName( bossData.instanceID, bossData.bossID ) );
