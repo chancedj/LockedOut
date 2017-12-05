@@ -98,6 +98,9 @@ L["WoW 13th - Bosses"]          = "WoW 13th - Bosses";
 L["WoW 13th - Lore."]           = "WoW 13th - Lore.";
 L["Argus - Pristine Argunite"]  = "Argus - Pristine Argunite";
 L["Argus - Invasions"]          = "Argus - Invasions";
+L["Argus - Cheap Ridgestalker"] = "Argus - Cheap Ridgestalker";
+L["Argus - Cheap Void-Purged"]  = "Argus - Cheap Void-Purged";
+L["Argus - Cheap Lightforged"]  = "Argus - Cheap Lightforged";
 
 -- expansion abbreviations
 L["Van"]    = "Van";
