@@ -76,12 +76,12 @@ function addon:getConfigOptions()
 			},
 			--]]
 			generalHeader={
-			  order = 10,
+			  order = 9,
 			  name = L["General Options"],
 			  type = "header",
 			},
 			currentRealmOnly = {
-			  order = 11,
+			  order = 10,
 			  name = L["Current Realm"],
 			  desc = L["Show characters from current realm only"],
 			  type = "toggle",
@@ -89,13 +89,30 @@ function addon:getConfigOptions()
 			  get = function(info) return self.config.profile.general.currentRealm end
 			},
             showRealmHeader = {
-			  order = 12,
+			  order = 11,
 			  name = L["Show Realm"],
 			  desc = L["Show the realm header"],
 			  type = "toggle",
 			  set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
 			  get = function(info) return self.config.profile.general.showRealmHeader end
 			},
+            configureFrameScale = {
+			  order = 12,
+			  name = "Frame Scale",
+			  desc = "Configure the scale of the window",
+			  type = "range",
+              min = 0.50,
+              max = 1.50,
+              step = 0.05,
+			  set = function(info,val)
+                        self.config.profile.general.frameScale = val;
+                        
+                        if( addon.tooltip ) then
+                            addon.tooltip:SetScale( val );
+                        end
+                    end,
+			  get = function(info) return self.config.profile.general.frameScale end
+            },
             showCharFirst = {
 			  order = 13,
 			  name = L["Show Active First"],
@@ -319,7 +336,8 @@ function addon:getDefaultOptions()
                 loggedInFirst = true,
                 anchorPoint = "cell",
                 showCharList = charList,
-                charSortBy = "rc"
+                charSortBy = "rc",
+                frameScale = 1.0
 			},
 			dungeon = {
 				show = true

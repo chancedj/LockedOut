@@ -79,6 +79,8 @@ function addon:aquireEmptyTooltip( ttName )
         tooltip = LibQTip:Acquire( ttName );
     end
 
+    tooltip:SetScale( addon.config.profile.general.frameScale );
+    
     return tooltip
 end
 
@@ -599,7 +601,8 @@ function addon:ShowInfo( frame, manualToggle )
     end
 
     addMainColorBanding( tooltip );
-    
+    tooltip:SetScale( addon.config.profile.general.frameScale );
+
     -- Show it, et voilà !
     tooltip:Show();
 end --  addon:OnEnter
