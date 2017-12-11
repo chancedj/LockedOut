@@ -51,7 +51,7 @@ function addon:getConfigOptions()
                 end;
             end
 
-            currencyList[ currencyData.ID ] = currencyData.icon .. currencyData.name;
+            currencyList[ currencyData.ID ] = (currencyData.icon == nil ) and "" or currencyData.icon .. currencyData.name;
         end
     end
 
@@ -59,7 +59,6 @@ function addon:getConfigOptions()
     for key, value in next, addon:getCharacterList() do
         charList[ key ] = value;
     end
-
 
     local configOptions = {
 		type = "group",

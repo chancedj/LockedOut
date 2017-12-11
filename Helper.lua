@@ -190,9 +190,12 @@ local CURRENCY_LIST = {
     { ID=1501, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Writhing Essence
     { ID=1506, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Argus Waystone
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
-    { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true }  -- Wakening Essence
+    { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Wakening Essence
     
     -- items
+    { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Pet Charm
+    { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
+    { ID=151568, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Primal Sargerite
 };
 
 local currencySortOptions = {
@@ -251,14 +254,16 @@ local characterSortOptions = {
 
 local function resolveCurrencyInfo( )
     for _, currency in next, CURRENCY_LIST do
-        if( currency.type == "C" ) then
-            currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
-        else
-            currency.name, _, _, _, _, _, _, _, _, currency.icon = GetItemInfo( currency.ID );
-        end;
-        
-        if( currency.icon ) then
-            currency.icon = "|T" .. currency.icon .. ":0|t"
+        if( currency.name == nil ) then
+            if( currency.type == "C" ) then
+                currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
+            else
+                currency.name, _, _, _, _, _, _, _, _, currency.icon = GetItemInfo( currency.ID );
+            end;
+            
+            if( currency.icon ) then
+                currency.icon = "|T" .. currency.icon .. ":0|t"
+            end
         end
     end
 end
@@ -364,12 +369,7 @@ function addon:getCurrencyListMap()
 end
 
 function addon:getCurrencyList()
-    local _, data = next( CURRENCY_LIST );
-    
-    -- make sure this is only done once
-    if( data.name == nil ) then
-        resolveCurrencyInfo();
-    end
+    resolveCurrencyInfo();
     
     return CURRENCY_LIST;
 end
