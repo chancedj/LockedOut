@@ -123,7 +123,7 @@ function addon:InitCharDB()
     return playerData, realmName, charNdx;
 end
 
-function addon:Lockedout_GetCurrentCharData()
+function addon:Lockedout_GetCurrentCharData( calledByEvent )
     local timeTilResets = GetQuestResetTime();
     
     if( timeTilResets > 24 * 60 * 60 ) then
@@ -136,12 +136,16 @@ function addon:Lockedout_GetCurrentCharData()
     
     local playerData, realmName, charNdx = self:InitCharDB();
 
-    self:Lockedout_BuildInstanceLockout( realmName, charNdx );
-    self:Lockedout_BuildWorldBoss( realmName, charNdx );
-    self:Lockedout_BuildCurrencyList( realmName, charNdx );
-    self:Lockedout_BuildEmissary( realmName, charNdx );
-    self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
-    
+    if( calledByEvent ) then
+        ---[[
+        self:Lockedout_BuildInstanceLockout( realmName, charNdx );
+        self:Lockedout_BuildWorldBoss( realmName, charNdx );
+        self:Lockedout_BuildCurrencyList( realmName, charNdx );
+        self:Lockedout_BuildEmissary( realmName, charNdx );
+        self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
+        --]]
+    end
+        
     table.sort( LockoutDb ); -- sort the realms alphabetically
     
     return realmName, charNdx, playerData;

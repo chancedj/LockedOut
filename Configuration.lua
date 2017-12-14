@@ -5,7 +5,7 @@
 local addonName, _ = ...;
 
 -- libraries
-local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "AceEvent-3.0" );
+local addon = LibStub( "AceAddon-3.0" ):NewAddon( addonName, "AceConsole-3.0", "AceEvent-3.0", "AceBucket-3.0" );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 --_G.LockedOut = addon;
@@ -402,10 +402,11 @@ function addon:OnInitialize()
 
     -- events
     self:RegisterEvent( "PLAYER_ENTERING_WORLD", "EVENT_ResetExpiredData" );
-    self:RegisterEvent( "UNIT_QUEST_LOG_CHANGED", "EVENT_FullCharacterRefresh" );
+    self:RegisterBucketEvent( "UNIT_QUEST_LOG_CHANGED", 1, "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
-    self:RegisterEvent( "ENCOUNTER_END", "EVENT_SaveToInstance" );
-    self:RegisterEvent( "CURRENCY_DISPLAY_UPDATE", "EVENT_CoinUpdate" );
+    self:RegisterEvent( "BAG_UPDATE", "EVENT_FullCharacterRefresh" );
+    self:RegisterBucketEvent( "ENCOUNTER_END", 1, "EVENT_SaveToInstance" );
+    self:RegisterBucketEvent( "CURRENCY_DISPLAY_UPDATE", 1, "EVENT_CoinUpdate" );
     
     self.toolTipShowing = false;
 end
@@ -465,13 +466,8 @@ function addon:OpenConfigDialog( button )
     --]]
 end
 
-function addon:EVENT_CoinUpdate( event, currencyID, amount )
-    local message = event .. " triggered";
-    if( currencyID ~= nil ) then
-        message = message .. " with id: " .. currencyID;
-    end
-    self:debug( message );
-    self:EVENT_FullCharacterRefresh( event );
+function addon:EVENT_CoinUpdate( currencyID, amount )
+    self:EVENT_FullCharacterRefresh( "CURRENCY_DISPLAY_UPDATE" );
 end
 
 function addon:EVENT_SaveToInstance( event, encounterID, encounterName, difficultyID, raidSize, endStatus )
@@ -489,6 +485,6 @@ function addon:EVENT_ResetExpiredData( event )
 end
 
 function addon:EVENT_FullCharacterRefresh( event )
-    self:debug( "char refresh triggered on event: " .. event );
-    self:Lockedout_GetCurrentCharData();
+    addon:debug( "char refresh triggered on event: " .. (event or "nil") );
+    self:Lockedout_GetCurrentCharData( event );
 end
