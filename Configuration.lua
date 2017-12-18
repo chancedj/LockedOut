@@ -466,25 +466,22 @@ function addon:OpenConfigDialog( button )
     --]]
 end
 
-function addon:EVENT_CoinUpdate( currencyID, amount )
+function addon:EVENT_CoinUpdate( )
     self:EVENT_FullCharacterRefresh( "CURRENCY_DISPLAY_UPDATE" );
 end
 
-function addon:EVENT_SaveToInstance( event, encounterID, encounterName, difficultyID, raidSize, endStatus )
+function addon:EVENT_SaveToInstance( )
     -- end status == 1 means success
-    if( endStatus == 1 ) then
-        self:EVENT_FullCharacterRefresh( event );
-    end
+    self:EVENT_FullCharacterRefresh();
 end
 
-function addon:EVENT_ResetExpiredData( event )
+function addon:EVENT_ResetExpiredData( )
     self:InitCharDB()
     self:checkExpiredLockouts( );
     
     self.config:RegisterDefaults( self:getDefaultOptions() );
 end
 
-function addon:EVENT_FullCharacterRefresh( event )
-    addon:debug( "char refresh triggered on event: " .. (event or "nil") );
-    self:Lockedout_GetCurrentCharData( event );
+function addon:EVENT_FullCharacterRefresh( )
+    self:Lockedout_GetCurrentCharData( "refresh" );
 end
