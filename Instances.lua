@@ -111,7 +111,9 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
         local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, false, true, calculatedResetDate );
 
         instanceData.bossData = instanceData.bossData or {};
-        populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
+        if( _G.LFGLockList and _G.LFGLockList[ tonumber(instanceID) ] == nil ) then
+            populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
+        end
     end -- for lfrNdx = 1, lfrCount
     --]]
 
