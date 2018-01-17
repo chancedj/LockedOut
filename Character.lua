@@ -108,15 +108,18 @@ function addon:InitCharDB()
     local _, className = UnitClass( "player" );
     local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
     local playerData = LockoutDb[ realmName ][ charNdx ] or {};
-    local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
+    
+    if( not self.loggingOut ) then
+        local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
 
-    playerData.charName = charName
-    playerData.className = className
+        playerData.charName = charName
+        playerData.className = className
 
-    playerData.iLevel = {};
-    playerData.iLevel[ "total" ]    = total_ilevel;
-    playerData.iLevel[ "equipped" ] = equippped_ilevel;
-    playerData.iLevel[ "pvp" ]      = pvp_ilevel;
+        playerData.iLevel = {};
+        playerData.iLevel[ "total" ]    = total_ilevel;
+        playerData.iLevel[ "equipped" ] = equippped_ilevel;
+        playerData.iLevel[ "pvp" ]      = pvp_ilevel;
+    end
     
     LockoutDb[ realmName ][ charNdx ] = playerData;            -- initialize playerDb if not already initialized
     

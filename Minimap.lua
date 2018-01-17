@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, table, strsplit, tsort, mfloor, abs =           -- variables
-      next, table, strsplit, table.sort, math.floor, math.abs    -- lua functions
+local next, table, time, date, strsplit, tsort, mfloor, abs =           -- variables
+      next, table, time, date, strsplit, table.sort, math.floor, math.abs    -- lua functions
 
 -- cache blizzard function/globals
 local SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE  =    -- variables
@@ -559,7 +559,15 @@ function addon:ShowInfo( frame, manualToggle )
                                             tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                         end
                                     end
-                                    
+
+                                    if ( self.anchor.data.lastLogin ) then
+                                        local line = tooltip:AddHeader( "" );
+                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                        tooltip:SetCell( line, 1, "Last Login" );
+                                        tooltip:SetCell( line, 2, date( "%c", self.anchor.data.lastLogin ) );
+                                        tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                    end
+                                                                        
                                     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )

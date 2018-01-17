@@ -11,8 +11,8 @@ local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 --_G.LockedOut = addon;
 
 -- Upvalues
-local next =
-      next;
+local next, time =
+      next, time;
 
 -- cache lua functions
 local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons =    -- variables
@@ -406,10 +406,12 @@ function addon:OnInitialize()
     self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "BAG_UPDATE", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "TIME_PLAYED_MSG", "EVENT_TimePlayed" );
+    self:RegisterEvent( "PLAYER_LOGOUT", "EVENT_Logout" );
     self:RegisterBucketEvent( "ENCOUNTER_END", 1, "EVENT_SaveToInstance" );
     self:RegisterBucketEvent( "CURRENCY_DISPLAY_UPDATE", 1, "EVENT_CoinUpdate" );
     
     self.toolTipShowing = false;
+    self.loggingOut = false;
 end
 
 BINDING_NAME_LOCKEDOUT = L["Show/Hide the LockedOut tooltip"]
@@ -469,8 +471,23 @@ end
 
 function addon:EVENT_TimePlayed( event, timePlayed, currentPlayedLevel )
     local playerData = self:InitCharDB( );
+    self.lastTimePlayedUpdate = time;
     
     playerData.timePlayed = { total = timePlayed, currentLevel = currentPlayedLevel };
+end
+
+function addon:EVENT_Logout( event )
+    self.loggingOut = true;
+    local playerData = self:InitCharDB( );
+    
+    playerData.lastLogin = time();
+    
+    -- means we fired before, and we can go ahead and force an update
+    if( self.lastTimePlayedUpdate ) then
+        local diff = playerData.lastLogin - self.lastTimePlayedUpdate;
+        
+        self:EVENT_TimePlayed( event, playerData.timePlayed.total + diff, playerData.timePlayed.currentLevel + diff ); 
+    end
 end
 
 function addon:EVENT_CoinUpdate( )
