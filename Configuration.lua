@@ -471,8 +471,6 @@ function addon:EVENT_TimePlayed( event, timePlayed, currentPlayedLevel )
     local playerData = self:InitCharDB( );
     
     playerData.timePlayed = { total = timePlayed, currentLevel = currentPlayedLevel };
-    
-    print( "updated time played" );
 end
 
 function addon:EVENT_CoinUpdate( )
