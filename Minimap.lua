@@ -541,6 +541,7 @@ function addon:ShowInfo( frame, manualToggle )
                                     local ttName = self.anchor:getTTName();
                                     local tooltip = addon:aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
+
                                     local line = tooltip:AddHeader( "" );
                                     tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
                                     tooltip:SetCell( line, 1, L["Character iLevels"], 2 );
@@ -549,6 +550,16 @@ function addon:ShowInfo( frame, manualToggle )
                                         tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end -- for k, p in next, charData.iLevel
 
+                                    if ( self.anchor.data.timePlayed ) then
+                                        local line = tooltip:AddHeader( "" );
+                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                        tooltip:SetCell( line, 1, "Time Played", 2 );
+                                        for k, p in next, self.anchor.data.timePlayed do
+                                            line = tooltip:AddLine( k, SecondsToTime( p, false, false, 5 ) );
+                                            tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                        end
+                                    end
+                                    
                                     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )

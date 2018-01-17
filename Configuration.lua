@@ -405,6 +405,7 @@ function addon:OnInitialize()
     self:RegisterBucketEvent( "UNIT_QUEST_LOG_CHANGED", 1, "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "WORLD_QUEST_COMPLETED_BY_SPELL", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "BAG_UPDATE", "EVENT_FullCharacterRefresh" );
+    self:RegisterEvent( "TIME_PLAYED_MSG", "EVENT_TimePlayed" );
     self:RegisterBucketEvent( "ENCOUNTER_END", 1, "EVENT_SaveToInstance" );
     self:RegisterBucketEvent( "CURRENCY_DISPLAY_UPDATE", 1, "EVENT_CoinUpdate" );
     
@@ -464,6 +465,14 @@ function addon:OpenConfigDialog( button )
         end
     end
     --]]
+end
+
+function addon:EVENT_TimePlayed( event, timePlayed, currentPlayedLevel )
+    local playerData = self:InitCharDB( );
+    
+    playerData.timePlayed = { total = timePlayed, currentLevel = currentPlayedLevel };
+    
+    print( "updated time played" );
 end
 
 function addon:EVENT_CoinUpdate( )
