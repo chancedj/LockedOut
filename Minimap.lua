@@ -391,6 +391,15 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
     tooltip:AddSeparator( );
 end
 
+local function shouldDisplayChar( realmName, playerData )
+    ---[[
+    addon:debug( realmName .. "." .. playerData.charName, playerData.currentLevel or -1 );
+
+    return  ( addon.config.profile.general.showCharList[ realmName .. "." .. playerData.charName ] ) and
+            ( playerData.currentLevel == nil or playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel )
+    --]]
+end
+
 function addon:ShowInfo( frame, manualToggle )
     if( manualToggle ~= nil ) then
         if( not manualToggle ) then
@@ -430,7 +439,7 @@ function addon:ShowInfo( frame, manualToggle )
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
-                if( self.config.profile.general.showCharList[ realmName .. "." .. charData.charName ] ) then
+                if( shouldDisplayChar( realmName, charData ) ) then
                     local tblNdx = #charList + 1;
                     charList[ tblNdx ] = {}
                     charList[ tblNdx ].charNdx = charNdx;

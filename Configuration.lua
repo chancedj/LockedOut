@@ -15,8 +15,8 @@ local next, time =
       next, time;
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons =    -- variables
-      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons      -- lua functions
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel      -- lua functions
       
 function addon:getConfigOptions()
 
@@ -75,12 +75,12 @@ function addon:getConfigOptions()
 			},
 			--]]
 			generalHeader={
-			  order = 9,
+			  order = 1,
 			  name = L["General Options"],
 			  type = "header",
 			},
 			currentRealmOnly = {
-			  order = 10,
+			  order = 2,
 			  name = L["Current Realm"],
 			  desc = L["Show characters from current realm only"],
 			  type = "toggle",
@@ -88,7 +88,7 @@ function addon:getConfigOptions()
 			  get = function(info) return self.config.profile.general.currentRealm end
 			},
             showRealmHeader = {
-			  order = 11,
+			  order = 3,
 			  name = L["Show Realm"],
 			  desc = L["Show the realm header"],
 			  type = "toggle",
@@ -96,7 +96,7 @@ function addon:getConfigOptions()
 			  get = function(info) return self.config.profile.general.showRealmHeader end
 			},
             configureFrameScale = {
-			  order = 12,
+			  order = 4,
 			  name = "Frame Scale",
 			  desc = "Configure the scale of the window",
 			  type = "range",
@@ -113,7 +113,7 @@ function addon:getConfigOptions()
 			  get = function(info) return self.config.profile.general.frameScale end
             },
             showCharFirst = {
-			  order = 13,
+			  order = 5,
 			  name = L["Show Active First"],
 			  desc = L["Show logged in char first"],
 			  type = "toggle",
@@ -121,7 +121,7 @@ function addon:getConfigOptions()
 			  get = function(info) return self.config.profile.general.loggedInFirst end
 			},
 			showMinimapIcon = {
-			  order = 14,
+			  order = 6,
 			  name = L["Hide Icon"],
 			  desc = L["Show Minimap Icon"],
 			  type = "toggle",
@@ -135,9 +135,8 @@ function addon:getConfigOptions()
                                 end,
 			  get = function(info) return self.config.profile.minimap.hide end
 			},
-            ---[[
             characterSort = {
-			  order = 15,
+			  order = 7,
 			  name = L["Sort Chars By"],
 			  desc = L["Configure how characters are sorted in the list"],
 			  type = "select",
@@ -146,9 +145,8 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.charSortBy = val; end,
 			  get = function(info) return self.config.profile.general.charSortBy end
 			},
-            --]]
             setAnchorPoint = {
-			  order = 16,
+			  order = 8,
 			  name = L["Anchor To"],
 			  desc = L["Choose where hover tooltip displays"],
 			  type = "select",
@@ -157,9 +155,8 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
 			  get = function(info) return self.config.profile.general.anchorPoint end
 			},
-			---[[
 			minimapIconList = {
-			  order = 18,
+			  order = 9,
 			  name = L["Choose Icon (reload ui)"],
 			  desc = L["Choose icon for addon - requires ui refresh or login/logout"],
 			  type = "select",
@@ -167,9 +164,21 @@ function addon:getConfigOptions()
 			  set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
 			  get = function(info) return self.config.profile.minimap.addonIcon end
 			},
+			---[[
+            charTrackWhen = {
+			  order = 10,
+			  name = "Start Tracking Level",
+			  desc = "Start tracking characters greater than or equal to level below",
+			  type = "range",
+              min = 1,
+              max = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
+              step = 1,
+			  set = function(info,val) self.config.profile.general.minTrackCharLevel = val; end,
+			  get = function(info) return self.config.profile.general.minTrackCharLevel end
+            },
 			--]]
 			charVisible = {
-			  order = 19,
+			  order = 11,
 			  name = "Visible Characters",
 			  desc = "Which characters should show in menu",
 			  type = "multiselect",
@@ -336,7 +345,8 @@ function addon:getDefaultOptions()
                 anchorPoint = "cell",
                 showCharList = charList,
                 charSortBy = "rc",
-                frameScale = 1.0
+                frameScale = 1.0,
+                minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ]
 			},
 			dungeon = {
 				show = true

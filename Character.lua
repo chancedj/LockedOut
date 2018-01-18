@@ -14,8 +14,8 @@ local next, time =
       next, time;
 
 -- cache blizzard function/globals
-local GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime =  -- variables 
-      GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
+local GetRealmName, UnitName, UnitClass, UnitLevel, GetAverageItemLevel, GetQuestResetTime =  -- variables 
+      GetRealmName, UnitName, UnitClass, UnitLevel, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
 
 --[[
     this will generate the saved data for characters and realms
@@ -109,6 +109,7 @@ function addon:InitCharDB()
 
     -- get and initialize character data
     local charName = UnitName( "player" );
+    local currentLevel = UnitLevel( "player" );
     local _, className = UnitClass( "player" );
     local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
     local playerData = LockoutDb[ realmName ][ charNdx ] or {};
@@ -116,8 +117,9 @@ function addon:InitCharDB()
     if( not self.loggingOut ) then
         local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
 
-        playerData.charName = charName
-        playerData.className = className
+        playerData.charName = charName;
+        playerData.className = className;
+		playerData.currentLevel = currentLevel;
         playerData.lastLogin = time();
 
         playerData.iLevel = playerData.iLevel or {};
@@ -146,14 +148,16 @@ function addon:Lockedout_GetCurrentCharData( calledByEvent )
     
     local playerData, realmName, charNdx = self:InitCharDB();
 
-    if( calledByEvent ) then
-        ---[[
-        self:Lockedout_BuildInstanceLockout( realmName, charNdx );
-        self:Lockedout_BuildWorldBoss( realmName, charNdx );
-        self:Lockedout_BuildCurrencyList( realmName, charNdx );
-        self:Lockedout_BuildEmissary( realmName, charNdx );
-        self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
-        --]]
+    if( playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel ) then
+        if( calledByEvent ) then
+            ---[[
+            self:Lockedout_BuildInstanceLockout( realmName, charNdx );
+            self:Lockedout_BuildWorldBoss( realmName, charNdx );
+            self:Lockedout_BuildCurrencyList( realmName, charNdx );
+            self:Lockedout_BuildEmissary( realmName, charNdx );
+            self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
+            --]]
+        end
     end
         
     table.sort( LockoutDb ); -- sort the realms alphabetically
