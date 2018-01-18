@@ -9,6 +9,10 @@ local addon     = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L         = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 local LibQTip   = LibStub( "LibQTip-1.0" )
 
+-- Upvalues
+local next, time =
+      next, time;
+
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime =  -- variables 
       GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
@@ -114,11 +118,14 @@ function addon:InitCharDB()
 
         playerData.charName = charName
         playerData.className = className
+        playerData.lastLogin = time();
 
-        playerData.iLevel = {};
+        playerData.iLevel = playerData.iLevel or {};
         playerData.iLevel[ "total" ]    = total_ilevel;
         playerData.iLevel[ "equipped" ] = equippped_ilevel;
         playerData.iLevel[ "pvp" ]      = pvp_ilevel;
+        
+        playerData.timePlayed = playerData.timePlayed or { total = 0, currentLevel = 0 };
     end
     
     LockoutDb[ realmName ][ charNdx ] = playerData;            -- initialize playerDb if not already initialized

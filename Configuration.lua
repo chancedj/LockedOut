@@ -471,7 +471,7 @@ end
 
 function addon:EVENT_TimePlayed( event, timePlayed, currentPlayedLevel )
     local playerData = self:InitCharDB( );
-    self.lastTimePlayedUpdate = time;
+    self.lastTimePlayedUpdate = time();
     
     playerData.timePlayed = { total = timePlayed, currentLevel = currentPlayedLevel };
 end
