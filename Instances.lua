@@ -51,11 +51,157 @@ local function getBossData( data )
     return deadCount, totalCount;
 end -- getBossData()
 
-local function populateBossData( bossData, encounterId, numEncounters, fnEncounter  )
-    for encounterNdx = 1, numEncounters do
-        local bossName, _, isKilled = fnEncounter( encounterId, encounterNdx );
+--[[
+
+    -- use this to determine the mapping so we can properly utilize blizzard
+    -- to handle localizations
+    GetEncounterMapping() => {
+        EncounterInfo[ EncounterName ] => {
+            EncounterID
+            -- boss will be sorted by order they appear in encounter journal
+            Bosses => {
+                bossID
+                bossName
+            }
+        }
+    }
+
+--]]
+--local EncounterInfo = nil;
+--local EncounterMap = nil;
+local function PrepEncounterMapping()
+    --[[
+    if( EncounterInfo ) then
+        return;
+    end
+    --]]
+
+    -- get current tier setting so we don't step on what's currently set
+    local currentTierId = EJ_GetCurrentTier();
+    local isRaidTable = { false, true };
+    
+    EncounterInfo = {};
+    EncounterMap = {};
+    for tierId = 1, EJ_GetNumTiers() do
+        EJ_SelectTier( tierId );
         
-        bossData[ #bossData + 1 ] = { bossName = bossName, isKilled = isKilled };
+        for _, isRaid in next, isRaidTable do
+            -- the world bosses are under the first instance for all (Pandaria, Draenor, Broken Isles)
+            -- so just stick with getting the instance back for the first
+            local encounterIndex = 1;
+            local encounterId, encounterName = EJ_GetInstanceByIndex( encounterIndex, isRaid );
+            while( encounterId ) do
+                if( encounterId ) then
+                    EJ_SelectInstance( encounterId );
+
+                    local bossIndex = 1;
+                    local bossName, _, bossId = EJ_GetEncounterInfoByIndex( bossIndex );
+                    local bosses = {};
+                    local bossMap = {};
+                    while( bossName ) do
+                        bosses[ #bosses + 1 ] = { bossName = bossName, bossId = bossId };
+                        bossMap[ bossName ] = { bossId = bossId, bossIndex = #bosses };
+
+                        --if( string.find( bossName, "Corruption" ) ) then
+                        --    print( "bossIndex = : ", #bosses, " bossid: ", bossId );
+                        --end
+                        
+                        bossIndex = bossIndex + 1;
+                        bossName, _, bossId = EJ_GetEncounterInfoByIndex( bossIndex );
+                    end -- while bossName
+
+                    EncounterMap[ encounterName ] = {
+                        encounterId = encounterId,
+                        bossMap = bossMap;
+                    };
+                    EncounterInfo[ encounterId ] = {
+                        encounterName = encounterName,
+                        bosses = bosses
+                    }
+                    addon:debug( "tier: ", tierId,  " encounterId: ", encounterId, " isRaid: " , isRaid, " encounterName: ", encounterName, " bossCount: ", #bosses );
+                end -- if( encounterId ) then
+
+                encounterIndex = encounterIndex + 1;
+                encounterId, encounterName = EJ_GetInstanceByIndex( encounterIndex, isRaid );
+            end -- while( encounterId ) do
+        end -- for _, isRaid in next, isRaidTable do
+    end -- for tierId = 1, EJ_GetNumTiers()
+
+    -- set it back to the current tier
+    EJ_SelectTier( currentTierId );    
+
+    addon.EncounterInfo = EncounterInfo;
+    addon.EncounterMap = EncounterMap;
+    
+    return;
+end -- CheckForMissingMappings()
+
+--[[ This is required because the boss name in the encounter journal
+     does not match with the boss in the stupid name that is returned from the API
+     so we need to map so we know later to fix the boss names using the correct translation
+     though this will have an added side effect of using the boss name from EJ and not the actual
+     instance.
+--]] 
+local bossMap = {
+    -- [ EncounterId ] = { [ numEncounters ] = { [ unmappedBossIndex ] = { bossIndex, bossId } } }
+    -- Emerald Nightmare
+    [ 768 ] = 
+    {
+        -- encounter (LFR VS other)
+        [ 3 ] = 
+        {
+            -- boss encounter index
+            [ 2 ] = { bossIndex = 2, bossId = 1738 }
+        },
+        [ 11 ] = 
+        {
+            -- boss encounter index
+            [ 5 ] = { bossIndex = 2, bossId = 1738 }
+        },
+    },
+    -- Antorus, the Burning Throne
+    [ 946 ] = 
+    {
+        -- encounter (LFR VS other)
+        [ 3 ] = 
+        {
+            -- boss encounter index
+            [ 2 ] = { bossIndex = 5, bossId = 2025 }
+        },
+        [ 11 ] = 
+        {
+            -- boss encounter index
+            [ 5 ] = { bossIndex = 5, bossId = 2025 }
+        },
+    }
+}
+
+local function populateBossData( bossData, instanceSaveId, numEncounters, fnEncounter, encounterId, encounterBossMap )
+    for encounterNdx = 1, numEncounters do
+        local bossName, _, isKilled = fnEncounter( instanceSaveId, encounterNdx );
+
+        local mapOverride = nil;
+        if( encounterBossMap == nil ) then
+            print( "encounterBossMap: is nil ", bossName );
+        elseif( encounterBossMap[ bossName ] == nil ) then
+            -- need to include a hack. can't use texture for Saved, but can for Lfr
+            -- may have to have a specfic place to hook in and map a replacement
+            -- get the correct mapping since the names don't match
+            mapOverride = bossMap[ encounterId ][ numEncounters ][ encounterNdx ];
+
+            if( mapOverride == nil ) then
+                print( bossName, " is missing from map w/ encounter: ", encounterId );
+                print( "e: ", encounterId, " encounterNdx: ", encounterNdx, " ne: " , numEncounters );
+            end
+        end
+
+        local bossMapping = mapOverride or encounterBossMap[ bossName ];
+        bossData[ #bossData + 1 ] = {
+            bossName = bossName, 
+            isKilled = isKilled, 
+            bossId =  bossMapping.bossId,
+            bossIndex = bossMapping.bossIndex
+        };
     end -- for encounterNdx = 1, numEncounters
     
     return bosses;
@@ -63,26 +209,29 @@ end -- populateBossData()
 
 local function addInstanceData( instanceData, instanceName, difficulty, numEncounters, locked, isRaid, resetDate )
     local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
-    instanceData[ instanceName ] = instanceData[ instanceName ] or {};
-    instanceData[ instanceName ][ difficultyName ] = instanceData[ instanceName ][ difficultyName ] or {};
-    instanceData[ instanceName ][ difficultyName ].locked = locked;
-    instanceData[ instanceName ][ difficultyName ].isRaid = isRaid;
-    instanceData[ instanceName ][ difficultyName ].resetDate = resetDate;
-    instanceData[ instanceName ][ difficultyName ].difficulty = difficulty;
+
+    local key = EncounterMap[ instanceName ] and EncounterMap[ instanceName ].encounterId or instanceName;
     
-    return instanceData[ instanceName ][ difficultyName ];
+    instanceData[ key ] = instanceData[ key ] or {};
+    instanceData[ key ][ difficultyName ] = instanceData[ key ][ difficultyName ] or {};
+    instanceData[ key ][ difficultyName ].locked = locked;
+    instanceData[ key ][ difficultyName ].isRaid = isRaid;
+    instanceData[ key ][ difficultyName ].resetDate = resetDate;
+    instanceData[ key ][ difficultyName ].difficulty = difficulty;
+    
+    return instanceData[ key ][ difficultyName ];
 end -- addInstanceData()
 
 local function removeUntouchedInstances( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
-    for instanceName, instanceDetails in next, instances do
+    for instanceKey, instanceDetails in next, instances do
         local validInstanceCount = 0;
         for difficultyName, instance in next, instanceDetails do
             local killCount, totalCount = getBossData( instance.bossData );
             
             if( killCount == 0 ) then
                 -- remove instance from list
-                instances[ instanceName ][ difficultyName ] = nil;
+                instances[ instanceKey ][ difficultyName ] = nil;
             else
                 local _, difficultyAbbr = convertDifficulty( instance.difficulty );
                 instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
@@ -92,13 +241,15 @@ local function removeUntouchedInstances( instances )
         end -- for difficultyName, instance in next, instanceDetails
         
         if( validInstanceCount == 0 ) then
-            instances[ instanceName ] = nil;
+            instances[ instanceKey ] = nil;
         end -- if( validInstanceCount == 0 )
-    end -- for instanceName, instanceDetails in next, instances
+    end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
 
 function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     local instances = {}; -- initialize instance table;
+    
+    PrepEncounterMapping();
     
     ---[[
     local lfrCount = GetNumRFDungeons();
@@ -108,11 +259,16 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             , _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );
 
         local numEncounters = GetLFGDungeonNumEncounters( instanceID );
+        
+        if( EncounterMap[ instanceName ] == nil ) then
+            print( "missing: ", instanceName );
+        end
+        
         local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, false, true, calculatedResetDate );
 
         instanceData.bossData = instanceData.bossData or {};
         if( _G.LFGLockList and _G.LFGLockList[ tonumber(instanceID) ] == nil ) then
-            populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo );
+            populateBossData( instanceData.bossData, instanceID, numEncounters, GetLFGDungeonEncounterInfo, EncounterMap[ instanceName ].encounterId, EncounterMap[ instanceName ].bossMap );
         end
     end -- for lfrNdx = 1, lfrCount
     --]]
@@ -122,17 +278,22 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     for lockId = 1, lockCount do
         local instanceName, _, reset, difficulty, locked, _, _, isRaid, _, _, numEncounters, _ = GetSavedInstanceInfo( lockId );
 
+        if( EncounterMap[ instanceName ] == nil ) then
+            print( instanceName, " not found! ", instanceID );
+        end
+            
         -- if reset == 0, it's expired but can be extended - so it will still show in the list.
         if ( reset > 0 ) then
             local resetDate = GetServerTime() + reset;
             local instanceData = addInstanceData( instances, instanceName, difficulty, numEncounters, locked, isRaid, resetDate);
 
             instanceData.bossData = {};
-            populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo );
+            populateBossData( instanceData.bossData, lockId, numEncounters, GetSavedInstanceEncounterInfo, EncounterMap[ instanceName ].encounterId, EncounterMap[ instanceName ].bossMap );
         end -- if( reset > 0 )
     end -- for lockId = 1, lockCount
     --]]
-    
+
+    -- get mythic+ keystone info
     --[[
     for bagID = 0, NUM_BAG_SLOTS do
         for slotID = 1, GetContainerNumSlots(bagID) do
@@ -151,5 +312,14 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     --]]
 
     removeUntouchedInstances( instances );
+    -- sort the bosses, has to be done after LFR and completed instances are combined and removed.
+    for i, instanceData in next, instances do
+        for j, instanceDetails in next, instanceData do
+            if( instanceData.bosses ) then
+                table.sort( instanceData.bosses, function( a, b ) return a.bossIndex < b.bossIndex; end );
+            end
+        end
+    end
+    
     LockoutDb[ realmName ][ charNdx ].instances = instances;
 end -- Lockedout_BuildInstanceLockout()

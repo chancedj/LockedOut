@@ -124,15 +124,15 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
     local lineNum = tooltip:AddLine( );
     tooltip.lines[ lineNum ].is_header = true;
     tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
-    for instanceName, _  in next, instanceList do
-        lineNum = tooltip:AddLine( instanceName );
+    for encounterId, encounterName in next, instanceList do
+        lineNum = tooltip:AddLine( encounterName );
         
         for colNdx, charData in next, charList do
             if (LockoutDb[ charData.realmName ] ~= nil) and
                (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-               (LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ] ~= nil) then
+               (LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ encounterId ] ~= nil) then
                 local data = {};
-                local instances = LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ];
+                local instances = LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ encounterId ];
                 local instanceDisplay = {};
                 for difficulty, instanceDetails in next, instances do
                     data[ #data + 1 ] = instanceDetails.displayText;
@@ -185,7 +185,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 tooltip:Show();
                                             end -- function( data )
                 instanceDisplay.deleteTT = emptyFunction;
-                instanceDisplay.anchor = getAnchorPkt( "in", instanceName, instances, lineNum, colNdx + 1 );
+                instanceDisplay.anchor = getAnchorPkt( "in", encounterName, instances, lineNum, colNdx + 1 );
 
                 tooltip:SetCell( lineNum, colNdx + 1, addon:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
 
@@ -392,12 +392,10 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
 end
 
 local function shouldDisplayChar( realmName, playerData )
-    ---[[
     addon:debug( realmName .. "." .. playerData.charName, playerData.currentLevel or -1 );
 
     return  ( addon.config.profile.general.showCharList[ realmName .. "." .. playerData.charName ] ) and
             ( playerData.currentLevel == nil or playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel )
-    --]]
 end
 
 function addon:ShowInfo( frame, manualToggle )
@@ -415,7 +413,7 @@ function addon:ShowInfo( frame, manualToggle )
         self.tooltip = nil;
     end -- if ( self.tooltip ~= nil )
     
-    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData();
+    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData( "abc" );
 
     -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
     local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
@@ -456,15 +454,16 @@ function addon:ShowInfo( frame, manualToggle )
                     end
                     
                     -- the get a list of all instances across characters for vertical
-                    for instanceName, details in next, charData.instances do
+                    for encounterId, details in next, charData.instances do
                         local key, data = next( details );
                         
+                        local encounterName = addon.EncounterInfo[ encounterId ].encounterName;
                         if ( data.isRaid ) then
-                            raidList[ instanceName ] = "set";
+                            raidList[ encounterId ] = encounterName;
                         else
-                            dungeonList[ instanceName ] = "set";
+                            dungeonList[ encounterId ] = encounterName;
                         end -- if ( data.isRaid )
-                    end -- for instanceName, _ in next, instances
+                    end -- for encounterId, _ in next, instances
                     
                     for bossKey, bossData in next, charData.worldBosses do
                         local instanceID, bossID = strsplit( "|", bossKey );
