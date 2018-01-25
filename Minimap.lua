@@ -162,7 +162,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                                                     tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
                                                     tooltip:SetCell( ln, col, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
-                                                    for _, bossData in next, instanceData.bossData do
+                                                    for bossIndex, bossData in next, instanceData.bossData do
                                                         if( col == 2 ) then
                                                             ln = tooltip:AddLine( );
                                                         else
@@ -176,7 +176,9 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                             status = "|cFF00FF00" .. L["Available"] .. "|r";
                                                         end; -- if ( bossData.isKilled )
 
-                                                        tooltip:SetCell( ln, 1, bossData.bossName, nil, "CENTER" );
+                                                        local bossName = addon.EncounterInfo[ instanceData.encounterId ].bosses[ bossIndex ].bossName;
+                                                        
+                                                        tooltip:SetCell( ln, 1, bossName, nil, "CENTER" );
                                                         tooltip:SetCell( ln, col, status, nil, "CENTER" );
                                                     end -- for bossName, bossData in next, instanceData.bossData
                                                 end -- for difficulty, instanceDetails in next, instances

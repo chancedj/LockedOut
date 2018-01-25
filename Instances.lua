@@ -218,6 +218,7 @@ local function addInstanceData( instanceData, instanceName, difficulty, numEncou
     instanceData[ key ][ difficultyName ].isRaid = isRaid;
     instanceData[ key ][ difficultyName ].resetDate = resetDate;
     instanceData[ key ][ difficultyName ].difficulty = difficulty;
+    instanceData[ key ][ difficultyName ].encounterId = EncounterMap[ instanceName ].encounterId;
     
     return instanceData[ key ][ difficultyName ];
 end -- addInstanceData()
