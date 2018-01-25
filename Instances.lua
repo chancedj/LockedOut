@@ -9,8 +9,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, type, table = -- variables
-      next, type, table      -- lua functions
+local next, type, table, tsort = -- variables
+      next, type, table, table.sort      -- lua functions
 
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
@@ -100,12 +100,8 @@ local function PrepEncounterMapping()
                     local bossMap = {};
                     while( bossName ) do
                         bosses[ #bosses + 1 ] = { bossName = bossName, bossId = bossId };
-                        bossMap[ bossName ] = { bossId = bossId, bossIndex = #bosses };
+                        bossMap[ bossName ] = { bossId = bossId, bossIndex = bossIndex };
 
-                        --if( string.find( bossName, "Corruption" ) ) then
-                        --    print( "bossIndex = : ", #bosses, " bossid: ", bossId );
-                        --end
-                        
                         bossIndex = bossIndex + 1;
                         bossName, _, bossId = EJ_GetEncounterInfoByIndex( bossIndex );
                     end -- while bossName
@@ -316,9 +312,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     -- sort the bosses, has to be done after LFR and completed instances are combined and removed.
     for i, instanceData in next, instances do
         for j, instanceDetails in next, instanceData do
-            if( instanceData.bosses ) then
-                table.sort( instanceData.bosses, function( a, b ) return a.bossIndex < b.bossIndex; end );
-            end
+            tsort( instanceDetails.bossData, function( a, b ) return a.bossIndex < b.bossIndex; end );
         end
     end
     
