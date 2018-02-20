@@ -176,7 +176,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                             status = "|cFF00FF00" .. L["Available"] .. "|r";
                                                         end; -- if ( bossData.isKilled )
 
-                                                        local bossName = addon.EncounterInfo[ instanceData.encounterId ].bosses[ bossIndex ].bossName;
+                                                        local bossName = bossData.bossName;
                                                         
                                                         tooltip:SetCell( ln, 1, bossName, nil, "CENTER" );
                                                         tooltip:SetCell( ln, col, status, nil, "CENTER" );
@@ -456,14 +456,13 @@ function addon:ShowInfo( frame, manualToggle )
                     end
                     
                     -- the get a list of all instances across characters for vertical
-                    for encounterId, details in next, charData.instances do
+                    for encounterName, details in next, charData.instances do
                         local key, data = next( details );
                         
-                        local encounterName = addon.EncounterInfo[ encounterId ].encounterName;
                         if ( data.isRaid ) then
-                            raidList[ encounterId ] = encounterName;
+                            raidList[ encounterName ] = encounterName;
                         else
-                            dungeonList[ encounterId ] = encounterName;
+                            dungeonList[ encounterName ] = encounterName;
                         end -- if ( data.isRaid )
                     end -- for encounterId, _ in next, instances
                     

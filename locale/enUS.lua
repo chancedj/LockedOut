@@ -76,11 +76,12 @@ L["Choose where hover tooltip displays"]                            = "Choose wh
 L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose icon for addon - requires ui refresh or login/logout";
 
 -- difficulty mapping full
-L["Unknown"]    = "Unknown";
-L["Normal"]     = "Normal";
-L["Heroic"]     = "Heroic";
-L["Mythic"]     = "Mythic";
-L["Lfr"]        = "Lfr";
+L["Unknown"]            = "Unknown";
+L["Normal"]             = "Normal";
+L["Heroic"]             = "Heroic";
+L["Mythic"]             = "Mythic";
+L["Lfr"]                = "Lfr";
+L["Timewalking"]        = "Timewalking";
 
 -- difficulty mapping abbreviation
 L["U"]  = "U";
@@ -88,6 +89,7 @@ L["N"] 	= "N";
 L["H"] 	= "H";
 L["M"]  = "M";
 L["L"]  = "L";
+L["T"]  = "T";
 
 -- quest.lua mappings
 L["Blingtron"]                  = "Blingtron";
