@@ -26,7 +26,7 @@ local EMISSARY_LIST = {
     { questID = "43179", numRequired=3 }, -- kirin tor of dalaran
     { questID = "42421", numRequired=4 }, -- the nightfallen
     { questID = "42234", numRequired=4 }, -- the valajar   
-    { questID = "42422", numRequired=4 } -- the wardens
+    { questID = "42422", numRequired=4 }  -- the wardens
 }
 
 local function copyEmissaryData( from, to )
@@ -78,7 +78,9 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
         end
         --]]
     end
-    
+
+    -- fix nil error on char rebuild
+    LockoutDb[ realmName ][ charNdx ].emissaries = emissaries;
     for realmName, charDataList in next, LockoutDb do
         for charNdx, charData in next, charDataList do
             local charEmissaries = charData.emissaries;
@@ -96,5 +98,6 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
         end
     end
     
+    -- last update since we may have updated
     LockoutDb[ realmName ][ charNdx ].emissaries = emissaries;
 end -- Lockedout_BuildEmissary()
