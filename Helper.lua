@@ -397,3 +397,36 @@ function addon:getWeeklyLockoutDate()
 
     return weeklyResetTime
 end
+
+local function fif( value, t, f )
+    if( value ) then
+        return t;
+    else
+        return f;
+    end;
+end
+
+--- recursive printing for debug purposes
+function addon:printTable( tbl, maxDepth, depth )
+	if ( tbl == nil ) then return; end
+	if ( maxDepth ~= nil ) and ( depth == maxDepth ) then return; end
+	
+	depth = depth or 0; -- initialize depth to 0 if nil
+	local indent = strrep( "  ", depth ) .. "=>";
+	
+	for key, value in next, tbl do
+		if ( type ( value ) == "table" ) then
+			print( indent .. key );
+
+			-- initialize depth to 0 if nil
+			self:printTable( value, maxDepth, depth + 1 );
+		elseif( type( value ) == "boolean" ) then
+			print( indent .. key .. " - " .. fif( value, "true", "false" ) );
+		elseif( type( value ) == "function" ) then
+			print( indent .. key .. " = " .. value() );
+		else
+			print( indent .. key .. " - " .. value );
+		end -- if ( type ( value ) == "table" )
+	end -- for key, value in next, tbl
+	
+end 

@@ -18,13 +18,235 @@ local next, time =
 local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel =    -- variables
       InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel      -- lua functions
 
-function addon:getConfigOptions()
-
+local function getGeneralOptionConfig( self )
     local anchorOptions = {
         ["cell"] = L["At cursor location"],
         ["parent"] = L["At bottom of frame"]
     }
     
+    local characterSortOptions = {}
+    for key, data in next, self:getCharSortOptions() do
+        characterSortOptions[ key ] = data.description;
+    end
+    
+    local charList = {};
+    for key, value in next, addon:getCharacterList() do
+        charList[ key ] = value;
+    end
+
+    return {
+        order  = 1,
+        type = "group",
+        name = L["General Options"],
+        args = {
+            currentRealmOnly = {
+              order = 1,
+              name = L["Current Realm"],
+              desc = L["Show characters from current realm only"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.currentRealm = val; end,
+              get = function(info) return self.config.profile.general.currentRealm end
+            },
+            showRealmHeader = {
+              order = 2,
+              name = L["Show Realm"],
+              desc = L["Show the realm header"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
+              get = function(info) return self.config.profile.general.showRealmHeader end
+            },
+            configureFrameScale = {
+              order = 3,
+              name = "Frame Scale",
+              desc = "Configure the scale of the window",
+              type = "range",
+              min = 0.50,
+              max = 1.50,
+              step = 0.05,
+              set = function(info,val)
+                        self.config.profile.general.frameScale = val;
+                        
+                        if( addon.tooltip ) then
+                            addon.tooltip:SetScale( val );
+                        end
+                    end,
+              get = function(info) return self.config.profile.general.frameScale end
+            },
+            showCharFirst = {
+              order = 4,
+              name = L["Show Active First"],
+              desc = L["Show logged in char first"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.loggedInFirst = val; end,
+              get = function(info) return self.config.profile.general.loggedInFirst end
+            },
+            showMinimapIcon = {
+              order = 5,
+              name = L["Hide Icon"],
+              desc = L["Show Minimap Icon"],
+              type = "toggle",
+              set = function(info,val)
+                                    self.config.profile.minimap.hide = val;
+                                    if( self.config.profile.minimap.hide ) then
+                                        self.icon:Hide( addonName );
+                                    else
+                                        self.icon:Show( addonName );
+                                    end
+                                end,
+              get = function(info) return self.config.profile.minimap.hide end
+            },
+            characterSort = {
+              order = 6,
+              name = L["Sort Chars By"],
+              desc = L["Configure how characters are sorted in the list"],
+              type = "select",
+              style = "dropdown",
+              values = characterSortOptions,
+              set = function(info,val) self.config.profile.general.charSortBy = val; end,
+              get = function(info) return self.config.profile.general.charSortBy end
+            },
+            setAnchorPoint = {
+              order = 7,
+              name = L["Anchor To"],
+              desc = L["Choose where hover tooltip displays"],
+              type = "select",
+              style = "dropdown",
+              values = anchorOptions,
+              set = function(info,val) self.config.profile.general.anchorPoint = val; end,
+              get = function(info) return self.config.profile.general.anchorPoint end
+            },
+            minimapIconList = {
+              order = 8,
+              name = L["Choose Icon (reload ui)"],
+              desc = L["Choose icon for addon - requires ui refresh or login/logout"],
+              type = "select",
+              values = addon:getIconOptions(),
+              set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
+              get = function(info) return self.config.profile.minimap.addonIcon end
+            },
+            charTrackWhen = {
+              order = 9,
+              name = "Start Tracking Level",
+              desc = "Start tracking characters greater than or equal to level below",
+              type = "range",
+              min = 1,
+              max = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
+              step = 1,
+              set = function(info,val) self.config.profile.general.minTrackCharLevel = val; end,
+              get = function(info) return self.config.profile.general.minTrackCharLevel end
+            },
+            charVisible = {
+              order = 10,
+              name = "Visible Characters",
+              desc = "Which characters should show in menu",
+              type = "multiselect",
+              values = charList,
+              set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
+              get = function(info,key) return self.config.profile.general.showCharList[key] end
+            },
+        }
+    };
+end
+      
+local function getDungeonHeaderConfig( self )
+    return {
+            order  = 10,
+            name = L["Instance Options"],
+            type = "group",
+            args = {
+                dungeonShow = {
+                  order = 21,
+                  name = L["Show"],
+                  desc = L["Show dungeon information"],
+                  type = "toggle",
+                  set = function(info,val) self.config.profile.dungeon.show = val; end,
+                  get = function(info) return self.config.profile.dungeon.show end
+                },
+            }
+        };
+end
+   
+local function getRaidHeaderConfig( self )
+    return {
+            order  = 20,
+            name = L["Raid Options"],
+            type = "group",
+            args = {
+                raidShow = {
+                  order = 31,
+                  name = L["Show"],
+                  desc = L["Show raid information"],
+                  type = "toggle",
+                  set = function(info,val) self.config.profile.raid.show = val; end,
+                  get = function(info) return self.config.profile.raid.show end
+                },
+            }
+        }
+end
+
+local function getWorldBossHeaderConfig( self )
+    return {
+        order  = 30,
+        name = L["World Boss Options"],
+        type = "group",
+        args = {
+            worldBossShow = {
+              order = 41,
+              name = L["Show"],
+              desc = L["Show world boss information"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.worldBoss.show = val; end,
+              get = function(info) return self.config.profile.worldBoss.show end
+            },
+            worldBossOnlyDead = {
+              order = 42,
+              name = L["Show when dead"],
+              desc = L["Show in list only when killed"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.worldBoss.showKilledOnly = val; end,
+              get = function(info) return self.config.profile.worldBoss.showKilledOnly end
+            },
+        }
+    };
+end
+
+local function getEmissaryHeaderConfig( self )
+    return {
+        order  = 40,
+        name = L["Emissary Options"],
+        type = "group",
+        args = {
+            emissaryShow = {
+              order = 51,
+              name = L["Show"],
+              desc = L["Show Emissary Information"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.emissary.show = val; end,
+              get = function(info) return self.config.profile.emissary.show end
+            },
+        }
+    };
+end
+
+local function getWeeklyQuestHeaderConfig( self )
+    return {
+        order  = 50,
+        name = L["Repeatable Quest Options"],
+        type = "group",
+        args = {
+            weeklyQuestShow = {
+              order = 61,
+              name = L["Show"],
+              desc = L["Show repeatable quest information"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.weeklyQuest.show = val; end,
+              get = function(info) return self.config.profile.weeklyQuest.show end
+            },
+        }
+    };
+end
+
+local function getCurrencyHeaderConfig( self )
     local currencyOptions = {
                                 ["short"] = L["Short"],
                                 ["long"] = L["Long"]
@@ -33,11 +255,6 @@ function addon:getConfigOptions()
     local currencySortOptions = {};
     for key, data in next, self:getCurrencyOptions() do
         currencySortOptions[ key ] = data.description;
-    end
-    
-    local characterSortOptions = {}
-    for key, data in next, self:getCharSortOptions() do
-        characterSortOptions[ key ] = data.description;
     end
     
     local currencyList = { };
@@ -55,500 +272,66 @@ function addon:getConfigOptions()
         end
     end
 
-    local charList = {};
-    for key, value in next, addon:getCharacterList() do
-        charList[ key ] = value;
-    end
-
-    local configOptions = {
-		type = "group",
-		name = addonName,
-		args = {
-            generalOptGroup = {
-                order  = 1,
-                type = "group",
-                name = L["General Options"],
-                args = {
-                    currentRealmOnly = {
-                      order = 1,
-                      name = L["Current Realm"],
-                      desc = L["Show characters from current realm only"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.general.currentRealm = val; end,
-                      get = function(info) return self.config.profile.general.currentRealm end
-                    },
-                    showRealmHeader = {
-                      order = 2,
-                      name = L["Show Realm"],
-                      desc = L["Show the realm header"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
-                      get = function(info) return self.config.profile.general.showRealmHeader end
-                    },
-                    configureFrameScale = {
-                      order = 3,
-                      name = "Frame Scale",
-                      desc = "Configure the scale of the window",
-                      type = "range",
-                      min = 0.50,
-                      max = 1.50,
-                      step = 0.05,
-                      set = function(info,val)
-                                self.config.profile.general.frameScale = val;
-                                
-                                if( addon.tooltip ) then
-                                    addon.tooltip:SetScale( val );
-                                end
-                            end,
-                      get = function(info) return self.config.profile.general.frameScale end
-                    },
-                    showCharFirst = {
-                      order = 4,
-                      name = L["Show Active First"],
-                      desc = L["Show logged in char first"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.general.loggedInFirst = val; end,
-                      get = function(info) return self.config.profile.general.loggedInFirst end
-                    },
-                    showMinimapIcon = {
-                      order = 5,
-                      name = L["Hide Icon"],
-                      desc = L["Show Minimap Icon"],
-                      type = "toggle",
-                      set = function(info,val)
-                                            self.config.profile.minimap.hide = val;
-                                            if( self.config.profile.minimap.hide ) then
-                                                self.icon:Hide( addonName );
-                                            else
-                                                self.icon:Show( addonName );
-                                            end
-                                        end,
-                      get = function(info) return self.config.profile.minimap.hide end
-                    },
-                    characterSort = {
-                      order = 6,
-                      name = L["Sort Chars By"],
-                      desc = L["Configure how characters are sorted in the list"],
-                      type = "select",
-                      style = "dropdown",
-                      values = characterSortOptions,
-                      set = function(info,val) self.config.profile.general.charSortBy = val; end,
-                      get = function(info) return self.config.profile.general.charSortBy end
-                    },
-                    setAnchorPoint = {
-                      order = 7,
-                      name = L["Anchor To"],
-                      desc = L["Choose where hover tooltip displays"],
-                      type = "select",
-                      style = "dropdown",
-                      values = anchorOptions,
-                      set = function(info,val) self.config.profile.general.anchorPoint = val; end,
-                      get = function(info) return self.config.profile.general.anchorPoint end
-                    },
-                    minimapIconList = {
-                      order = 8,
-                      name = L["Choose Icon (reload ui)"],
-                      desc = L["Choose icon for addon - requires ui refresh or login/logout"],
-                      type = "select",
-                      values = addon:getIconOptions(),
-                      set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
-                      get = function(info) return self.config.profile.minimap.addonIcon end
-                    },
-                    charTrackWhen = {
-                      order = 9,
-                      name = "Start Tracking Level",
-                      desc = "Start tracking characters greater than or equal to level below",
-                      type = "range",
-                      min = 1,
-                      max = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
-                      step = 1,
-                      set = function(info,val) self.config.profile.general.minTrackCharLevel = val; end,
-                      get = function(info) return self.config.profile.general.minTrackCharLevel end
-                    },
-                    charVisible = {
-                      order = 10,
-                      name = "Visible Characters",
-                      desc = "Which characters should show in menu",
-                      type = "multiselect",
-                      values = charList,
-                      set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
-                      get = function(info,key) return self.config.profile.general.showCharList[key] end
-                    },
-                }
+    return {
+        order  = 60,
+        name = L["Currency Options"],
+        type = "group",
+        args = {
+            currencyShow = {
+              order = 101,
+              name = L["Show"],
+              desc = L["Show currency information"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.currency.show = val; end,
+              get = function(info) return self.config.profile.currency.show end
             },
-            ---[[
-            dungeonHeader={
-                order  = 10,
-                name = L["Instance Options"],
-                type = "group",
-                args = {
-                    dungeonShow = {
-                      order = 21,
-                      name = L["Show"],
-                      desc = L["Show dungeon information"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.dungeon.show = val; end,
-                      get = function(info) return self.config.profile.dungeon.show end
-                    },
-                }
+            currencyShorten = {
+              order = 102,
+              name = L["Currency Display"],
+              desc = L["Configures currency display"],
+              type = "select",
+              style = "dropdown",
+              values = currencyOptions,
+              set = function(info,val) self.config.profile.currency.display = val; end,
+              get = function(info) return self.config.profile.currency.display end
             },
-            raidHeader={
-                order  = 20,
-                name = L["Raid Options"],
-                type = "group",
-                args = {
-                    raidShow = {
-                      order = 31,
-                      name = L["Show"],
-                      desc = L["Show raid information"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.raid.show = val; end,
-                      get = function(info) return self.config.profile.raid.show end
-                    },
-                }
+            currencySort = {
+              order = 102,
+              name = L["Sort By"],
+              desc = L["Configure how currency is sorted"],
+              type = "select",
+              style = "dropdown",
+              values = currencySortOptions,
+              set = function(info,val) self.config.profile.currency.sortBy = val; end,
+              get = function(info) return self.config.profile.currency.sortBy end
             },
-            worldBossHeader={
-                order  = 30,
-                name = L["World Boss Options"],
-                type = "group",
-                args = {
-                    worldBossShow = {
-                      order = 41,
-                      name = L["Show"],
-                      desc = L["Show world boss information"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.worldBoss.show = val; end,
-                      get = function(info) return self.config.profile.worldBoss.show end
-                    },
-                    worldBossOnlyDead = {
-                      order = 42,
-                      name = L["Show when dead"],
-                      desc = L["Show in list only when killed"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.worldBoss.showKilledOnly = val; end,
-                      get = function(info) return self.config.profile.worldBoss.showKilledOnly end
-                    },
-                }
-            },
-            emissaryHeader={
-                order  = 40,
-                name = L["Emissary Options"],
-                type = "group",
-                args = {
-                    emissaryShow = {
-                      order = 51,
-                      name = L["Show"],
-                      desc = L["Show Emissary Information"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.emissary.show = val; end,
-                      get = function(info) return self.config.profile.emissary.show end
-                    },
-                }
-            },
-            weeklyQuestHeader={
-                order  = 50,
-                name = L["Repeatable Quest Options"],
-                type = "group",
-                args = {
-                    weeklyQuestShow = {
-                      order = 61,
-                      name = L["Show"],
-                      desc = L["Show repeatable quest information"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.weeklyQuest.show = val; end,
-                      get = function(info) return self.config.profile.weeklyQuest.show end
-                    },
-                }
-            },
-            currencyHeader={
-                order  = 60,
-                name = L["Currency Options"],
-                type = "group",
-                args = {
-                    currencyShow = {
-                      order = 101,
-                      name = L["Show"],
-                      desc = L["Show currency information"],
-                      type = "toggle",
-                      set = function(info,val) self.config.profile.currency.show = val; end,
-                      get = function(info) return self.config.profile.currency.show end
-                    },
-                    currencyShorten = {
-                      order = 102,
-                      name = L["Currency Display"],
-                      desc = L["Configures currency display"],
-                      type = "select",
-                      style = "dropdown",
-                      values = currencyOptions,
-                      set = function(info,val) self.config.profile.currency.display = val; end,
-                      get = function(info) return self.config.profile.currency.display end
-                    },
-                    currencySort = {
-                      order = 102,
-                      name = L["Sort By"],
-                      desc = L["Configure how currency is sorted"],
-                      type = "select",
-                      style = "dropdown",
-                      values = currencySortOptions,
-                      set = function(info,val) self.config.profile.currency.sortBy = val; end,
-                      get = function(info) return self.config.profile.currency.sortBy end
-                    },
-                    currencyVisible = {
-                      order = 103,
-                      name = L["Visible Currencies"],
-                      desc = L["Select which currencies you'd like to see"],
-                      type = "multiselect",
-                      values = currencyList,
-                      set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
-                      get = function(info,key) return self.config.profile.currency.displayList[key] end
-                    }
-                }
-            },
-            --]]
+            currencyVisible = {
+              order = 103,
+              name = L["Visible Currencies"],
+              desc = L["Select which currencies you'd like to see"],
+              type = "multiselect",
+              values = currencyList,
+              set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
+              get = function(info,key) return self.config.profile.currency.displayList[key] end
+            }
         }
     };
+end
 
-    --[[
+function addon:getConfigOptions()
     local configOptions = {
 		type = "group",
 		name = addonName,
 		args = {
-			enableAddon = {
-			  order = 1,
-			  name = L["Enable"],
-			  desc = L["Enables / disables the addon"],
-			  type = "toggle",
-			  set = function(info,val) self.config.global.enabled = val; end,
-			  get = function(info) return self.config.global.enabled end
-			},
-			generalHeader={
-			  order = 1,
-			  name = L["General Options"],
-			  type = "header",
-			},
-			currentRealmOnly = {
-			  order = 2,
-			  name = L["Current Realm"],
-			  desc = L["Show characters from current realm only"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.general.currentRealm = val; end,
-			  get = function(info) return self.config.profile.general.currentRealm end
-			},
-            showRealmHeader = {
-			  order = 3,
-			  name = L["Show Realm"],
-			  desc = L["Show the realm header"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
-			  get = function(info) return self.config.profile.general.showRealmHeader end
-			},
-            configureFrameScale = {
-			  order = 4,
-			  name = "Frame Scale",
-			  desc = "Configure the scale of the window",
-			  type = "range",
-              min = 0.50,
-              max = 1.50,
-              step = 0.05,
-			  set = function(info,val)
-                        self.config.profile.general.frameScale = val;
-                        
-                        if( addon.tooltip ) then
-                            addon.tooltip:SetScale( val );
-                        end
-                    end,
-			  get = function(info) return self.config.profile.general.frameScale end
-            },
-            showCharFirst = {
-			  order = 5,
-			  name = L["Show Active First"],
-			  desc = L["Show logged in char first"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.general.loggedInFirst = val; end,
-			  get = function(info) return self.config.profile.general.loggedInFirst end
-			},
-			showMinimapIcon = {
-			  order = 6,
-			  name = L["Hide Icon"],
-			  desc = L["Show Minimap Icon"],
-			  type = "toggle",
-			  set = function(info,val)
-                                    self.config.profile.minimap.hide = val;
-                                    if( self.config.profile.minimap.hide ) then
-                                        self.icon:Hide( addonName );
-                                    else
-                                        self.icon:Show( addonName );
-                                    end
-                                end,
-			  get = function(info) return self.config.profile.minimap.hide end
-			},
-            characterSort = {
-			  order = 7,
-			  name = L["Sort Chars By"],
-			  desc = L["Configure how characters are sorted in the list"],
-			  type = "select",
-			  style = "dropdown",
-			  values = characterSortOptions,
-			  set = function(info,val) self.config.profile.general.charSortBy = val; end,
-			  get = function(info) return self.config.profile.general.charSortBy end
-			},
-            setAnchorPoint = {
-			  order = 8,
-			  name = L["Anchor To"],
-			  desc = L["Choose where hover tooltip displays"],
-			  type = "select",
-			  style = "dropdown",
-			  values = anchorOptions,
-			  set = function(info,val) self.config.profile.general.anchorPoint = val; end,
-			  get = function(info) return self.config.profile.general.anchorPoint end
-			},
-			minimapIconList = {
-			  order = 9,
-			  name = L["Choose Icon (reload ui)"],
-			  desc = L["Choose icon for addon - requires ui refresh or login/logout"],
-			  type = "select",
-			  values = addon:getIconOptions(),
-			  set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
-			  get = function(info) return self.config.profile.minimap.addonIcon end
-			},
-            charTrackWhen = {
-			  order = 10,
-			  name = "Start Tracking Level",
-			  desc = "Start tracking characters greater than or equal to level below",
-			  type = "range",
-              min = 1,
-              max = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
-              step = 1,
-			  set = function(info,val) self.config.profile.general.minTrackCharLevel = val; end,
-			  get = function(info) return self.config.profile.general.minTrackCharLevel end
-            },
-			charVisible = {
-			  order = 11,
-			  name = "Visible Characters",
-			  desc = "Which characters should show in menu",
-			  type = "multiselect",
-			  values = charList,
-			  set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
-			  get = function(info,key) return self.config.profile.general.showCharList[key] end
-			},
-			dungeonHeader={
-			  order = 20,
-			  name = L["Instance Options"],
-			  type = "header",
-			},
-			dungeonShow = {
-			  order = 21,
-			  name = L["Show"],
-			  desc = L["Show dungeon information"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.dungeon.show = val; end,
-			  get = function(info) return self.config.profile.dungeon.show end
-			},
-			raidHeader={
-			  order = 30,
-			  name = L["Raid Options"],
-			  type = "header",
-			},
-			raidShow = {
-			  order = 31,
-			  name = L["Show"],
-			  desc = L["Show raid information"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.raid.show = val; end,
-			  get = function(info) return self.config.profile.raid.show end
-			},
-			worldBossHeader={
-			  order = 40,
-			  name = L["World Boss Options"],
-			  type = "header",
-			},
-			worldBossShow = {
-			  order = 41,
-			  name = L["Show"],
-			  desc = L["Show world boss information"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.worldBoss.show = val; end,
-			  get = function(info) return self.config.profile.worldBoss.show end
-			},
-			worldBossOnlyDead = {
-			  order = 42,
-			  name = L["Show when dead"],
-			  desc = L["Show in list only when killed"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.worldBoss.showKilledOnly = val; end,
-			  get = function(info) return self.config.profile.worldBoss.showKilledOnly end
-			},
-			emissaryHeader={
-			  order = 50,
-			  name = L["Emissary Options"],
-			  type = "header",
-			},
-			emissaryShow = {
-			  order = 51,
-			  name = L["Show"],
-			  desc = L["Show Emissary Information"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.emissary.show = val; end,
-			  get = function(info) return self.config.profile.emissary.show end
-			},
-			weeklyQuestHeader={
-			  order = 60,
-			  name = L["Repeatable Quest Options"],
-			  type = "header",
-			},
-			weeklyQuestShow = {
-			  order = 61,
-			  name = L["Show"],
-			  desc = L["Show repeatable quest information"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.weeklyQuest.show = val; end,
-			  get = function(info) return self.config.profile.weeklyQuest.show end
-			},
-			currencyHeader={
-			  order = 100,
-			  name = L["Currency Options"],
-			  type = "header",
-			},
-			currencyShow = {
-			  order = 101,
-			  name = L["Show"],
-			  desc = L["Show currency information"],
-			  type = "toggle",
-			  set = function(info,val) self.config.profile.currency.show = val; end,
-			  get = function(info) return self.config.profile.currency.show end
-			},
-			currencyShorten = {
-			  order = 102,
-			  name = L["Currency Display"],
-			  desc = L["Configures currency display"],
-			  type = "select",
-			  style = "dropdown",
-			  values = currencyOptions,
-			  set = function(info,val) self.config.profile.currency.display = val; end,
-			  get = function(info) return self.config.profile.currency.display end
-			},
-			currencySort = {
-			  order = 102,
-			  name = L["Sort By"],
-			  desc = L["Configure how currency is sorted"],
-			  type = "select",
-			  style = "dropdown",
-			  values = currencySortOptions,
-			  set = function(info,val) self.config.profile.currency.sortBy = val; end,
-			  get = function(info) return self.config.profile.currency.sortBy end
-			},
-			currencyVisible = {
-			  order = 103,
-			  name = L["Visible Currencies"],
-			  desc = L["Select which currencies you'd like to see"],
-			  type = "multiselect",
-			  values = currencyList,
-			  set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
-			  get = function(info,key) return self.config.profile.currency.displayList[key] end
-			}
-		}
-	};
-	--]]
+            generalOptGroup     = getGeneralOptionConfig( self ),
+            dungeonHeader       = getDungeonHeaderConfig( self ),
+            raidHeader          = getRaidHeaderConfig( self ),
+            worldBossHeader     = getWorldBossHeaderConfig( self ),
+            emissaryHeader      = getEmissaryHeaderConfig( self ),
+            weeklyQuestHeader   = getWeeklyQuestHeaderConfig( self ),
+            currencyHeader      = getCurrencyHeaderConfig( self ),
+        }
+    };
 
 	return configOptions;
 end
