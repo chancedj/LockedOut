@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, table, tsort, mfloor, abs =           -- variables
-      next, table, table.sort, math.floor, math.abs    -- lua functions
+local next, table, time, date, strsplit, tsort, mfloor, abs =           -- variables
+      next, table, time, date, strsplit, table.sort, math.floor, math.abs    -- lua functions
 
 -- cache blizzard function/globals
 local SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE  =    -- variables
@@ -73,12 +73,14 @@ function addon:aquireEmptyTooltip( ttName )
     local tooltip = LibQTip:Acquire( ttName );
 
     self.openSubTooltips[ #self.openSubTooltips + 1 ] = ttName;
-    
+
     if( #tooltip.lines > 0 ) then
         LibQTip:Release( tooltip );
         tooltip = LibQTip:Acquire( ttName );
     end
 
+    tooltip:SetScale( addon.config.profile.general.frameScale );
+    
     return tooltip
 end
 
@@ -122,15 +124,15 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
     local lineNum = tooltip:AddLine( );
     tooltip.lines[ lineNum ].is_header = true;
     tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
-    for instanceName, _  in next, instanceList do
-        lineNum = tooltip:AddLine( instanceName );
+    for encounterId, encounterName in next, instanceList do
+        lineNum = tooltip:AddLine( encounterName );
         
         for colNdx, charData in next, charList do
             if (LockoutDb[ charData.realmName ] ~= nil) and
                (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-               (LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ] ~= nil) then
+               (LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ encounterId ] ~= nil) then
                 local data = {};
-                local instances = LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ instanceName ];
+                local instances = LockoutDb[ charData.realmName ][ charData.charNdx ].instances[ encounterId ];
                 local instanceDisplay = {};
                 for difficulty, instanceDetails in next, instances do
                     data[ #data + 1 ] = instanceDetails.displayText;
@@ -160,7 +162,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
 
                                                     tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
                                                     tooltip:SetCell( ln, col, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
-                                                    for bossName, bossData in next, instanceData.bossData do
+                                                    for bossIndex, bossData in next, instanceData.bossData do
                                                         if( col == 2 ) then
                                                             ln = tooltip:AddLine( );
                                                         else
@@ -174,6 +176,8 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                             status = "|cFF00FF00" .. L["Available"] .. "|r";
                                                         end; -- if ( bossData.isKilled )
 
+                                                        local bossName = bossData.bossName;
+                                                        
                                                         tooltip:SetCell( ln, 1, bossName, nil, "CENTER" );
                                                         tooltip:SetCell( ln, col, status, nil, "CENTER" );
                                                     end -- for bossName, bossData in next, instanceData.bossData
@@ -183,7 +187,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 tooltip:Show();
                                             end -- function( data )
                 instanceDisplay.deleteTT = emptyFunction;
-                instanceDisplay.anchor = getAnchorPkt( "in", instanceName, instances, lineNum, colNdx + 1 );
+                instanceDisplay.anchor = getAnchorPkt( "in", encounterName, instances, lineNum, colNdx + 1 );
 
                 tooltip:SetCell( lineNum, colNdx + 1, addon:colorizeString( charData.className, table.concat( data, " " ) ), nil, "CENTER" );
 
@@ -205,15 +209,15 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
     local lineNum = tooltip:AddLine( );
     tooltip.lines[ lineNum ].is_header = true;
     tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
-    for bossName, _ in next, worldBossList do
+    for bossKey, bossName in next, worldBossList do
         lineNum = tooltip:AddLine( bossName );
         
         for colNdx, charData in next, charList do
             if (LockoutDb[ charData.realmName ] ~= nil) and
                (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-               (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ] ~= nil) then
-                local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossName ];
-
+               (LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossKey ] ~= nil) then
+                local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossKey ];
+                
                 local bossDisplay = {};
                 bossDisplay.displayTT  = displayReset;
                 bossDisplay.deleteTT   = emptyFunction;
@@ -389,6 +393,13 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
     tooltip:AddSeparator( );
 end
 
+local function shouldDisplayChar( realmName, playerData )
+    addon:debug( realmName .. "." .. playerData.charName, playerData.currentLevel or -1 );
+
+    return  ( addon.config.profile.general.showCharList[ realmName .. "." .. playerData.charName ] ) and
+            ( playerData.currentLevel == nil or playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel )
+end
+
 function addon:ShowInfo( frame, manualToggle )
     if( manualToggle ~= nil ) then
         if( not manualToggle ) then
@@ -404,7 +415,7 @@ function addon:ShowInfo( frame, manualToggle )
         self.tooltip = nil;
     end -- if ( self.tooltip ~= nil )
     
-    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData();
+    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData( "abc" );
 
     -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
     local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
@@ -428,7 +439,7 @@ function addon:ShowInfo( frame, manualToggle )
         if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
-                if( self.config.profile.general.showCharList[ realmName .. "." .. charData.charName ] ) then
+                if( shouldDisplayChar( realmName, charData ) ) then
                     local tblNdx = #charList + 1;
                     charList[ tblNdx ] = {}
                     charList[ tblNdx ].charNdx = charNdx;
@@ -445,18 +456,22 @@ function addon:ShowInfo( frame, manualToggle )
                     end
                     
                     -- the get a list of all instances across characters for vertical
-                    for instanceName, details in next, charData.instances do
+                    for encounterName, details in next, charData.instances do
                         local key, data = next( details );
                         
                         if ( data.isRaid ) then
-                            raidList[ instanceName ] = "set";
+                            raidList[ encounterName ] = encounterName;
                         else
-                            dungeonList[ instanceName ] = "set";
+                            dungeonList[ encounterName ] = encounterName;
                         end -- if ( data.isRaid )
-                    end -- for instanceName, _ in next, instances
+                    end -- for encounterId, _ in next, instances
                     
-                    for bossName, _ in next, charData.worldBosses do
-                        worldBossList[ bossName ] = "set"
+                    for bossKey, bossData in next, charData.worldBosses do
+                        local instanceID, bossID = strsplit( "|", bossKey );
+
+                        if( instanceID ~= nil ) and ( bossID ~= nil ) then
+                            worldBossList[ bossKey ] = addon:getWorldBossName( instanceID, bossID );
+                        end
                     end -- for bossName, _ in next, charData.worldBosses
                     
                     for currID, currData in next, charData.currency do
@@ -473,13 +488,13 @@ function addon:ShowInfo( frame, manualToggle )
                     end
                     
                     for questID, emData in next, charData.emissaries do
-                        if( emData.name ~= nil ) then
+                        local title = addon:getQuestTitleByID( questID );
+                        if( title ~= nil ) then
                             -- add a 10 second buffer - things get a little off when the reset date ends up short by a second or two..
                             local day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
-                            self:debug( realmName .. "." .. charData.charName .. " name: " .. emData.name .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
                             emissaryList[ day + 1 ] = {
-                                displayName = "(+" .. day .. " Day) " .. emData.name,
-                                name = emData.name,
+                                displayName = "(+" .. day .. " Day) " .. title,
                                 questID = questID
                             }
                         end
@@ -535,6 +550,7 @@ function addon:ShowInfo( frame, manualToggle )
                                     local ttName = self.anchor:getTTName();
                                     local tooltip = addon:aquireEmptyTooltip( ttName );
                                     tooltip:SetColumnLayout( 2 );
+
                                     local line = tooltip:AddHeader( "" );
                                     tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
                                     tooltip:SetCell( line, 1, L["Character iLevels"], 2 );
@@ -543,6 +559,24 @@ function addon:ShowInfo( frame, manualToggle )
                                         tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end -- for k, p in next, charData.iLevel
 
+                                    if ( self.anchor.data.timePlayed ) then
+                                        local line = tooltip:AddHeader( "" );
+                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                        tooltip:SetCell( line, 1, "Time Played", 2 );
+                                        for k, p in next, self.anchor.data.timePlayed do
+                                            line = tooltip:AddLine( k, SecondsToTime( p, false, false, 5 ) );
+                                            tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                        end
+                                    end
+
+                                    if ( self.anchor.data.lastLogin ) then
+                                        local line = tooltip:AddHeader( "" );
+                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                        tooltip:SetCell( line, 1, "Last Login" );
+                                        tooltip:SetCell( line, 2, date( "%c", self.anchor.data.lastLogin ) );
+                                        tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                    end
+                                                                        
                                     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )
@@ -595,7 +629,8 @@ function addon:ShowInfo( frame, manualToggle )
     end
 
     addMainColorBanding( tooltip );
-    
+    tooltip:SetScale( addon.config.profile.general.frameScale );
+
     -- Show it, et voilà !
     tooltip:Show();
 end --  addon:OnEnter

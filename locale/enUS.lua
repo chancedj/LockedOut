@@ -24,7 +24,8 @@ L["Currency Display"]                   = "Currency Display";
 
 -- configuration menu
 -- * headers
-L["General Options"]            = "General Options";
+L["Frame Options"]              = "Frame Options";
+L["Character Options"]          = "Character Options";
 L["Current Realm"]              = "Current Realm";
 L["Show Realm"]                 = "Show Realm";
 L["Show Active First"]          = "Show Active First";
@@ -76,11 +77,12 @@ L["Choose where hover tooltip displays"]                            = "Choose wh
 L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose icon for addon - requires ui refresh or login/logout";
 
 -- difficulty mapping full
-L["Unknown"]    = "Unknown";
-L["Normal"]     = "Normal";
-L["Heroic"]     = "Heroic";
-L["Mythic"]     = "Mythic";
-L["Lfr"]        = "Lfr";
+L["Unknown"]            = "Unknown";
+L["Normal"]             = "Normal";
+L["Heroic"]             = "Heroic";
+L["Mythic"]             = "Mythic";
+L["Lfr"]                = "Lfr";
+L["Timewalking"]        = "Timewalking";
 
 -- difficulty mapping abbreviation
 L["U"]  = "U";
@@ -88,6 +90,7 @@ L["N"] 	= "N";
 L["H"] 	= "H";
 L["M"]  = "M";
 L["L"]  = "L";
+L["T"]  = "T";
 
 -- quest.lua mappings
 L["Blingtron"]                  = "Blingtron";
@@ -98,6 +101,9 @@ L["WoW 13th - Bosses"]          = "WoW 13th - Bosses";
 L["WoW 13th - Lore."]           = "WoW 13th - Lore.";
 L["Argus - Pristine Argunite"]  = "Argus - Pristine Argunite";
 L["Argus - Invasions"]          = "Argus - Invasions";
+L["Argus - Cheap Ridgestalker"] = "Argus - Cheap Ridgestalker";
+L["Argus - Cheap Void-Purged"]  = "Argus - Cheap Void-Purged";
+L["Argus - Cheap Lightforged"]  = "Argus - Cheap Lightforged";
 
 -- expansion abbreviations
 L["Van"]    = "Van";

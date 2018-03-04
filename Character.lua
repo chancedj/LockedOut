@@ -9,9 +9,13 @@ local addon     = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L         = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 local LibQTip   = LibStub( "LibQTip-1.0" )
 
+-- Upvalues
+local next, time =
+      next, time;
+
 -- cache blizzard function/globals
-local GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime =  -- variables 
-      GetRealmName, UnitName, UnitClass, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
+local GetRealmName, UnitName, UnitClass, UnitLevel, GetAverageItemLevel, GetQuestResetTime =  -- variables 
+      GetRealmName, UnitName, UnitClass, UnitLevel, GetAverageItemLevel, GetQuestResetTime;   -- blizzard api
 
 --[[
     this will generate the saved data for characters and realms
@@ -105,25 +109,33 @@ function addon:InitCharDB()
 
     -- get and initialize character data
     local charName = UnitName( "player" );
+    local currentLevel = UnitLevel( "player" );
     local _, className = UnitClass( "player" );
     local charNdx = getCharIndex( LockoutDb[ realmName ], charName );
     local playerData = LockoutDb[ realmName ][ charNdx ] or {};
-    local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
+    
+    if( not self.loggingOut ) then
+        local total_ilevel, equippped_ilevel, pvp_ilevel = GetAverageItemLevel();
 
-    playerData.charName = charName
-    playerData.className = className
+        playerData.charName = charName;
+        playerData.className = className;
+		playerData.currentLevel = currentLevel;
+        playerData.lastLogin = time();
 
-    playerData.iLevel = {};
-    playerData.iLevel[ "total" ]    = total_ilevel;
-    playerData.iLevel[ "equipped" ] = equippped_ilevel;
-    playerData.iLevel[ "pvp" ]      = pvp_ilevel;
+        playerData.iLevel = playerData.iLevel or {};
+        playerData.iLevel[ "total" ]    = total_ilevel;
+        playerData.iLevel[ "equipped" ] = equippped_ilevel;
+        playerData.iLevel[ "pvp" ]      = pvp_ilevel;
+        
+        playerData.timePlayed = playerData.timePlayed or { total = 0, currentLevel = 0 };
+    end
     
     LockoutDb[ realmName ][ charNdx ] = playerData;            -- initialize playerDb if not already initialized
     
     return playerData, realmName, charNdx;
 end
 
-function addon:Lockedout_GetCurrentCharData()
+function addon:Lockedout_GetCurrentCharData( calledByEvent )
     local timeTilResets = GetQuestResetTime();
     
     if( timeTilResets > 24 * 60 * 60 ) then
@@ -136,12 +148,18 @@ function addon:Lockedout_GetCurrentCharData()
     
     local playerData, realmName, charNdx = self:InitCharDB();
 
-    self:Lockedout_BuildInstanceLockout( realmName, charNdx );
-    self:Lockedout_BuildWorldBoss( realmName, charNdx );
-    self:Lockedout_BuildCurrencyList( realmName, charNdx );
-    self:Lockedout_BuildEmissary( realmName, charNdx );
-    self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
-    
+    if( playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel ) then
+        if( calledByEvent ) then
+            ---[[
+            self:Lockedout_BuildInstanceLockout( realmName, charNdx );
+            self:Lockedout_BuildWorldBoss( realmName, charNdx );
+            self:Lockedout_BuildCurrencyList( realmName, charNdx );
+            self:Lockedout_BuildEmissary( realmName, charNdx );
+            self:Lockedout_BuildWeeklyQuests( realmName, charNdx );
+            --]]
+        end
+    end
+        
     table.sort( LockoutDb ); -- sort the realms alphabetically
     
     return realmName, charNdx, playerData;

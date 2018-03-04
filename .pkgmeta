@@ -39,6 +39,9 @@ externals:
     Libs/AceConfig-3.0:
         url: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
         tag: latest
-
+    Libs/AceBucket-3.0:
+        url: https://repos.wowace.com/wow/ace3/trunk/AceBucket-3.0/
+        tag: latest
+        
 ignore:
  - README.MD

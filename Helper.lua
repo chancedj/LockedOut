@@ -8,12 +8,14 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local print, type =                                -- variables
-      print, type                                  -- lua functions
+local print, type, tonumber =                      -- variables
+      print, type, tonumber                        -- lua functions
 
 -- cache blizzard function/globals
-local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo, RAID_CLASS_COLORS =                        -- variables
-      GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS; -- blizzard global table
+local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
+        EJ_SelectInstance, EJ_GetEncounterInfoByIndex, RAID_CLASS_COLORS =                          -- variables
+      GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
+        EJ_SelectInstance, EJ_GetEncounterInfoByIndex, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS;    -- blizzard global table
 
 addon.ExpansionAbbr = {
     [0] = L["Van"],
@@ -83,6 +85,7 @@ local weekdayRemap = {
 }
 
 local CURRENCY_LIST = {
+    -- currency
     { ID=1,    name=nil, icon=nil, expansionLevel=1, type="C", show=false }, -- Currency Token Test Token 4
     { ID=2,    name=nil, icon=nil, expansionLevel=1, type="C", show=false }, -- Currency Token Test Token 2
     { ID=4,    name=nil, icon=nil, expansionLevel=1, type="C", show=false }, -- Currency Token Test Token 5
@@ -187,7 +190,12 @@ local CURRENCY_LIST = {
     { ID=1501, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Writhing Essence
     { ID=1506, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Argus Waystone
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
-    { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true }  -- Wakening Essence
+    { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Wakening Essence
+    
+    -- items
+    { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Pet Charm
+    { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
+    { ID=151568, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Primal Sargerite
 };
 
 local currencySortOptions = {
@@ -246,14 +254,16 @@ local characterSortOptions = {
 
 local function resolveCurrencyInfo( )
     for _, currency in next, CURRENCY_LIST do
-        if( currency.type == "C" ) then
-            currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
-        else
-            currency.name, _, _, _, _, _, _, _, _, currency.icon = GetItemInfo( currency.ID );
-        end;
-        
-        if( currency.icon ) then
-            currency.icon = "|T" .. currency.icon .. ":0|t"
+        if( currency.name == nil ) then
+            if( currency.type == "C" ) then
+                currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
+            else
+                currency.name, _, _, _, _, _, _, _, _, currency.icon = GetItemInfo( currency.ID );
+            end;
+            
+            if( currency.icon ) then
+                currency.icon = "|T" .. currency.icon .. ":0|t"
+            end
         end
     end
 end
@@ -275,6 +285,26 @@ function addon:getQuestTitleByID( questID )
     -- example pulled from below
     -- http://www.wowinterface.com/forums/showthread.php?t=46934
     return QuestTitleFromID[ questID ];
+end
+
+function addon:getWorldBossName( sInstanceID, sBossID )
+    local iInstanceID = tonumber( sInstanceID );
+    local iBossID = tonumber( sBossID );
+
+    EJ_SelectInstance( iInstanceID );
+
+    local bossNdx = 1;
+    local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
+    while bossID do
+        if( bossID == iBossID ) then
+            return bossName
+        end
+        
+        bossNdx = bossNdx + 1;
+        bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
+    end
+    
+    return "unknown";
 end
 
 function addon:debug( msg )
@@ -339,12 +369,7 @@ function addon:getCurrencyListMap()
 end
 
 function addon:getCurrencyList()
-    local _, data = next( CURRENCY_LIST );
-    
-    -- make sure this is only done once
-    if( data.name == nil ) then
-        resolveCurrencyInfo();
-    end
+    resolveCurrencyInfo();
     
     return CURRENCY_LIST;
 end
@@ -372,3 +397,36 @@ function addon:getWeeklyLockoutDate()
 
     return weeklyResetTime
 end
+
+local function fif( value, t, f )
+    if( value ) then
+        return t;
+    else
+        return f;
+    end;
+end
+
+--- recursive printing for debug purposes
+function addon:printTable( tbl, maxDepth, depth )
+	if ( tbl == nil ) then return; end
+	if ( maxDepth ~= nil ) and ( depth == maxDepth ) then return; end
+	
+	depth = depth or 0; -- initialize depth to 0 if nil
+	local indent = strrep( "  ", depth ) .. "=>";
+	
+	for key, value in next, tbl do
+		if ( type ( value ) == "table" ) then
+			print( indent .. key );
+
+			-- initialize depth to 0 if nil
+			self:printTable( value, maxDepth, depth + 1 );
+		elseif( type( value ) == "boolean" ) then
+			print( indent .. key .. " - " .. fif( value, "true", "false" ) );
+		elseif( type( value ) == "function" ) then
+			print( indent .. key .. " = " .. value() );
+		else
+			print( indent .. key .. " - " .. value );
+		end -- if ( type ( value ) == "table" )
+	end -- for key, value in next, tbl
+	
+end 
