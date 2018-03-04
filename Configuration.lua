@@ -23,37 +23,35 @@ local function getGeneralOptionConfig( self )
         ["cell"] = L["At cursor location"],
         ["parent"] = L["At bottom of frame"]
     }
-    
-    local characterSortOptions = {}
-    for key, data in next, self:getCharSortOptions() do
-        characterSortOptions[ key ] = data.description;
-    end
-    
-    local charList = {};
-    for key, value in next, addon:getCharacterList() do
-        charList[ key ] = value;
-    end
 
     return {
         order  = 1,
         type = "group",
-        name = L["General Options"],
+        name = L["Frame Options"],
         args = {
-            currentRealmOnly = {
+            minimapIconList = {
               order = 1,
-              name = L["Current Realm"],
-              desc = L["Show characters from current realm only"],
-              type = "toggle",
-              set = function(info,val) self.config.profile.general.currentRealm = val; end,
-              get = function(info) return self.config.profile.general.currentRealm end
+              name = L["Choose Icon (reload ui)"],
+              desc = L["Choose icon for addon - requires ui refresh or login/logout"],
+              type = "select",
+              values = addon:getIconOptions(),
+              set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
+              get = function(info) return self.config.profile.minimap.addonIcon end
             },
-            showRealmHeader = {
+            showMinimapIcon = {
               order = 2,
-              name = L["Show Realm"],
-              desc = L["Show the realm header"],
+              name = L["Hide Icon"],
+              desc = L["Show Minimap Icon"],
               type = "toggle",
-              set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
-              get = function(info) return self.config.profile.general.showRealmHeader end
+              set = function(info,val)
+                                    self.config.profile.minimap.hide = val;
+                                    if( self.config.profile.minimap.hide ) then
+                                        self.icon:Hide( addonName );
+                                    else
+                                        self.icon:Show( addonName );
+                                    end
+                                end,
+              get = function(info) return self.config.profile.minimap.hide end
             },
             configureFrameScale = {
               order = 3,
@@ -72,41 +70,8 @@ local function getGeneralOptionConfig( self )
                     end,
               get = function(info) return self.config.profile.general.frameScale end
             },
-            showCharFirst = {
-              order = 4,
-              name = L["Show Active First"],
-              desc = L["Show logged in char first"],
-              type = "toggle",
-              set = function(info,val) self.config.profile.general.loggedInFirst = val; end,
-              get = function(info) return self.config.profile.general.loggedInFirst end
-            },
-            showMinimapIcon = {
-              order = 5,
-              name = L["Hide Icon"],
-              desc = L["Show Minimap Icon"],
-              type = "toggle",
-              set = function(info,val)
-                                    self.config.profile.minimap.hide = val;
-                                    if( self.config.profile.minimap.hide ) then
-                                        self.icon:Hide( addonName );
-                                    else
-                                        self.icon:Show( addonName );
-                                    end
-                                end,
-              get = function(info) return self.config.profile.minimap.hide end
-            },
-            characterSort = {
-              order = 6,
-              name = L["Sort Chars By"],
-              desc = L["Configure how characters are sorted in the list"],
-              type = "select",
-              style = "dropdown",
-              values = characterSortOptions,
-              set = function(info,val) self.config.profile.general.charSortBy = val; end,
-              get = function(info) return self.config.profile.general.charSortBy end
-            },
             setAnchorPoint = {
-              order = 7,
+              order = 4,
               name = L["Anchor To"],
               desc = L["Choose where hover tooltip displays"],
               type = "select",
@@ -115,17 +80,62 @@ local function getGeneralOptionConfig( self )
               set = function(info,val) self.config.profile.general.anchorPoint = val; end,
               get = function(info) return self.config.profile.general.anchorPoint end
             },
-            minimapIconList = {
-              order = 8,
-              name = L["Choose Icon (reload ui)"],
-              desc = L["Choose icon for addon - requires ui refresh or login/logout"],
+        }
+    };
+end
+
+local function getCharacterOptionConfig( self )
+    local characterSortOptions = {}
+    for key, data in next, self:getCharSortOptions() do
+        characterSortOptions[ key ] = data.description;
+    end
+    
+    local charList = {};
+    for key, value in next, addon:getCharacterList() do
+        charList[ key ] = value;
+    end
+
+    return {
+        order  = 5,
+        type = "group",
+        name = L["Character Options"],
+        args = {
+            showRealmHeader = {
+              order = 1,
+              name = L["Show Realm"],
+              desc = L["Show the realm header"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.showRealmHeader = val; end,
+              get = function(info) return self.config.profile.general.showRealmHeader end
+            },
+            currentRealmOnly = {
+              order = 2,
+              name = L["Current Realm"],
+              desc = L["Show characters from current realm only"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.currentRealm = val; end,
+              get = function(info) return self.config.profile.general.currentRealm end
+            },
+            showCharFirst = {
+              order = 3,
+              name = L["Show Active First"],
+              desc = L["Show logged in char first"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.loggedInFirst = val; end,
+              get = function(info) return self.config.profile.general.loggedInFirst end
+            },
+            characterSort = {
+              order = 4,
+              name = L["Sort Chars By"],
+              desc = L["Configure how characters are sorted in the list"],
               type = "select",
-              values = addon:getIconOptions(),
-              set = function(info,val) self.config.profile.minimap.addonIcon = val; end,
-              get = function(info) return self.config.profile.minimap.addonIcon end
+              style = "dropdown",
+              values = characterSortOptions,
+              set = function(info,val) self.config.profile.general.charSortBy = val; end,
+              get = function(info) return self.config.profile.general.charSortBy end
             },
             charTrackWhen = {
-              order = 9,
+              order = 5,
               name = "Start Tracking Level",
               desc = "Start tracking characters greater than or equal to level below",
               type = "range",
@@ -136,7 +146,7 @@ local function getGeneralOptionConfig( self )
               get = function(info) return self.config.profile.general.minTrackCharLevel end
             },
             charVisible = {
-              order = 10,
+              order = 6,
               name = "Visible Characters",
               desc = "Which characters should show in menu",
               type = "multiselect",
@@ -147,7 +157,7 @@ local function getGeneralOptionConfig( self )
         }
     };
 end
-      
+
 local function getDungeonHeaderConfig( self )
     return {
             order  = 10,
@@ -324,6 +334,7 @@ function addon:getConfigOptions()
 		name = addonName,
 		args = {
             generalOptGroup     = getGeneralOptionConfig( self ),
+            characterOptGroup   = getCharacterOptionConfig( self ),
             dungeonHeader       = getDungeonHeaderConfig( self ),
             raidHeader          = getRaidHeaderConfig( self ),
             worldBossHeader     = getWorldBossHeaderConfig( self ),

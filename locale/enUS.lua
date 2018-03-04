@@ -24,7 +24,8 @@ L["Currency Display"]                   = "Currency Display";
 
 -- configuration menu
 -- * headers
-L["General Options"]            = "General Options";
+L["Frame Options"]              = "Frame Options";
+L["Character Options"]          = "Character Options";
 L["Current Realm"]              = "Current Realm";
 L["Show Realm"]                 = "Show Realm";
 L["Show Active First"]          = "Show Active First";
