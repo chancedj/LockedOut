@@ -26,6 +26,7 @@ local function convertDifficulty(difficulty)
     elseif difficulty == 5 then     return L[ "Heroic" ],       L[ "H" ];
     elseif difficulty == 6 then     return L[ "Heroic" ],       L[ "H" ];
     elseif difficulty == 7 then     return L[ "Lfr" ],          L[ "L" ];
+    elseif difficulty == 9 then     return L[ "Normal" ],       L[ "N" ];
     elseif difficulty == 11 then    return L[ "Heroic" ],       L[ "H" ];
     elseif difficulty == 12 then    return L[ "Normal" ],       L[ "N" ];
     elseif difficulty == 14 then    return L[ "Normal" ],       L[ "N" ];
