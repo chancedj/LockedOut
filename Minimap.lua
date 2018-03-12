@@ -147,41 +147,52 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 tooltip:SetColumnLayout( 1 );
                                                 tooltip:AddHeader( "Boss Name" );
                                                 for difficulty, instanceData in next, self.anchor.data do
-                                                    local col = tooltip:AddColumn( "CENTER" );
+                                                    if( difficulty ~= "keystone" ) then
+                                                        local col = tooltip:AddColumn( "CENTER" );
 
-                                                    local ln = 1;
-                                                    tooltip:SetCell( ln, col, difficulty, nil, "CENTER" );
-                                                    tooltip:SetLineColor( ln, 1, 1, 1, 0.1 );
-                                                    
-                                                    if( col == 2 ) then
-                                                        ln = tooltip:AddLine( );
-                                                        tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
-                                                    else
-                                                        ln = ln + 1;
-                                                    end
-
-                                                    tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
-                                                    tooltip:SetCell( ln, col, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
-                                                    for bossIndex, bossData in next, instanceData.bossData do
+                                                        local ln = 1;
+                                                        tooltip:SetCell( ln, col, difficulty, nil, "CENTER" );
+                                                        tooltip:SetLineColor( ln, 1, 1, 1, 0.1 );
+                                                        
                                                         if( col == 2 ) then
                                                             ln = tooltip:AddLine( );
+                                                            tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                                         else
                                                             ln = ln + 1;
-                                                        end -- if( col == 2 )
-                                                    
-                                                        local status = "";
-                                                        if ( bossData.isKilled ) then
-                                                            status = "|cFFFF0000" .. L["Defeated"] .. "|r"; 
-                                                        else
-                                                            status = "|cFF00FF00" .. L["Available"] .. "|r";
-                                                        end; -- if ( bossData.isKilled )
+                                                        end
 
-                                                        local bossName = bossData.bossName;
+                                                        tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
+                                                        tooltip:SetCell( ln, col, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
+                                                        for bossIndex, bossData in next, instanceData.bossData do
+                                                            if( col == 2 ) then
+                                                                ln = tooltip:AddLine( );
+                                                            else
+                                                                ln = ln + 1;
+                                                            end -- if( col == 2 )
                                                         
-                                                        tooltip:SetCell( ln, 1, bossName, nil, "CENTER" );
-                                                        tooltip:SetCell( ln, col, status, nil, "CENTER" );
+                                                            local status = "";
+                                                            if ( bossData.isKilled ) then
+                                                                status = "|cFFFF0000" .. L["Defeated"] .. "|r"; 
+                                                            else
+                                                                status = "|cFF00FF00" .. L["Available"] .. "|r";
+                                                            end; -- if ( bossData.isKilled )
+
+                                                            local bossName = bossData.bossName;
+                                                            
+                                                            tooltip:SetCell( ln, 1, bossName, nil, "CENTER" );
+                                                            tooltip:SetCell( ln, col, status, nil, "CENTER" );
+                                                        end;
                                                     end -- for bossName, bossData in next, instanceData.bossData
                                                 end -- for difficulty, instanceDetails in next, instances
+
+                                                -- means only keystone is showing
+                                                if( #tooltip.lines == 1 ) then
+                                                    local _, instanceData = next(self.anchor.data);
+                                                    tooltip:AddColumn( "CENTER" );
+                                                    tooltip:SetCell( 1, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
+                                                    tooltip:SetCell( 1, 2, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
+                                                    tooltip:SetLineColor( 1, 1, 1, 1, 0.1 );
+                                                end;
                                                 
                                                 setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                                 tooltip:Show();

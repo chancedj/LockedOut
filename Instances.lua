@@ -83,21 +83,39 @@ local function addInstanceData( instanceData, instanceName, difficulty, numEncou
     return instanceData[ key ][ difficultyName ];
 end -- addInstanceData()
 
+local function addKeystoneData( instanceData, instanceName, difficulty, resetDate )
+    local key = instanceName;
+    local difficultyName = "keystone";
+
+    instanceData[ key ] = instanceData[ key ] or {};
+    instanceData[ key ][ difficultyName ] = instanceData[ key ][ difficultyName ] or {};
+    instanceData[ key ][ difficultyName ].isRaid = false;
+    instanceData[ key ][ difficultyName ].resetDate = resetDate;
+    instanceData[ key ][ difficultyName ].difficulty = difficulty;
+    
+    return instanceData[ key ][ difficultyName ];
+end
+
 local function removeUntouchedInstances( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
     for instanceKey, instanceDetails in next, instances do
         local validInstanceCount = 0;
         for difficultyName, instance in next, instanceDetails do
-            local killCount, totalCount = getBossData( instance.bossData );
-            
-            if( killCount == 0 ) then
-                -- remove instance from list
-                instances[ instanceKey ][ difficultyName ] = nil;
+            if( difficultyName == "keystone" ) then
+                instance.displayText = "+" .. instance.difficulty;
+                validInstanceCount = 1;
             else
-                local _, difficultyAbbr = convertDifficulty( instance.difficulty );
-                instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+                local killCount, totalCount = getBossData( instance.bossData );
                 
-                validInstanceCount = validInstanceCount + 1;
+                if( killCount == 0 ) then
+                    -- remove instance from list
+                    instances[ instanceKey ][ difficultyName ] = nil;
+                else
+                    local _, difficultyAbbr = convertDifficulty( instance.difficulty );
+                    instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+                    
+                    validInstanceCount = validInstanceCount + 1;
+                end
             end
         end -- for difficultyName, instance in next, instanceDetails
         
@@ -145,7 +163,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     --]]
 
     -- get mythic+ keystone info
-    --[[
+    ---[[
     for bagID = 0, NUM_BAG_SLOTS do
         for slotID = 1, GetContainerNumSlots(bagID) do
             local link = GetContainerItemLink( bagID, slotID );
@@ -153,9 +171,10 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             if link and string.find( link, "Keystone: " ) then
                 local _, mapID, level = strsplit( ":", link );
                 local mapName = C_ChallengeMode.GetMapInfo( mapID );
-                print( "keystone found: link: " .. tostring( link ) );
-                print( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
+                addon:debug( "keystone found: link: " .. tostring( link ) );
+                addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
+                addKeystoneData( instances, mapName, level, calculatedResetDate )
                 break;
             end
         end
