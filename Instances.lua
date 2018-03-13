@@ -14,9 +14,13 @@ local next, type, table, tsort = -- variables
 
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
-      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo = -- variables 
+      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
+      GetSavedInstanceEncounterInfo,
+      C_GetMapTable, C_GetMapPlayerStats, C_GetMapInfo                                          =
       GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
-      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo   -- blizzard api
+      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
+      GetSavedInstanceEncounterInfo,
+      C_ChallengeMode.GetMapTable, C_ChallengeMode.GetMapPlayerStats, C_ChallengeMode.GetMapInfo
 
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
@@ -163,7 +167,6 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     --]]
 
     -- get mythic+ keystone info
-    ---[[
     for bagID = 0, NUM_BAG_SLOTS do
         for slotID = 1, GetContainerNumSlots(bagID) do
             local link = GetContainerItemLink( bagID, slotID );
@@ -179,18 +182,18 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             end
         end
     end
-    --]]
 
-    removeUntouchedInstances( instances );
-    -- sort the bosses, has to be done after LFR and completed instances are combined and removed.
     --[[
-        -- will have to find a better way to sort later
-    for i, instanceData in next, instances do
-        for j, instanceDetails in next, instanceData do
-            tsort( instanceDetails.bossData, function( a, b ) return a.bossIndex < b.bossIndex; end );
-        end
+    -- this is for getting the best keystone done per map
+    for _, mapId in next, C_GetMapTable() do
+        local _, _, bestLevel = C_GetMapPlayerStats( mapId );
+        local mapName = C_GetMapInfo( mapId );
+        
+        print( mapName, " - bestLevel: ", bestLevel );
     end
     --]]
+    
+    removeUntouchedInstances( instances );
     
     LockoutDb[ realmName ][ charNdx ].instances = instances;
 end -- Lockedout_BuildInstanceLockout()
