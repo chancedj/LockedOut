@@ -297,7 +297,12 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
     tooltip.lines[ lineNum ].is_header = true;
     tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
     for _, currencyData in next, currencyList do
-        local displayName = currencyData.name .. " (" .. addon.ExpansionAbbr[ currencyData.expansionLevel ] .. ")";
+        local displayName = currencyData.name;
+
+        if( addon.config.profile.currency.displayExpansion ) then
+            displayName = displayName .. " (" .. addon.ExpansionAbbr[ currencyData.expansionLevel ] .. ")";
+        end
+
         if( currencyData.icon ) then
             lineNum = tooltip:AddLine( currencyData.icon .. displayName );
         end

@@ -53,6 +53,7 @@ L["Hide Icon"]              = "Hide Icon";
 L["Show when dead"]         = "Show when dead";
 L["Sort By"]                = "Sort By";
 L["Visible Currencies"]     = "Visible Currencies";
+L["Display Expansion"]      = "Display Expansion";
 L["Anchor To"]              = "Anchor To";
 L["Choose Icon (reload ui)"]  = "Choose Icon (reload ui)";
 
@@ -73,6 +74,7 @@ L["Show Emissary Information"]                                      = "Show Emis
 L["Show repeatable quest information"]                              = "Show repeatable quest information";
 L["Configure how currency is sorted"]                               = "Configure how currency is sorted";
 L["Select which currencies you'd like to see"]                      = "Select which currencies you'd like to see";
+L["Display expansion abbreviation the currency belongs to"]         = "Display expansion abbreviation the currency belongs to";
 L["Choose where hover tooltip displays"]                            = "Choose where hover tooltip displays";
 L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose icon for addon - requires ui refresh or login/logout";
 

@@ -315,15 +315,23 @@ local function getCurrencyHeaderConfig( self )
               set = function(info,val) self.config.profile.currency.sortBy = val; end,
               get = function(info) return self.config.profile.currency.sortBy end
             },
-            currencyVisible = {
+            displayExpansion = {
               order = 103,
+              name = L["Display Expansion"],
+              desc = L["Display expansion abbreviation the currency belongs to"],
+              type = "toggle",
+              set = function(info,key,val) self.config.profile.currency.displayExpansion = val; end,
+              get = function(info,key) return self.config.profile.currency.displayExpansion end
+            },
+            currencyVisible = {
+              order = 104,
               name = L["Visible Currencies"],
               desc = L["Select which currencies you'd like to see"],
               type = "multiselect",
               values = currencyList,
               set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
               get = function(info,key) return self.config.profile.currency.displayList[key] end
-            }
+            },
         }
     };
 end
@@ -402,7 +410,8 @@ function addon:getDefaultOptions()
 				show = true,
                 display = "long",
                 displayList = currencyListDefaults,
-                sortBy = "en"
+                sortBy = "en",
+                displayExpansion = true
 			},
             emissary = {
                 show = true
