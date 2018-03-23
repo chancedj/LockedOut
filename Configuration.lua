@@ -80,6 +80,14 @@ local function getGeneralOptionConfig( self )
               set = function(info,val) self.config.profile.general.anchorPoint = val; end,
               get = function(info) return self.config.profile.general.anchorPoint end
             },
+            showResetTime = {
+              order = 5,
+              name = L["Show Reset Time"],
+              desc = L["Show reset time instead of checkbox when completed"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.showResetTime = val; end,
+              get = function(info) return self.config.profile.general.showResetTime end
+            },
         }
     };
 end
@@ -394,7 +402,8 @@ function addon:getDefaultOptions()
                 showCharList = charList,
                 charSortBy = "rc",
                 frameScale = 1.0,
-                minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ]
+                minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
+                showResetTime = false
 			},
 			dungeon = {
 				show = true

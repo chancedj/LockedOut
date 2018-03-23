@@ -47,15 +47,16 @@ L["Realm then Name"]            = "Realm then Name";
 L["Name then Realm"]            = "Name then Realm";
 
 -- * labels
-L["Enable"]                 = "Enable";
-L["Show"]                   = "Show";
-L["Hide Icon"]              = "Hide Icon";
-L["Show when dead"]         = "Show when dead";
-L["Sort By"]                = "Sort By";
-L["Visible Currencies"]     = "Visible Currencies";
-L["Display Expansion"]      = "Display Expansion";
-L["Anchor To"]              = "Anchor To";
-L["Choose Icon (reload ui)"]  = "Choose Icon (reload ui)";
+L["Enable"]                     = "Enable";
+L["Show"]                       = "Show";
+L["Hide Icon"]                  = "Hide Icon";
+L["Show when dead"]             = "Show when dead";
+L["Sort By"]                    = "Sort By";
+L["Visible Currencies"]         = "Visible Currencies";
+L["Display Expansion"]          = "Display Expansion";
+L["Anchor To"]                  = "Anchor To";
+L["Show Reset Time"]            = "Show Reset Time"    
+L["Choose Icon (reload ui)"]    = "Choose Icon (reload ui)";
 
 -- * label descriptions
 L["Enables / disables the addon"]                                   = "Enables / disables the addon";
@@ -76,6 +77,7 @@ L["Configure how currency is sorted"]                               = "Configure
 L["Select which currencies you'd like to see"]                      = "Select which currencies you'd like to see";
 L["Display expansion abbreviation the currency belongs to"]         = "Display expansion abbreviation the currency belongs to";
 L["Choose where hover tooltip displays"]                            = "Choose where hover tooltip displays";
+L["Show reset time instead of checkbox when completed"]             = "Show reset time instead of checkbox when completed"
 L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose icon for addon - requires ui refresh or login/logout";
 
 -- difficulty mapping full
