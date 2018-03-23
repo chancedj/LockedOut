@@ -100,6 +100,14 @@ local function setAnchorToTooltip( tooltip, linenum, cellnum )
     addPopupColorBanding( tooltip );
 end
 
+local function getDisplayTime( displayTime )
+    if( getDisplayTime ) then
+        return "|cFFFF0000" .. SecondsToTime( displayTime - GetServerTime() ) .. "|r";
+    else
+        return "";
+    end;
+end
+
 local function displayReset( self )
     local ttName = self.anchor:getTTName();
     local tooltip = addon:aquireEmptyTooltip( ttName );
@@ -107,7 +115,7 @@ local function displayReset( self )
     tooltip:SetColumnLayout( 2 );
     local ln = tooltip:AddLine( );
     tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
-    tooltip:SetCell( ln, 2, "|cFFFF0000" .. SecondsToTime( self.anchor.data.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
+    tooltip:SetCell( ln, 2, getDisplayTime( self.anchor.data.resetDate ), nil, "CENTER" );
     tooltip:SetLineScript( ln, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
 
     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
@@ -115,6 +123,18 @@ local function displayReset( self )
     
     tooltip:Show();
 end -- function( data )
+
+local function handleResetDisplay( tooltip, lineNum, colNdx, anchor, data )
+    if( addon.config.profile.general.showResetTime ) then
+        if( data.displayText ~= "" ) then
+            tooltip:SetCell( lineNum, colNdx, getDisplayTime( data.resetDate ), nil, "CENTER" );
+        end;
+        anchor.displayTT  = emptyFunction;
+    else
+        anchor.displayTT  = displayReset;
+        tooltip:SetCell( lineNum, colNdx, data.displayText, nil, "CENTER" );
+    end
+end;
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
     -- make sure it's not empty
@@ -230,11 +250,9 @@ local function populateWorldBossData( header, tooltip, charList, worldBossList )
                 local bossData = LockoutDb[ charData.realmName ][ charData.charNdx ].worldBosses[ bossKey ];
                 
                 local bossDisplay = {};
-                bossDisplay.displayTT  = displayReset;
+                handleResetDisplay( tooltip, lineNum, colNdx + 1, bossDisplay, bossData );
                 bossDisplay.deleteTT   = emptyFunction;
                 bossDisplay.anchor     = getAnchorPkt( "wb", bossName, bossData, lineNum, colNdx + 1 );
-
-                tooltip:SetCell( lineNum, colNdx + 1, bossData.displayText, nil, "CENTER" );
 
                 tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() bossDisplay:displayTT( ); end );    -- close out tooltip when leaving
                 tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() bossDisplay:deleteTT( ); end );    -- open tooltip with info when entering cell.
@@ -398,7 +416,6 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
                     else
                         displayText = emData.fullfilled .. "/" .. emData.required;
                     end
-
                     tooltip:SetCell( lineNum, colNdx + 1, displayText, nil, "CENTER" );
                 end
             end
