@@ -19,6 +19,7 @@ L["Character iLevels"]                  = "Character iLevels";
 L["Defeated"]                           = "Defeated";
 L["Available"]                          = "Available";
 L["Right-click for configuration menu"] = "Right-click for configuration menu";
+L["Keystone Helper"]                    = "+# is current keystone, [#] is best completed mythic";
 L["*Resets in"]                         = "*Resets in";
 L["Currency Display"]                   = "Currency Display";
 

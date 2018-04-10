@@ -87,9 +87,9 @@ local function addInstanceData( instanceData, instanceName, difficulty, numEncou
     return instanceData[ key ][ difficultyName ];
 end -- addInstanceData()
 
-local function addKeystoneData( instanceData, instanceName, difficulty, resetDate )
+local function addKeystoneData( difficultyName, instanceData, instanceName, difficulty, resetDate )
     local key = instanceName;
-    local difficultyName = "keystone";
+    --local difficultyName = "keystone";
 
     instanceData[ key ] = instanceData[ key ] or {};
     instanceData[ key ][ difficultyName ] = instanceData[ key ][ difficultyName ] or {};
@@ -107,6 +107,9 @@ local function removeUntouchedInstances( instances )
         for difficultyName, instance in next, instanceDetails do
             if( difficultyName == "keystone" ) then
                 instance.displayText = "+" .. instance.difficulty;
+                validInstanceCount = 1;
+            elseif( difficultyName == "mythicbest" ) then
+                instance.displayText = "[" .. instance.difficulty .. "]";
                 validInstanceCount = 1;
             else
                 local killCount, totalCount = getBossData( instance.bossData );
@@ -178,7 +181,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
-                addKeystoneData( instances, mapName, level, calculatedResetDate );
+                addKeystoneData( "keystone", instances, mapName, level, calculatedResetDate );
 
                 -- mark it found, then break out;
                 keyFound = true;
@@ -190,14 +193,16 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
         if (keyfound) then break end;
     end
 
-    --[[
+    ---[[
     -- this is for getting the best keystone done per map
     for _, mapId in next, C_GetMapTable() do
         local _, _, bestLevel = C_GetMapPlayerStats( mapId );
         if( bestLevel ) then
             local mapName = C_GetMapInfo( mapId );
-        
-            print( mapName, " - bestLevel: ", bestLevel );
+
+            addKeystoneData( "mythicbest", instances, mapName, bestLevel, calculatedResetDate );
+
+            addon:debug( mapName, " - bestLevel: ", bestLevel );
         end
     end
     --]]

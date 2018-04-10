@@ -166,8 +166,10 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 
                                                 tooltip:SetColumnLayout( 1 );
                                                 tooltip:AddHeader( "Boss Name" );
+                                                local resetAssigned = true;
                                                 for difficulty, instanceData in next, self.anchor.data do
-                                                    if( difficulty ~= "keystone" ) then
+                                                    if ( difficulty ~= "keystone" ) and ( difficulty ~= "mythicbest" ) then
+                                                        resetAssigned = false;
                                                         local col = tooltip:AddColumn( "CENTER" );
 
                                                         local ln = 1;
@@ -206,7 +208,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 end -- for difficulty, instanceDetails in next, instances
 
                                                 -- means only keystone is showing
-                                                if( #tooltip.lines == 1 ) then
+                                                if( resetUnassigned ) then
                                                     local _, instanceData = next(self.anchor.data);
                                                     tooltip:AddColumn( "CENTER" );
                                                     tooltip:SetCell( 1, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
@@ -632,8 +634,12 @@ function addon:ShowInfo( frame, manualToggle )
     tooltip:AddSeparator( );
     tooltip:AddSeparator( );
 
+    local lineNum = 0;
     if( self.config.profile.dungeon.show ) then
         populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
+        lineNum = tooltip:AddLine( );
+        tooltip:SetCell( lineNum, 1, "* " .. L["Keystone Helper"], nil, "LEFT", #charList + 1 );
+        tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );
     end
     if( self.config.profile.raid.show ) then
         populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
@@ -651,7 +657,7 @@ function addon:ShowInfo( frame, manualToggle )
         populateCurrencyData( L["Currency"], tooltip, charList, currencyDisplayList );
     end
 
-    local lineNum = tooltip:AddLine( );
+    lineNum = tooltip:AddLine( );
     tooltip:SetCell( lineNum, 1, "* " .. L["Right-click for configuration menu"], nil, "LEFT", #charList + 1 );
     tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );
     
