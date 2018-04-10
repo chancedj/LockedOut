@@ -167,6 +167,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     --]]
 
     -- get mythic+ keystone info
+    local keyFound = false;
     for bagID = 0, NUM_BAG_SLOTS do
         for slotID = 1, GetContainerNumSlots(bagID) do
             local link = GetContainerItemLink( bagID, slotID );
@@ -177,19 +178,27 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
-                addKeystoneData( instances, mapName, level, calculatedResetDate )
+                addKeystoneData( instances, mapName, level, calculatedResetDate );
+
+                -- mark it found, then break out;
+                keyFound = true;
                 break;
             end
         end
+        
+        -- since it's a nested loop, we need to break twice.
+        if (keyfound) then break end;
     end
 
     --[[
     -- this is for getting the best keystone done per map
     for _, mapId in next, C_GetMapTable() do
         local _, _, bestLevel = C_GetMapPlayerStats( mapId );
-        local mapName = C_GetMapInfo( mapId );
+        if( bestLevel ) then
+            local mapName = C_GetMapInfo( mapId );
         
-        print( mapName, " - bestLevel: ", bestLevel );
+            print( mapName, " - bestLevel: ", bestLevel );
+        end
     end
     --]]
     
