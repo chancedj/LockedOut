@@ -174,7 +174,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             
             if link and string.find( link, "Keystone: " ) then
                 local _, mapID, level = strsplit( ":", link );
-                local mapName = C_ChallengeMode.GetMapInfo( mapID );
+                local mapName = C_GetMapInfo( mapID );
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
