@@ -97,6 +97,9 @@ L["M"]  = "M";
 L["L"]  = "L";
 L["T"]  = "T";
 
+-- server reset
+L["Instances Reset"]            = "Instances Reset";
+
 -- quest.lua mappings
 L["Blingtron"]                  = "Blingtron";
 L["Instant Complete"]           = "Instant Complete";

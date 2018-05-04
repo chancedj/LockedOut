@@ -15,11 +15,11 @@ local next, type, table, tsort = -- variables
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
-      GetSavedInstanceEncounterInfo,
+      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
       C_GetMapTable, C_GetMapPlayerStats, C_GetMapInfo                                          =
       GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
-      GetSavedInstanceEncounterInfo,
+      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
       C_ChallengeMode.GetMapTable, C_ChallengeMode.GetMapPlayerStats, C_ChallengeMode.GetMapInfo
 
 local function convertDifficulty(difficulty)
@@ -131,6 +131,20 @@ local function removeUntouchedInstances( instances )
         end -- if( validInstanceCount == 0 )
     end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
+
+local function callbackResetInstances()
+    local msg = addonName .. " - " .. L["Instances Reset"];
+    
+    if( IsInRaid() ) then
+        SendChatMessage( msg, "RAID" );
+    elseif( IsInGroup() ) then
+        SendChatMessage( msg, "PARTY" );
+    else
+        print( msg );
+    end
+end
+-- hook in after function is defined
+hooksecurefunc("ResetInstances", callbackResetInstances);
 
 function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     local instances = {}; -- initialize instance table;
