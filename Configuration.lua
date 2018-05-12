@@ -80,6 +80,14 @@ local function getGeneralOptionConfig( self )
               set = function(info,val) self.config.profile.general.anchorPoint = val; end,
               get = function(info) return self.config.profile.general.anchorPoint end
             },
+            showResetTime = {
+              order = 5,
+              name = L["Show Reset Time"],
+              desc = L["Show reset time instead of checkbox when completed"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.general.showResetTime = val; end,
+              get = function(info) return self.config.profile.general.showResetTime end
+            },
         }
     };
 end
@@ -90,9 +98,9 @@ local function getCharacterOptionConfig( self )
         characterSortOptions[ key ] = data.description;
     end
     
-    local charList = {};
+    local showCharList = {};
     for key, value in next, addon:getCharacterList() do
-        charList[ key ] = value;
+        showCharList[ key ] = value;
     end
 
     return {
@@ -150,7 +158,7 @@ local function getCharacterOptionConfig( self )
               name = "Visible Characters",
               desc = "Which characters should show in menu",
               type = "multiselect",
-              values = charList,
+              values = showCharList,
               set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
               get = function(info,key) return self.config.profile.general.showCharList[key] end
             },
@@ -315,15 +323,23 @@ local function getCurrencyHeaderConfig( self )
               set = function(info,val) self.config.profile.currency.sortBy = val; end,
               get = function(info) return self.config.profile.currency.sortBy end
             },
-            currencyVisible = {
+            displayExpansion = {
               order = 103,
+              name = L["Display Expansion"],
+              desc = L["Display expansion abbreviation the currency belongs to"],
+              type = "toggle",
+              set = function(info,key,val) self.config.profile.currency.displayExpansion = val; end,
+              get = function(info,key) return self.config.profile.currency.displayExpansion end
+            },
+            currencyVisible = {
+              order = 104,
               name = L["Visible Currencies"],
               desc = L["Select which currencies you'd like to see"],
               type = "multiselect",
               values = currencyList,
               set = function(info,key,val) self.config.profile.currency.displayList[key] = val; end,
               get = function(info,key) return self.config.profile.currency.displayList[key] end
-            }
+            },
         }
     };
 end
@@ -358,9 +374,9 @@ function addon:getDefaultOptions()
         end
     end
 
-    local charList = {};
+    local showCharList = {};
     for key, _ in next, addon:getCharacterList() do
-        charList[ key ] = true;
+        showCharList[ key ] = true;
     end
 
 	local defaultOptions = {
@@ -383,10 +399,11 @@ function addon:getDefaultOptions()
                 showRealmHeader = true,
                 loggedInFirst = true,
                 anchorPoint = "cell",
-                showCharList = charList,
+                showCharList = showCharList,
                 charSortBy = "rc",
                 frameScale = 1.0,
-                minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ]
+                minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
+                showResetTime = false
 			},
 			dungeon = {
 				show = true
@@ -402,7 +419,8 @@ function addon:getDefaultOptions()
 				show = true,
                 display = "long",
                 displayList = currencyListDefaults,
-                sortBy = "en"
+                sortBy = "en",
+                displayExpansion = true
 			},
             emissary = {
                 show = true
@@ -520,6 +538,8 @@ function addon:OpenConfigDialog( button )
 end
 
 function addon:EVENT_TimePlayed( event, timePlayed, currentPlayedLevel )
+    addon:debug( "EVENT_TimePlayed: ", event );
+
     local playerData = self:InitCharDB( );
     self.lastTimePlayedUpdate = time();
     
@@ -527,6 +547,8 @@ function addon:EVENT_TimePlayed( event, timePlayed, currentPlayedLevel )
 end
 
 function addon:EVENT_Logout( event )
+    addon:debug( "EVENT_Logout: ", event );
+
     self.loggingOut = true;
     local playerData = self:InitCharDB( );
     
@@ -540,22 +562,30 @@ function addon:EVENT_Logout( event )
     end
 end
 
-function addon:EVENT_CoinUpdate( )
+function addon:EVENT_CoinUpdate( event )
+    addon:debug( "EVENT_CoinUpdate: ", "CURRENCY_DISPLAY_UPDATE" );
+
     self:EVENT_FullCharacterRefresh( "CURRENCY_DISPLAY_UPDATE" );
 end
 
-function addon:EVENT_SaveToInstance( )
+function addon:EVENT_SaveToInstance( event )
+    addon:debug( "EVENT_SaveToInstance: ", "ENCOUNTER_END" );
+
     -- end status == 1 means success
     self:EVENT_FullCharacterRefresh();
 end
 
-function addon:EVENT_ResetExpiredData( )
+function addon:EVENT_ResetExpiredData( event )
+    addon:debug( "EVENT_ResetExpiredData: ", event );
+
     self:InitCharDB()
     self:checkExpiredLockouts( );
     
     self.config:RegisterDefaults( self:getDefaultOptions() );
 end
 
-function addon:EVENT_FullCharacterRefresh( )
+function addon:EVENT_FullCharacterRefresh( event )
+    addon:debug( "EVENT_FullCharacterRefresh: ", event );
+
     self:Lockedout_GetCurrentCharData( "refresh" );
 end

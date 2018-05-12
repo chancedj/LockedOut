@@ -14,9 +14,13 @@ local next, type, table, tsort = -- variables
 
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
-      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo = -- variables 
+      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
+      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
+      C_GetMapTable, C_GetMapPlayerStats, C_GetMapInfo                                          =
       GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
-      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo, GetSavedInstanceEncounterInfo   -- blizzard api
+      GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
+      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
+      C_ChallengeMode.GetMapTable, C_ChallengeMode.GetMapPlayerStats, C_ChallengeMode.GetMapInfo
 
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
@@ -83,21 +87,42 @@ local function addInstanceData( instanceData, instanceName, difficulty, numEncou
     return instanceData[ key ][ difficultyName ];
 end -- addInstanceData()
 
+local function addKeystoneData( difficultyName, instanceData, instanceName, difficulty, resetDate )
+    local key = instanceName;
+    --local difficultyName = "keystone";
+
+    instanceData[ key ] = instanceData[ key ] or {};
+    instanceData[ key ][ difficultyName ] = instanceData[ key ][ difficultyName ] or {};
+    instanceData[ key ][ difficultyName ].isRaid = false;
+    instanceData[ key ][ difficultyName ].resetDate = resetDate;
+    instanceData[ key ][ difficultyName ].difficulty = difficulty;
+    
+    return instanceData[ key ][ difficultyName ];
+end
+
 local function removeUntouchedInstances( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
     for instanceKey, instanceDetails in next, instances do
         local validInstanceCount = 0;
         for difficultyName, instance in next, instanceDetails do
-            local killCount, totalCount = getBossData( instance.bossData );
-            
-            if( killCount == 0 ) then
-                -- remove instance from list
-                instances[ instanceKey ][ difficultyName ] = nil;
+            if( difficultyName == "keystone" ) then
+                instance.displayText = "+" .. instance.difficulty;
+                validInstanceCount = 1;
+            elseif( difficultyName == "mythicbest" ) then
+                instance.displayText = "[" .. instance.difficulty .. "]";
+                validInstanceCount = 1;
             else
-                local _, difficultyAbbr = convertDifficulty( instance.difficulty );
-                instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+                local killCount, totalCount = getBossData( instance.bossData );
                 
-                validInstanceCount = validInstanceCount + 1;
+                if( killCount == 0 ) then
+                    -- remove instance from list
+                    instances[ instanceKey ][ difficultyName ] = nil;
+                else
+                    local _, difficultyAbbr = convertDifficulty( instance.difficulty );
+                    instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
+                    
+                    validInstanceCount = validInstanceCount + 1;
+                end
             end
         end -- for difficultyName, instance in next, instanceDetails
         
@@ -106,6 +131,20 @@ local function removeUntouchedInstances( instances )
         end -- if( validInstanceCount == 0 )
     end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
+
+local function callbackResetInstances()
+    local msg = addonName .. " - " .. L["Instances Reset"];
+    
+    if( IsInRaid() ) then
+        SendChatMessage( msg, "RAID" );
+    elseif( IsInGroup() ) then
+        SendChatMessage( msg, "PARTY" );
+    else
+        print( msg );
+    end
+end
+-- hook in after function is defined
+hooksecurefunc("ResetInstances", callbackResetInstances);
 
 function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     local instances = {}; -- initialize instance table;
@@ -145,33 +184,44 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     --]]
 
     -- get mythic+ keystone info
-    --[[
+    local keyFound = false;
     for bagID = 0, NUM_BAG_SLOTS do
         for slotID = 1, GetContainerNumSlots(bagID) do
             local link = GetContainerItemLink( bagID, slotID );
             
             if link and string.find( link, "Keystone: " ) then
                 local _, mapID, level = strsplit( ":", link );
-                local mapName = C_ChallengeMode.GetMapInfo( mapID );
-                print( "keystone found: link: " .. tostring( link ) );
-                print( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
+                local mapName = C_GetMapInfo( mapID );
+                addon:debug( "keystone found: link: " .. tostring( link ) );
+                addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
+                addKeystoneData( "keystone", instances, mapName, level, calculatedResetDate );
+
+                -- mark it found, then break out;
+                keyFound = true;
                 break;
             end
         end
+        
+        -- since it's a nested loop, we need to break twice.
+        if (keyfound) then break end;
     end
-    --]]
 
-    removeUntouchedInstances( instances );
-    -- sort the bosses, has to be done after LFR and completed instances are combined and removed.
-    --[[
-        -- will have to find a better way to sort later
-    for i, instanceData in next, instances do
-        for j, instanceDetails in next, instanceData do
-            tsort( instanceDetails.bossData, function( a, b ) return a.bossIndex < b.bossIndex; end );
+    ---[[
+    -- this is for getting the best keystone done per map
+    for _, mapId in next, C_GetMapTable() do
+        local _, _, bestLevel = C_GetMapPlayerStats( mapId );
+        if( bestLevel ) then
+            local mapName = C_GetMapInfo( mapId );
+
+            addKeystoneData( "mythicbest", instances, mapName, bestLevel, calculatedResetDate );
+
+            addon:debug( mapName, " - bestLevel: ", bestLevel );
         end
     end
     --]]
+    
+    removeUntouchedInstances( instances );
     
     LockoutDb[ realmName ][ charNdx ].instances = instances;
 end -- Lockedout_BuildInstanceLockout()

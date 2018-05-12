@@ -13,23 +13,25 @@ local next = -- variables
 
 -- cache blizzard function/globals
 local UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetQuestObjectiveInfo, GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID =                       -- variables 
+        , GetQuestObjectiveInfo, GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID, GetLFGDungeonRewards  =                       -- variables 
       UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetQuestObjectiveInfo, GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID   -- blizzard api
+        , GetQuestObjectiveInfo, GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID, GetLFGDungeonRewards    -- blizzard api
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 
+local function getResetDateByForm( resetForm, questID )
+    local resetDate;
+
+    if( resetForm == "daily" ) then         resetDate = addon:getDailyLockoutDate();
+    elseif( resetForm == "weekly" ) then    resetDate = addon:getWeeklyLockoutDate();
+    else                                    resetDate = nil;    print( "improper resetForm for questID: ", questID ); end
+    
+    return resetDate;
+end
+
 local function checkQuestStatus( self )
     for _, questID in next, self.checkIDs do
-        local resetDate;
-        if( self.resetForm == "daily" ) then
-            resetDate = addon:getDailyLockoutDate();
-        elseif( self.resetForm == "weekly" ) then
-            resetDate = addon:getWeeklyLockoutDate();
-        else
-            resetDate = nil
-            print( "improper resetForm for questID: .. " .. questID );
-        end
+        local resetDate = getResetDateByForm( self.resetForm, questID );
 
         if ( IsQuestFlaggedCompleted( questID ) ) then
             return resetDate, true, BOSS_KILL_TEXT;
@@ -85,6 +87,20 @@ local function checkSpellStatus( self )
     return 0, false, nil;
 end
 
+local function checkDailyHeroicStatus( self )
+    for _, questID in next, self.checkIDs do
+        local resetDate = getResetDateByForm( self.resetForm, questID );
+
+        local doneToday = GetLFGDungeonRewards( questID );
+        
+        if ( doneToday ) then
+            return resetDate, doneToday, BOSS_KILL_TEXT;
+        end
+    end
+    
+    return 0, false, nil;
+end
+
 local QUEST_LIBRARY = {
     ["blingtron"]       = {name=L["Blingtron"],         startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=true,  checkIDs={40753,34774,31752} },
     --[[
@@ -96,14 +112,15 @@ local QUEST_LIBRARY = {
     Warlock: Unleash Infernal -- 219540
     Warrior: Val'kyr Call -- 221597
     --]]
-    ["instantquest"]        = {name=L["Instant Complete"],              startNdx=1, endNdx=1, resetForm="custom", checkStatus=checkSpellStatus, checkFullfilled=true,  copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
-    ["dalaranweekly"]       = {name=L["Dalaran Weekly"],                startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=true,  copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
-    ["seals"]               = {name=L["Seal of Fate"],                  startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=true,  copyAccountWide=false, checkIDs={43510} },
-    ["argusweekly"]         = {name=L["Argus - Pristine Argunite"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=true,  copyAccountWide=false, checkIDs={48799} },
-    ["argusinvasions"]      = {name=L["Argus - Invasions"],             startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=true,  copyAccountWide=false, checkIDs={49293} },
-    ["arguscridgestalker"]  = {name=L["Argus - Cheap Ridgestalker"],    startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=false, copyAccountWide=false, checkIDs={48910} },
-	["arguscvoidpurged"]    = {name=L["Argus - Cheap Void-Purged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=false, copyAccountWide=false, checkIDs={48911} },
-	["argusclightforged"]   = {name=L["Argus - Cheap Lightforged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus, checkFullfilled=false, copyAccountWide=false, checkIDs={48912} },
+    ["instantquest"]        = {name=L["Instant Complete"],              startNdx=1, endNdx=1, resetForm="custom", checkStatus=checkSpellStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
+    ["dalaranweekly"]       = {name=L["Dalaran Weekly"],                startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
+    ["seals"]               = {name=L["Seal of Fate"],                  startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={43510} },
+    ["argusweekly"]         = {name=L["Argus - Pristine Argunite"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={48799} },
+    ["argusinvasions"]      = {name=L["Argus - Invasions"],             startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={49293} },
+    ["arguscridgestalker"]  = {name=L["Argus - Cheap Ridgestalker"],    startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48910} },
+	["arguscvoidpurged"]    = {name=L["Argus - Cheap Void-Purged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48911} },
+	["argusclightforged"]   = {name=L["Argus - Cheap Lightforged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48912} },
+	["dailyheroic"]         = {name=L["Daily Heroic (essences)"],       startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkDailyHeroicStatus,   checkFullfilled=false, copyAccountWide=false, checkIDs={1046} },
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )

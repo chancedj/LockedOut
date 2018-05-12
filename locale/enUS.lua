@@ -19,6 +19,7 @@ L["Character iLevels"]                  = "Character iLevels";
 L["Defeated"]                           = "Defeated";
 L["Available"]                          = "Available";
 L["Right-click for configuration menu"] = "Right-click for configuration menu";
+L["Keystone Helper"]                    = "+# is current keystone, [#] is best completed mythic";
 L["*Resets in"]                         = "*Resets in";
 L["Currency Display"]                   = "Currency Display";
 
@@ -47,14 +48,16 @@ L["Realm then Name"]            = "Realm then Name";
 L["Name then Realm"]            = "Name then Realm";
 
 -- * labels
-L["Enable"]                 = "Enable";
-L["Show"]                   = "Show";
-L["Hide Icon"]              = "Hide Icon";
-L["Show when dead"]         = "Show when dead";
-L["Sort By"]                = "Sort By";
-L["Visible Currencies"]     = "Visible Currencies";
-L["Anchor To"]              = "Anchor To";
-L["Choose Icon (reload ui)"]  = "Choose Icon (reload ui)";
+L["Enable"]                     = "Enable";
+L["Show"]                       = "Show";
+L["Hide Icon"]                  = "Hide Icon";
+L["Show when dead"]             = "Show when dead";
+L["Sort By"]                    = "Sort By";
+L["Visible Currencies"]         = "Visible Currencies";
+L["Display Expansion"]          = "Display Expansion";
+L["Anchor To"]                  = "Anchor To";
+L["Show Reset Time"]            = "Show Reset Time"    
+L["Choose Icon (reload ui)"]    = "Choose Icon (reload ui)";
 
 -- * label descriptions
 L["Enables / disables the addon"]                                   = "Enables / disables the addon";
@@ -73,7 +76,9 @@ L["Show Emissary Information"]                                      = "Show Emis
 L["Show repeatable quest information"]                              = "Show repeatable quest information";
 L["Configure how currency is sorted"]                               = "Configure how currency is sorted";
 L["Select which currencies you'd like to see"]                      = "Select which currencies you'd like to see";
+L["Display expansion abbreviation the currency belongs to"]         = "Display expansion abbreviation the currency belongs to";
 L["Choose where hover tooltip displays"]                            = "Choose where hover tooltip displays";
+L["Show reset time instead of checkbox when completed"]             = "Show reset time instead of checkbox when completed"
 L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose icon for addon - requires ui refresh or login/logout";
 
 -- difficulty mapping full
@@ -92,6 +97,9 @@ L["M"]  = "M";
 L["L"]  = "L";
 L["T"]  = "T";
 
+-- server reset
+L["Instances Reset"]            = "Instances Reset";
+
 -- quest.lua mappings
 L["Blingtron"]                  = "Blingtron";
 L["Instant Complete"]           = "Instant Complete";
@@ -104,6 +112,7 @@ L["Argus - Invasions"]          = "Argus - Invasions";
 L["Argus - Cheap Ridgestalker"] = "Argus - Cheap Ridgestalker";
 L["Argus - Cheap Void-Purged"]  = "Argus - Cheap Void-Purged";
 L["Argus - Cheap Lightforged"]  = "Argus - Cheap Lightforged";
+L["Daily Heroic (essences)"]    = "Daily Heroic (essences)";
 
 -- expansion abbreviations
 L["Van"]    = "Van";
