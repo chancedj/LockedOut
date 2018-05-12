@@ -99,10 +99,8 @@ local function getCharacterOptionConfig( self )
     end
     
     local showCharList = {};
-    --local sortCharList = {};
-    for key, _ in next, addon:getCharacterList() do
-        showCharList[ key ] = true;
-        --sortCharList[ key ] = -1;
+    for key, value in next, addon:getCharacterList() do
+        showCharList[ key ] = value;
     end
 
     return {
@@ -164,59 +162,6 @@ local function getCharacterOptionConfig( self )
               set = function(info,key,val) self.config.profile.general.showCharList[key] = val; end,
               get = function(info,key) return self.config.profile.general.showCharList[key] end
             },
-            [[--
-            manualCharSort = {
-              order = 7,
-              type = "group",
-              name = "Char Sort Order",
-              -- todo: build list dynamically.
-              args = {
-                -- toon 1 name
-                test1 = {
-                  order = 1,
-                  name = "Ængelcandy",
-                  descStyle = "tooltip",
-                  type = "description",
-                  width = "half"
-                },
-                -- toon 1 input
-                test2 = {
-                  order = 2,
-                  name = "",
-                  type = "input",
-                },
-                -- toon 1 space
-                test3 = {
-                  order = 3,
-                  name = "",
-                  descStyle = "tooltip",
-                  type = "description",
-                  width = "half"
-                },
-                -- toon 2 input
-                test4 = {
-                  order = 4,
-                  name = "Kaliff",
-                  descStyle = "tooltip",
-                  type = "description",
-                  width = "half"
-                },
-                -- toon 2 input
-                test5 = {
-                  order = 5,
-                  name = "",
-                  type = "input"
-                },
-                -- toon 2 space
-                test6 = {
-                  order = 6,
-                  name = "",
-                  descStyle = "tooltip",
-                  type = "description"
-                }
-              }
-            }
-            --]]
         }
     };
 end
@@ -430,10 +375,8 @@ function addon:getDefaultOptions()
     end
 
     local showCharList = {};
-    --local sortCharList = {};
     for key, _ in next, addon:getCharacterList() do
         showCharList[ key ] = true;
-        --sortCharList[ key ] = -1;
     end
 
 	local defaultOptions = {
@@ -457,7 +400,6 @@ function addon:getDefaultOptions()
                 loggedInFirst = true,
                 anchorPoint = "cell",
                 showCharList = showCharList,
-                --sortCharList = sortCharList,
                 charSortBy = "rc",
                 frameScale = 1.0,
                 minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
