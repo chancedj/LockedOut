@@ -22,6 +22,9 @@ local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,    
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
       C_ChallengeMode.GetMapTable, C_ChallengeMode.GetMapPlayerStats, C_ChallengeMode.GetMapInfo
 
+local KEY_KEYSTONE = "keystone";
+local KEY_MYTHICBEST = "mythicbest";
+      
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
     elseif difficulty == 2 then     return L[ "Heroic" ],       L[ "H" ];
@@ -74,7 +77,6 @@ end -- populateBossData()
 
 local function addInstanceData( instanceData, instanceName, difficulty, numEncounters, locked, isRaid, resetDate )
     local difficultyName, difficultyAbbr = convertDifficulty( difficulty );
-
     local key = instanceName;
     
     instanceData[ key ] = instanceData[ key ] or {};
@@ -89,28 +91,27 @@ end -- addInstanceData()
 
 local function addKeystoneData( difficultyName, instanceData, instanceName, difficulty, resetDate )
     local key = instanceName;
-    --local difficultyName = "keystone";
 
     instanceData[ key ] = instanceData[ key ] or {};
     instanceData[ key ][ difficultyName ] = instanceData[ key ][ difficultyName ] or {};
     instanceData[ key ][ difficultyName ].isRaid = false;
     instanceData[ key ][ difficultyName ].resetDate = resetDate;
     instanceData[ key ][ difficultyName ].difficulty = difficulty;
-    
+
     return instanceData[ key ][ difficultyName ];
 end
 
 local function removeUntouchedInstances( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
     for instanceKey, instanceDetails in next, instances do
-        local validInstanceCount = 0;
+        local validInstanceFound = false;
         for difficultyName, instance in next, instanceDetails do
-            if( difficultyName == "keystone" ) then
+            if( difficultyName == KEY_KEYSTONE ) then
                 instance.displayText = "+" .. instance.difficulty;
-                validInstanceCount = 1;
-            elseif( difficultyName == "mythicbest" ) then
+                validInstanceFound = true;
+            elseif( difficultyName == KEY_MYTHICBEST ) then
                 instance.displayText = "[" .. instance.difficulty .. "]";
-                validInstanceCount = 1;
+                validInstanceFound = true;
             else
                 local killCount, totalCount = getBossData( instance.bossData );
                 
@@ -121,12 +122,16 @@ local function removeUntouchedInstances( instances )
                     local _, difficultyAbbr = convertDifficulty( instance.difficulty );
                     instance.displayText = killCount .. "/" .. totalCount .. difficultyAbbr;
                     
-                    validInstanceCount = validInstanceCount + 1;
+                    validInstanceFound = true;
                 end
             end
+            
+            if( validInstanceFound ) then
+                break;
+            end;
         end -- for difficultyName, instance in next, instanceDetails
-        
-        if( validInstanceCount == 0 ) then
+
+        if( not validInstanceFound ) then
             instances[ instanceKey ] = nil;
         end -- if( validInstanceCount == 0 )
     end -- for instanceKey, instanceDetails in next, instances
@@ -195,7 +200,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
-                addKeystoneData( "keystone", instances, mapName, level, calculatedResetDate );
+                addKeystoneData( KEY_KEYSTONE, instances, mapName, level, calculatedResetDate );
 
                 -- mark it found, then break out;
                 keyFound = true;
@@ -214,7 +219,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
         if( bestLevel ) then
             local mapName = C_GetMapInfo( mapId );
 
-            addKeystoneData( "mythicbest", instances, mapName, bestLevel, calculatedResetDate );
+            addKeystoneData( KEY_MYTHICBEST, instances, mapName, bestLevel, calculatedResetDate );
 
             addon:debug( mapName, " - bestLevel: ", bestLevel );
         end
