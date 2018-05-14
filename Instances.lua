@@ -133,6 +133,8 @@ local function removeUntouchedInstances( instances )
 
         if( not validInstanceFound ) then
             instances[ instanceKey ] = nil;
+            
+            addon:debug( "removing instance: ", instanceKey );
         end -- if( validInstanceCount == 0 )
     end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
@@ -152,7 +154,7 @@ end
 hooksecurefunc("ResetInstances", callbackResetInstances);
 
 function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
-    local instances = {}; -- initialize instance table;
+    local instances = LockoutDb[ realmName ][ charNdx ].instances or {}; -- initialize instance table;
     
     ---[[
     local lfrCount = GetNumRFDungeons();
