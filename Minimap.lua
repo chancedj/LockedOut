@@ -513,7 +513,7 @@ function addon:ShowInfo( frame, manualToggle )
                         local currNdx = CURRENCY_LIST_MAP[ currID ];
                         local curr = CURRENCY_LIST[ currNdx ];
                         
-                        if( curr ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
+                        if( curr ~= nil ) and ( curr.name ~= nil ) and (curr.icon ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
                             currencyList[ currID ] = currNdx;
                         end
                     end -- for currName, _ in next, charData.currency

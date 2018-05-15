@@ -254,7 +254,7 @@ local characterSortOptions = {
 
 local function resolveCurrencyInfo( )
     for _, currency in next, CURRENCY_LIST do
-        if( currency.name == nil ) then
+        if( currency.name == nil ) or ( currency.icon == nil ) then
             if( currency.type == "C" ) then
                 currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
             else
