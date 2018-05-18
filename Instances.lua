@@ -101,6 +101,13 @@ local function addKeystoneData( difficultyName, instanceData, instanceName, diff
     return instanceData[ key ][ difficultyName ];
 end
 
+local function clearKeystoneData( instances )
+    -- fix up the displayText now, and remove instances with no boss kills.
+    for instanceKey, instanceDetails in next, instances do
+        instanceDetails[ KEY_KEYSTONE ] = nil;
+    end -- for instanceKey, instanceDetails in next, instances
+end
+
 local function removeUntouchedInstances( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
     for instanceKey, instanceDetails in next, instances do
@@ -190,6 +197,10 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     end -- for lockId = 1, lockCount
     --]]
 
+    -- fix bug - if we save the value of instances
+    -- we need to first clear out the old ones.
+    clearKeystoneData( instances );
+    
     -- get mythic+ keystone info
     local keyFound = false;
     for bagID = 0, NUM_BAG_SLOTS do
