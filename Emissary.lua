@@ -52,7 +52,7 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
             
             emissaryData.fullfilled = numFulfilled or 0;
             emissaryData.required   = numRequired or 0;
-            emissaryData.isComplete = finished;
+            emissaryData.isComplete = finished and IsQuestFlaggedCompleted( questID );
             emissaryData.resetDate  = dailyResetDate + (day * dayCalc);
             
             self:debug( "In Process: ", questID );
