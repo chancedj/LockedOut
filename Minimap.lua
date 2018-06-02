@@ -168,7 +168,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 tooltip:AddHeader( "Boss Name" );
                                                 local resetAssigned = true;
                                                 for difficulty, instanceData in next, self.anchor.data do
-                                                    if ( difficulty ~= "keystone" ) and ( difficulty ~= "mythicbest" ) then
+                                                    if ( difficulty ~= addon.KEY_KEYSTONE ) and ( difficulty ~= addon.KEY_MYTHICBEST ) then
                                                         resetAssigned = false;
                                                         local col = tooltip:AddColumn( "CENTER" );
 

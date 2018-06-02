@@ -27,6 +27,9 @@ addon.ExpansionAbbr = {
     [6] = L["Leg"],    
 }
 
+addon.KEY_KEYSTONE = "keystone";
+addon.KEY_MYTHICBEST = "mythicbest";
+
 local iconTextures = {
     ["134244"]  = "|T" .. "134244" .. ":0|t",
     ["237446"]  = "|T" .. "237446" .. ":0|t",

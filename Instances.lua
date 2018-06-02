@@ -22,9 +22,6 @@ local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,    
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
       C_ChallengeMode.GetMapTable, C_ChallengeMode.GetMapPlayerStats, C_ChallengeMode.GetMapInfo
 
-local KEY_KEYSTONE = "keystone";
-local KEY_MYTHICBEST = "mythicbest";
-      
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
     elseif difficulty == 2 then     return L[ "Heroic" ],       L[ "H" ];
@@ -104,7 +101,7 @@ end
 local function clearKeystoneData( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
     for instanceKey, instanceDetails in next, instances do
-        instanceDetails[ KEY_KEYSTONE ] = nil;
+        instanceDetails[ addon.KEY_KEYSTONE ] = nil;
     end -- for instanceKey, instanceDetails in next, instances
 end
 
@@ -113,10 +110,10 @@ local function removeUntouchedInstances( instances )
     for instanceKey, instanceDetails in next, instances do
         local validInstanceFound = false;
         for difficultyName, instance in next, instanceDetails do
-            if( difficultyName == KEY_KEYSTONE ) then
+            if( difficultyName == addon.KEY_KEYSTONE ) then
                 instance.displayText = "+" .. instance.difficulty;
                 validInstanceFound = true;
-            elseif( difficultyName == KEY_MYTHICBEST ) then
+            elseif( difficultyName == addon.KEY_MYTHICBEST ) then
                 instance.displayText = "[" .. instance.difficulty .. "]";
                 validInstanceFound = true;
             else
@@ -161,7 +158,7 @@ end
 hooksecurefunc("ResetInstances", callbackResetInstances);
 
 function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
-    local instances = LockoutDb[ realmName ][ charNdx ].instances or {}; -- initialize instance table;
+    local instances = {}; -- initialize instance table;
     
     ---[[
     local lfrCount = GetNumRFDungeons();
@@ -213,7 +210,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
-                addKeystoneData( KEY_KEYSTONE, instances, mapName, level, calculatedResetDate );
+                addKeystoneData( addon.KEY_KEYSTONE, instances, mapName, level, calculatedResetDate );
 
                 -- mark it found, then break out;
                 keyFound = true;
@@ -232,7 +229,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
         if( bestLevel ) then
             local mapName = C_GetMapInfo( mapId );
 
-            addKeystoneData( KEY_MYTHICBEST, instances, mapName, bestLevel, calculatedResetDate );
+            addKeystoneData( addon.KEY_MYTHICBEST, instances, mapName, bestLevel, calculatedResetDate );
 
             addon:debug( mapName, " - bestLevel: ", bestLevel );
         end
