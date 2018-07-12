@@ -429,8 +429,12 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
 end
 
 local function shouldDisplayChar( realmName, playerData )
+    if (playerData.charName == nil) then
+        return false;
+    end
+    
     addon:debug( realmName .. "." .. playerData.charName, playerData.currentLevel or -1 );
-
+    
     return  ( addon.config.profile.general.showCharList[ realmName .. "." .. playerData.charName ] ) and
             ( playerData.currentLevel == nil or playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel )
 end
