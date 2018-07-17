@@ -342,7 +342,9 @@ function addon:getCharacterList()
     
     for realmName, characters in next, LockoutDb do
         for charNdx, charData in next, characters do
-            charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
+            if (charData.charName ~= nil) then
+                charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
+            end
         end
     end
 
