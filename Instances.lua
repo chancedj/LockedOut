@@ -194,7 +194,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             local link = GetContainerItemLink( bagID, slotID );
             
             if link and string.find( link, "Keystone: " ) then
-                local _, mapID, level = strsplit( ":", link );
+                local _, _, mapID, level = strsplit( ":", link );
                 local mapName = C_GetMapUIInfo( mapID );
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
