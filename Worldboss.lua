@@ -26,9 +26,9 @@ local WORLD_BOSS_LIST = {
     { instanceID=322, bossID=814,  questID=32518, bossName="Nalak, The Storm Lord", },
     { instanceID=322, bossID=826,  questID=32519, bossName="Oondasta",  },
     { instanceID=322, bossID=857,  questID=33117, bossName="Celestials" }, -- bossName="Chi-Ji, The Red Crane", }, remapped name
-    { instanceID=322, bossID=858,  questID=33117, bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
-    { instanceID=322, bossID=859,  questID=33117, bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
-    { instanceID=322, bossID=860,  questID=33117, bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
+    --{ instanceID=322, bossID=859,  questID=33117, bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
+    --{ instanceID=322, bossID=858,  questID=33117, bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
+    --{ instanceID=322, bossID=860,  questID=33117, bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
     { instanceID=322, bossID=861,  questID=33118, bossName="Ordos, Fire-God of the Yaungol", },
     
     -- Draenor
