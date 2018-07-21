@@ -18,6 +18,12 @@ local next, time =
 local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel =    -- variables
       InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel      -- lua functions
 
+local function getCurrentMaxLevel()
+    local accountExpansion = GetAccountExpansionLevel();
+    
+    return 110; --MAX_PLAYER_LEVEL_TABLE[ accountExpansion ];
+end
+
 local function getGeneralOptionConfig( self )
     local anchorOptions = {
         ["cell"] = L["At cursor location"],
@@ -148,7 +154,7 @@ local function getCharacterOptionConfig( self )
               desc = "Start tracking characters greater than or equal to level below",
               type = "range",
               min = 1,
-              max = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
+              max = getCurrentMaxLevel(),
               step = 1,
               set = function(info,val) self.config.profile.general.minTrackCharLevel = val; end,
               get = function(info) return self.config.profile.general.minTrackCharLevel end
@@ -402,7 +408,7 @@ function addon:getDefaultOptions()
                 showCharList = showCharList,
                 charSortBy = "rc",
                 frameScale = 1.0,
-                minTrackCharLevel = MAX_PLAYER_LEVEL_TABLE[ GetAccountExpansionLevel() ],
+                minTrackCharLevel = getCurrentMaxLevel(),
                 showResetTime = false
 			},
 			dungeon = {
