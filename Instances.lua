@@ -16,11 +16,11 @@ local next, type, table, tsort = -- variables
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
-      C_GetMapTable, C_GetMapPlayerStats, C_GetMapInfo                                          =
+      C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo                                          =
       GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
-      C_ChallengeMode.GetMapTable, C_ChallengeMode.GetMapPlayerStats, C_ChallengeMode.GetMapInfo
+      C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo
 
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
@@ -195,7 +195,7 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
             
             if link and string.find( link, "Keystone: " ) then
                 local _, mapID, level = strsplit( ":", link );
-                local mapName = C_GetMapInfo( mapID );
+                local mapName = C_GetMapUIInfo( mapID );
                 addon:debug( "keystone found: link: " .. tostring( link ) );
                 addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
                 
@@ -214,9 +214,10 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     ---[[
     -- this is for getting the best keystone done per map
     for _, mapId in next, C_GetMapTable() do
-        local _, _, bestLevel = C_GetMapPlayerStats( mapId );
+        --local _, _, bestLevel = C_GetMapPlayerStats( mapId );
+        local _, bestLevel = C_GetWeeklyBestForMap( mapId );
         if( bestLevel ) then
-            local mapName = C_GetMapInfo( mapId );
+            local mapName = C_GetMapUIInfo( mapId );
 
             addKeystoneData( addon.KEY_MYTHICBEST, instances, mapName, bestLevel, calculatedResetDate );
 
