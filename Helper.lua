@@ -24,7 +24,8 @@ addon.ExpansionAbbr = {
     [3] = L["Cata"],
     [4] = L["MoP"],
     [5] = L["WoD"],
-    [6] = L["Leg"],    
+    [6] = L["Leg"],
+    [7] = L["BfA"],
 }
 
 addon.KEY_KEYSTONE = "keystone";
@@ -195,10 +196,43 @@ local CURRENCY_LIST = {
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
     { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Wakening Essence
     
+    -- new BFA  currency.  Not sure which yet are hidden and which should be displayed.
+    -- using best guess (based on previous expansion currencies) to set flag.
+    { ID=1388, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Armor Scraps 
+    { ID=1401, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Stronghold Supplies 
+    { ID=1534, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Zandalari Archaeology Fragment 
+    { ID=1535, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Drust Archaeology Fragment 
+    { ID=1540, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Wood 
+    { ID=1541, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Iron 
+    { ID=1553, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Azerite 
+    { ID=1559, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Essence of Storms 
+    { ID=1560, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- War Resources 
+    { ID=1565, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Rich Azerite Fragment 
+    { ID=1579, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Champions of Azeroth 
+    { ID=1580, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Seal of Wartorn Fate 
+    { ID=1585, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Honor 
+    { ID=1586, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Honor Level 
+    { ID=1587, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- War Supplies 
+    { ID=1592, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Order of Embers 
+    { ID=1593, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Proudmore Admiralty 
+    { ID=1594, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Storm's Wake 
+    { ID=1595, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Talanji's Expedition 
+    { ID=1596, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Voldunai 
+    { ID=1597, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Zandalari Empire 
+    { ID=1598, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Tortollan Seekers 
+    { ID=1599, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- 7th Legion 
+    { ID=1600, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Honorbound 
+    { ID=1602, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Conquest 
+    { ID=1703, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- BFA Season 1 Rated Participation Currency 
+    { ID=1704, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Spirit Shard 
+    { ID=1705, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Warfronts - Personal Tracker - Iron in Chest (Hidden) 
+    { ID=1710, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Seafarer's Dubloon
+
     -- items
     { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Pet Charm
     { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
     { ID=151568, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Primal Sargerite
+    
 };
 
 local currencySortOptions = {

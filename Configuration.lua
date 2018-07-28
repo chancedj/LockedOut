@@ -24,6 +24,10 @@ local function getCurrentMaxLevel()
     return 110; --MAX_PLAYER_LEVEL_TABLE[ accountExpansion ];
 end
 
+local function getCurrentExpansionLevel()
+    return 6; -- GetAccountExpansionLevel()
+end
+
 local function getGeneralOptionConfig( self )
     local anchorOptions = {
         ["cell"] = L["At cursor location"],
@@ -353,6 +357,7 @@ end
 function addon:getConfigOptions()
     local configOptions = {
 		type = "group",
+        childGroups = "tab",
 		name = addonName,
 		args = {
             generalOptGroup     = getGeneralOptionConfig( self ),
@@ -374,7 +379,7 @@ function addon:getDefaultOptions()
     local currencyListDefaults = {};
     for _, currencyData in next, self:getCurrencyList() do
         if( currencyData.show ) then
-            currencyListDefaults[ currencyData.ID ] = (currencyData.expansionLevel == 6);
+            currencyListDefaults[ currencyData.ID ] = (currencyData.expansionLevel == getCurrentExpansionLevel());
         else
             currencyListDefaults[ currencyData.ID ] = nil; -- if improperly flagged, remove from list
         end
@@ -519,7 +524,7 @@ function addon:OpenConfigDialog( button )
 		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
 	end
     
-    --[[ this helps to build the currency table
+    ---[[ this helps to build the currency table
     local currList = self:getCurrencyList();
     for ndx=1, 2000 do
         local name = GetCurrencyInfo( ndx );
@@ -535,8 +540,8 @@ function addon:OpenConfigDialog( button )
             end
         
             if( found == false ) then
-                --print( "{ [" .. ndx .. "] = { ID=" .. ndx .. ", name=nil, expansionLevel=6 } }, -- " .. name );
-                print( '{ ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- ' .. name );
+                --print( '{ ID=' .. ndx .. ', name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- ' .. name );
+                --print( "{ [" .. ndx .. "] = { ID=" .. ndx .. ", name=nil, expansionLevel=" .. GetAccountExpansionLevel() .. " } }, -- " .. name );
             end
         end
     end
