@@ -17,6 +17,7 @@ local GetQuestObjectiveInfo, GetQuestTimeLeftMinutes =                          
 
 local EMISSARY_MAP_ID = 1014;
 local EMISSARY_LIST = {
+    --[[
     { questID = "48642", numRequired=4 }, -- argussian reach
     { questID = "48641", numRequired=4 }, -- armies of the legionfall
     { questID = "48639", numRequired=4 }, -- armies of the light
@@ -27,6 +28,17 @@ local EMISSARY_LIST = {
     { questID = "42421", numRequired=4 }, -- the nightfallen
     { questID = "42234", numRequired=4 }, -- the valajar   
     { questID = "42422", numRequired=4 }  -- the wardens
+    --]]
+	{ questID = "50604", numRequired=3 }, -- Tortollan Seekers
+	{ questID = "50562", numRequired=4 }, -- Champions of Azeroth 
+	{ questID = "50599", numRequired=4 }, -- Proudmoore Admiralty 
+	{ questID = "50600", numRequired=4 }, -- Order of Embers
+	{ questID = "50601", numRequired=4 }, -- Storm's Wake
+	{ questID = "50605", numRequired=4 }, -- Alliance War Effort
+	{ questID = "50598", numRequired=4 }, -- Zandalari Empire
+	{ questID = "50603", numRequired=4 }, -- Voldunai
+	{ questID = "50602", numRequired=4 }, -- Talanji's Expedition 
+	{ questID = "50606", numRequired=4 }  -- Horde War Effort 
 }
 
 local function copyEmissaryData( from, to )

@@ -15,12 +15,12 @@ local next, time =
       next, time;
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel MAX_PLAYER_LEVEL_TABLE =    -- variables
-      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel MAX_PLAYER_LEVEL_TABLE      -- lua functions
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, MAX_PLAYER_LEVEL_TABLE =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, MAX_PLAYER_LEVEL_TABLE      -- lua functions
 
 -- this allows me to override the blizzard function in the case of a "pre-patch" event.  e.g.: 8.0 (BfA) but Legion still active
 local function getCurrentExpansionLevel()
-    return GetAccountExpansionLevel()
+    return GetAccountExpansionLevel();
 end
 
 local function getCurrentMaxLevel()
@@ -525,7 +525,7 @@ function addon:OpenConfigDialog( button )
 		InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
 	end
     
-    ---[[ this helps to build the currency table
+    --[[ this helps to build the currency table
     local currList = self:getCurrencyList();
     for ndx=1, 2000 do
         local name = GetCurrencyInfo( ndx );

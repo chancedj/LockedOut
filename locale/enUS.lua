@@ -113,6 +113,8 @@ L["Argus - Cheap Ridgestalker"] = "Argus - Cheap Ridgestalker";
 L["Argus - Cheap Void-Purged"]  = "Argus - Cheap Void-Purged";
 L["Argus - Cheap Lightforged"]  = "Argus - Cheap Lightforged";
 L["Daily Heroic (essences)"]    = "Daily Heroic (essences)";
+L["Daily Heroic"]               = "Daily Heroic";
+L["Island Expeditions"]         = "Island Expeditions";
 
 -- expansion abbreviations
 L["Van"]    = "Van";

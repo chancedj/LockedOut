@@ -102,17 +102,7 @@ local function checkDailyHeroicStatus( self )
 end
 
 local QUEST_LIBRARY = {
-    ["blingtron"]       = {name=L["Blingtron"],         startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus, copyAccountWide=true,  checkIDs={40753,34774,31752} },
-    --[[
-    spellID's for the below instance quests
-    Death Knight: Frost Wyrm -- 221557
-    Demon Hunter: Fel Hammer's Wrath -- 221561
-    Mage: Might of Dalaran -- 221602
-    Paladin: Grand Crusade -- 221587
-    Warlock: Unleash Infernal -- 219540
-    Warrior: Val'kyr Call -- 221597
-    --]]
-    ["instantquest"]        = {name=L["Instant Complete"],              startNdx=1, endNdx=1, resetForm="custom", checkStatus=checkSpellStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={219540,221557,221561,221587,221597,221602} },
+    ["blingtron"]           = {name=L["Blingtron"],                     startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus,         checkFullfilled=false,  copyAccountWide=true,  checkIDs={40753,34774,31752} },
     ["dalaranweekly"]       = {name=L["Dalaran Weekly"],                startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={44164,44173,44166,44167,45799,44171,44172,44174,44175} },
     ["seals"]               = {name=L["Seal of Fate"],                  startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={43510} },
     ["argusweekly"]         = {name=L["Argus - Pristine Argunite"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={48799} },
@@ -120,7 +110,8 @@ local QUEST_LIBRARY = {
     ["arguscridgestalker"]  = {name=L["Argus - Cheap Ridgestalker"],    startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48910} },
 	["arguscvoidpurged"]    = {name=L["Argus - Cheap Void-Purged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48911} },
 	["argusclightforged"]   = {name=L["Argus - Cheap Lightforged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48912} },
-	["dailyheroic"]         = {name=L["Daily Heroic (essences)"],       startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkDailyHeroicStatus,   checkFullfilled=false, copyAccountWide=false, checkIDs={1046} },
+	["dailyheroic"]         = {name=L["Daily Heroic"],                  startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkDailyHeroicStatus,   checkFullfilled=false, copyAccountWide=false, checkIDs={1046} },
+	["islandex"]            = {name=L["Island Expeditions"],            startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={53435, 53436} }
 };
 
 function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
