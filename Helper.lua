@@ -228,9 +228,11 @@ local CURRENCY_LIST = {
     { ID=1710, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Seafarer's Dubloon
 
     -- items
-    { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Pet Charm
+    { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Shiny Pet Charm
     { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
     { ID=151568, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Primal Sargerite
+    { ID=152668, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Expulsum
+    { ID=163036, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Polished Pet Charm
     
     -- currencies that extend beyond expansions (expansionLevel should always be == current
     { ID=1166, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Timewarped Badge
