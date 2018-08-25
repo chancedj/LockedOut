@@ -16,6 +16,19 @@ local GetQuestObjectiveInfo, GetQuestTimeLeftMinutes =                          
       GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes                     -- blizzard api
 
 local EMISSARY_MAP_ID = 1014;
+local OLD_EMISSARY_LIST = {
+    { questID = "48642", numRequired=4 }, -- argussian reach
+    { questID = "48641", numRequired=4 }, -- armies of the legionfall
+    { questID = "48639", numRequired=4 }, -- armies of the light
+    { questID = "42420", numRequired=4 }, -- court of farondis
+    { questID = "42233", numRequired=4 }, -- highmountain tribes
+    { questID = "42170", numRequired=4 }, -- the dreamweavers
+    { questID = "43179", numRequired=3 }, -- kirin tor of dalaran
+    { questID = "42421", numRequired=4 }, -- the nightfallen
+    { questID = "42234", numRequired=4 }, -- the valajar   
+    { questID = "42422", numRequired=4 }  -- the wardens
+}
+
 local EMISSARY_LIST = {
     --[[
     { questID = "48642", numRequired=4 }, -- argussian reach
@@ -96,6 +109,11 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
     for realmName, charDataList in next, LockoutDb do
         for charNdx, charData in next, charDataList do
             local charEmissaries = charData.emissaries;
+            
+            for _, emData in next, OLD_EMISSARY_LIST do
+                charEmissaries[ emData.questID ] = nil;
+            end
+            
             for questID, emissaryData in next, emissaries do
                 if( charEmissaries[ questID ] ~= nil ) then
                     if( charEmissaries[ questID ].resetDate < emissaries[ questID ].resetDate ) then
@@ -105,7 +123,7 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
                         self:debug( "using: ", realmName, " - ", charData.charName );
                         emissaries[ questID ].resetDate = charEmissaries[ questID ].resetDate;
                     end
-                end               
+                end
             end
         end
     end
