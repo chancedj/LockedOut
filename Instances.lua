@@ -16,11 +16,14 @@ local next, type, table, tsort = -- variables
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
-      C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo                                          =
+      C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo,
+      C_RequestMapInfo, C_RequestRewards                                          =
+
       GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
-      C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo
+      C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo,
+      C_MythicPlus.RequestMapInfo, C_MythicPlus.RequestRewards
 
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
@@ -156,6 +159,10 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     ---[[
     local lfrCount = GetNumRFDungeons();
     local calculatedResetDate = addon:getWeeklyLockoutDate();
+
+    C_RequestMapInfo();
+    --C_RequestRewards();
+
     for lfrNdx = 1, lfrCount do
         local instanceID, _, _, _, _, _, _, _, _, _, _, _, difficulty, _, _, _
             , _, _, _, instanceName, _ = GetRFDungeonInfo( lfrNdx );
