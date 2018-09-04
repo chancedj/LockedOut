@@ -60,7 +60,18 @@ local WORLD_BOSS_LIST = {
     { instanceID=959, bossID=2012, questID=49166, bossName="Inquisitor Meto" },
     { instanceID=959, bossID=2013, questID=49170, bossName="Occularus" },
     { instanceID=959, bossID=2014, questID=49171, bossName="Sotanathor" },
-    { instanceID=959, bossID=2015, questID=49168, bossName="Pit Lord Vilemus" }
+
+    -- BfA
+    { instanceID=1028, bossID=2139, questID=52181, bossName="T'zane" },
+    --{ instanceID=1028, bossID=2141, questID=52157, bossName="Ji'arak" }, -- no questID yet.
+    { instanceID=1028, bossID=2197, questID=52157, bossName="Hailstone Construct" },
+    { instanceID=1028, bossID=2199, questID=52163, bossName="Azurethos" },
+    { instanceID=1028, bossID=2198, questID=52166, bossName="Warbringer Yenajz" },
+    { instanceID=1028, bossID=2210, questID=52169, bossName="Dunegorger Kraulok" },
+    
+    -- Warfront Bosses
+    { instanceID=1028, bossID=2213, questID=52847, bossName="Doom's Howl" },
+    { instanceID=1028, bossID=2212, questID=52848, bossName="The Lion's Roar" },
 --]]
 }
 
@@ -82,6 +93,7 @@ function CheckForMissingMappings()
 
         local bossIndex = 1;
         local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex );
+
         while bossId do
             worldBosses[ bossId ] = {}
             worldBosses[ bossId ].instanceId = instanceId;
