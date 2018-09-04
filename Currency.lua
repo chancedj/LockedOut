@@ -35,7 +35,18 @@ local BONUS_ROLL_QUESTID = {
             47054   -- broken shore
 
         }
+    },
+    [ 1580 ] = {
+        [1] = {
+            52837,  -- resources
+            52840,  -- resources
+            52834,  -- gold
+            52838,  -- gold
+            52835,  -- marks of honor
+            52839,  -- marks of honor
+        }
     }
+
 }
 --]]
 
