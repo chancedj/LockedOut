@@ -125,10 +125,6 @@ local function removeUntouchedInstances( instances )
                     validInstanceFound = true;
                 end
             end
-            
-            if( validInstanceFound ) then
-                break;
-            end;
         end -- for difficultyName, instance in next, instanceDetails
 
         if( not validInstanceFound ) then
