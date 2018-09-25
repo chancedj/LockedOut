@@ -63,7 +63,7 @@ local WORLD_BOSS_LIST = {
 
     -- BfA
     { instanceID=1028, bossID=2139, questID=52181, bossName="T'zane" }, -- unverified
-    --{ instanceID=1028, bossID=2141, questID=52157, bossName="Ji'arak" }, -- no questID yet.
+    { instanceID=1028, bossID=2141, questID=52169, bossName="Ji'arak" }, -- verified
     { instanceID=1028, bossID=2197, questID=52157, bossName="Hailstone Construct" }, -- unverified
     { instanceID=1028, bossID=2199, questID=52163, bossName="Azurethos" }, -- verified
     { instanceID=1028, bossID=2198, questID=52166, bossName="Warbringer Yenajz" }, -- verified
