@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, table, time, date, strsplit, tsort, mfloor, abs =           -- variables
-      next, table, time, date, strsplit, table.sort, math.floor, math.abs    -- lua functions
+local next, tonumber, table, time, date, strsplit, tsort, mfloor, abs =           -- variables
+      next, tonumber, table, time, date, strsplit, table.sort, math.floor, math.abs    -- lua functions
 
 -- cache blizzard function/globals
 local SecondsToTime, READY_CHECK_NOT_READY_TEXTURE, READY_CHECK_READY_TEXTURE  =    -- variables
@@ -166,6 +166,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 
                                                 tooltip:SetColumnLayout( 1 );
                                                 tooltip:AddHeader( "Boss Name" );
+                                                local hasBossData = false;
                                                 local resetAssigned = true;
                                                 for difficulty, instanceData in next, self.anchor.data do
                                                     if ( difficulty ~= addon.KEY_KEYSTONE ) and ( difficulty ~= addon.KEY_MYTHICBEST ) then
@@ -186,6 +187,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                         tooltip:SetCell( ln, 1, "|cFF00FF00" .. L["*Resets in"] .. "|r", nil, "CENTER" );
                                                         tooltip:SetCell( ln, col, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
                                                         for bossIndex, bossData in next, instanceData.bossData do
+                                                            hasBossData = true;
                                                             if( col == 2 ) then
                                                                 ln = tooltip:AddLine( );
                                                             else
@@ -215,9 +217,12 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                     tooltip:SetCell( 1, 2, "|cFFFF0000" .. SecondsToTime( instanceData.resetDate - GetServerTime() ) .. "|r", nil, "CENTER" );
                                                     tooltip:SetLineColor( 1, 1, 1, 1, 0.1 );
                                                 end;
-                                                
-                                                setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
-                                                tooltip:Show();
+
+                                                -- display only if there is any boss data for the instance(s)
+                                                if ( hasBossData ) then
+                                                    setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
+                                                    tooltip:Show();
+                                                end;
                                             end -- function( data )
                 instanceDisplay.deleteTT = emptyFunction;
                 instanceDisplay.anchor = getAnchorPkt( "in", encounterName, instances, lineNum, colNdx + 1 );
@@ -395,6 +400,15 @@ end -- populateInstanceData
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 local CHAR_DELETE_TEXT = "|T" .. READY_CHECK_NOT_READY_TEXTURE .. ":0|t";
+
+local function sortEmissaries( a, b )
+    if( a.code ~= b.code ) then
+        return a.code < b.code;
+    end
+
+    return a.emissaryName < b.emissaryName;
+end
+
 local function populateEmissaryData( header, tooltip, charList, emissaryList )
     -- make sure it's not empty
     if ( next( emissaryList ) == nil ) then return; end
@@ -403,36 +417,41 @@ local function populateEmissaryData( header, tooltip, charList, emissaryList )
     local lineNum = tooltip:AddLine( );
     tooltip.lines[ lineNum ].is_header = true;
     tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
-    for _, emissaryData in next, emissaryList do
-        lineNum = tooltip:AddLine( emissaryData.displayName );
-        
-        for colNdx, charData in next, charList do
-            if( emissaryData.questID ~= nil ) then
+
+    for expId, emissaryExpData in next, emissaryList do
+        local sortedQuestIds = addon:getKeysSortedByValue( emissaryExpData, sortEmissaries );
+
+        for _, questID in next, sortedQuestIds do
+            local emissaryData = emissaryExpData[ questID ];
+
+            lineNum = tooltip:AddLine( emissaryData.displayName );
+            
+            for colNdx, charData in next, charList do
                 if (LockoutDb[ charData.realmName ] ~= nil) and
                    (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
-                   (LockoutDb[ charData.realmName ][ charData.charNdx ].emissaries[ emissaryData.questID ] ~= nil) then
-                    local emData = LockoutDb[ charData.realmName ][ charData.charNdx ].emissaries[ emissaryData.questID ];
-                    local displayText;
+                   (LockoutDb[ charData.realmName ][ charData.charNdx ].emissaries[ questID ] ~= nil) then
+                    local emData = LockoutDb[ charData.realmName ][ charData.charNdx ].emissaries[ questID ];
+                    local displayText = "";
                     if( emData.isComplete ) then
-                        displayText = BOSS_KILL_TEXT
-                    else
+                        displayText = BOSS_KILL_TEXT;
+                    elseif( emData.active ) then
                         displayText = emData.fullfilled .. "/" .. emData.required;
                     end
+
+                    if( emData.paragonReady ) then
+                        displayText = displayText .. " P";
+                    end;
                     tooltip:SetCell( lineNum, colNdx + 1, displayText, nil, "CENTER" );
                 end
-            end
-            tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
-        end -- for colNdx, charData in next, charList
-    end -- for currencyName, _ in next, currencyList
+                tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+            end -- for colNdx, charData in next, charList
+        end -- for currencyName, _ in next, currencyList
+    end
 
     tooltip:AddSeparator( );
 end
 
 local function shouldDisplayChar( realmName, playerData )
-    if (playerData.charName == nil) then
-        return false;
-    end
-    
     addon:debug( realmName .. "." .. playerData.charName, playerData.currentLevel or -1 );
     
     return  ( addon.config.profile.general.showCharList[ realmName .. "." .. playerData.charName ] ) and
@@ -466,7 +485,7 @@ function addon:ShowInfo( frame, manualToggle )
     local raidList = {};
     local worldBossList = {};
     local currencyList = {};
-    local emissaryList = { {}, {}, {} }; -- initialize with 3
+    local emissaryList = { [ "6"] = {}, [ "7" ] = {} }; -- initialize with the expansions
     local weeklyQuestList = {};
 
     local CURRENCY_LIST = self:getCurrencyList();
@@ -526,16 +545,39 @@ function addon:ShowInfo( frame, manualToggle )
                         weeklyQuestList[ questAbbr ] = questData.name;
                     end
                     
+                    --[[ TODO:  change k/v type.
+                        Key: #table (1,2,3....)
+                        table: =    code, "0", "1", .... "P"
+                                    questID, ....
+                                    emissaryName, ....
+                        sort:  =    code, emissaryName
+                    --]]
                     for questID, emData in next, charData.emissaries do
                         local title = addon:getQuestTitleByID( questID );
-                        if( title ~= nil ) then
+                        if( title ~= nil and emData.expLevel ~= nil ) then
                             -- add a 10 second buffer - things get a little off when the reset date ends up short by a second or two..
-                            local day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
-                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
-                            emissaryList[ day + 1 ] = {
-                                displayName = "(+" .. day .. " Day) " .. title,
-                                questID = questID
-                            }
+                            local day;
+                            if( emData.resetDate == -1 ) then
+                                day = -1;
+                            else
+                                day = mfloor( abs( emData.resetDate + 10 - dailyLockout ) / (24 * 60 * 60) );
+                            end
+
+                            if( day >= 0 and day <= 3 ) then
+	                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+	                            emissaryList[ emData.expLevel ][ questID ] = {
+	                                displayName = addon.ExpansionAbbr[ tonumber(emData.expLevel) ] .. "(+" .. day .. ") " .. title,
+                                    emissaryName = title,
+                                    code = tostring( day )
+	                            }
+                            elseif( emData.paragonReady ) then
+	                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+	                            emissaryList[ emData.expLevel ][ questID ] = {
+	                                displayName = addon.ExpansionAbbr[ tonumber(emData.expLevel) ] .. " " .. title,
+                                    emissaryName = title,
+                                    code = "P"
+	                            }
+                            end
                         end
                     end
                 end
@@ -621,7 +663,8 @@ function addon:ShowInfo( frame, manualToggle )
                                 end -- function( data )
         charDisplay.deleteTT = emptyFunction;
         charDisplay.deleteChar =    function( self )
-                                        LockoutDb[ char.realmName ][ char.charNdx ] = nil;
+                                        --LockoutDb[ char.realmName ][ char.charNdx ] = nil;
+                                        addon:deleteChar( char.realmName, char.charNdx );
 
                                         local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
                                         LibQTip:Release( tooltip );

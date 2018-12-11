@@ -102,7 +102,7 @@ local function checkDailyHeroicStatus( self )
 end
 
 local QUEST_LIBRARY = {
-    ["blingtron"]           = {name=L["Blingtron"],                     startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus,         checkFullfilled=false,  copyAccountWide=true,  checkIDs={40753,34774,31752} },
+    ["blingtron"]           = {name=L["Blingtron"],                     startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=true,  checkIDs={40753,34774,31752} },
     ["cityweekly"]          = {name=L["Main City Weekly"],              startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={53037,53038,53039,53036,53030,53034,53035} },
     ["seals"]               = {name=L["Seal of Fate"],                  startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={43510} },
     ["argusweekly"]         = {name=L["Argus - Pristine Argunite"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={48799} },

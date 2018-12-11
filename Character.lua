@@ -54,6 +54,24 @@ local function clearExpiredLockouts( dataTable )
     end -- for key, data in next, dataTable
 end -- clearExpiredLockouts()
 
+local function clearExpiredEmissaries( dataTable )
+    if( dataTable == nil ) then return; end
+    local currentServerTime = GetServerTime();
+    
+    for key, data in next, dataTable do
+        if( data.resetDate == nil ) or (data.resetDate < currentServerTime ) then
+            if( data.paragonReady ) then
+                -- reset back to paragon only emissary type
+                data.active = false;
+                data.isComplete = false;
+                data.resetDate = -1;
+            else
+                dataTable[ key ] = nil;
+            end
+        end -- if( data.resetDate == nil ) or ( data.resetDate < currentServerTime )
+    end -- for key, data in next, dataTable
+end -- clearExpiredEmissaries()
+
 local function clearCurrencyQuests( dataTable )
     if( dataTable == nil ) then return; end
     local currentServerTime = GetServerTime();
@@ -94,7 +112,7 @@ function addon:checkExpiredLockouts()
             end
             
             clearExpiredLockouts( charData.worldBosses );
-            clearExpiredLockouts( charData.emissaries );
+            clearExpiredEmissaries( charData.emissaries );
             clearExpiredLockouts( charData.weeklyQuests );
             clearCurrencyQuests( charData.currency );
         end -- for charNdx, charData in next, characters

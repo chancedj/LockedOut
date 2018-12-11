@@ -203,15 +203,15 @@ local CURRENCY_LIST = {
     { ID=1535, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Drust Archaeology Fragment 
     { ID=1540, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Wood 
     { ID=1541, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Iron 
-    { ID=1553, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Azerite 
+    { ID=1553, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Azerite 
     { ID=1559, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Essence of Storms 
-    { ID=1560, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- War Resources 
-    { ID=1565, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Rich Azerite Fragment 
+    { ID=1560, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- War Resources 
+    { ID=1565, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Rich Azerite Fragment 
     { ID=1579, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Champions of Azeroth 
-    { ID=1580, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Seal of Wartorn Fate 
+    { ID=1580, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Seal of Wartorn Fate 
     { ID=1585, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Honor 
     { ID=1586, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Honor Level 
-    { ID=1587, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- War Supplies 
+    { ID=1587, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- War Supplies 
     { ID=1592, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Order of Embers 
     { ID=1593, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Proudmore Admiralty 
     { ID=1594, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Storm's Wake 
@@ -223,9 +223,12 @@ local CURRENCY_LIST = {
     { ID=1600, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Honorbound 
     { ID=1602, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Conquest 
     { ID=1703, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- BFA Season 1 Rated Participation Currency 
-    { ID=1704, name=nil, icon=nil, expansionLevel=1, type="C", show=true }, -- Spirit Shard 
+    { ID=1704, name=nil, icon=nil, expansionLevel=1, type="C", show=true },  -- Spirit Shard 
     { ID=1705, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Warfronts - Personal Tracker - Iron in Chest (Hidden) 
     { ID=1710, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Seafarer's Dubloon
+    { ID=1716, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Honorbound Service Medal
+    { ID=1717, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- 7th Legion Service Medal
+    { ID=1718, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Titanium Residium
 
     -- items
     { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Shiny Pet Charm
@@ -310,7 +313,6 @@ local function resolveCurrencyInfo( )
 end
 
 local MyScanningTooltip = CreateFrame("GameTooltip", "MyScanningTooltip", UIParent, "GameTooltipTemplate")
-
 local QuestTitleFromID = setmetatable({}, { __index = function(t, id)
 	MyScanningTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	MyScanningTooltip:SetHyperlink("quest:"..id)
@@ -322,10 +324,18 @@ local QuestTitleFromID = setmetatable({}, { __index = function(t, id)
 	end
 end })
 
+local _questCachDb = {};
 function addon:getQuestTitleByID( questID )
     -- example pulled from below
     -- http://www.wowinterface.com/forums/showthread.php?t=46934
-    return QuestTitleFromID[ questID ];
+    local questName =  _questCachDb[ questID ];
+
+    if ( not questName ) then
+        _questCachDb[ questID ] = QuestTitleFromID[ questID ];
+        questName =  _questCachDb[ questID ];
+    end
+
+    return questName;
 end
 
 function addon:getWorldBossName( sInstanceID, sBossID )
@@ -373,6 +383,34 @@ function addon:destroyDb()
     if( type( key ) ~= "number" ) then LockoutDb = nil; end;
 end -- destroyDb
 
+---[[
+function addon:deleteChar( realmName, charNdx )
+    if( LockoutDb ) then
+        if( LockoutDb[ realmName ] ) then
+            LockoutDb[ realmName ][ charNdx ] = nil;
+
+            if( #LockoutDb[ realmName ] == 0 ) then
+                LockoutDb[ realmName ] = nil;
+            end
+        end
+    end
+end
+--]]
+
+-- pulled from SO: https://stackoverflow.com/questions/2038418/associatively-sorting-a-table-by-value-in-lua
+function addon:getKeysSortedByValue(tbl, sortFunction)
+  local keys = {}
+  for key in pairs(tbl) do
+    table.insert(keys, key)
+  end
+
+  table.sort(keys, function(a, b)
+    return sortFunction(tbl[a], tbl[b])
+  end)
+
+  return keys
+end
+
 function addon:getCharacterList()
     local charList = {};
     
@@ -380,9 +418,7 @@ function addon:getCharacterList()
     
     for realmName, characters in next, LockoutDb do
         for charNdx, charData in next, characters do
-            if (charData.charName ~= nil) then
-                charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
-            end
+            charList[ realmName .. "." .. charData.charName ] = realmName .. " - " .. charData.charName;
         end
     end
 
