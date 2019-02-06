@@ -253,6 +253,15 @@ local function getEmissaryHeaderConfig( self )
               set = function(info,val) self.config.profile.emissary.show = val; end,
               get = function(info) return self.config.profile.emissary.show end
             },
+            emissaryExp = {
+              order = 52,
+              name = L["Emissary groups"],
+              desc = L["Which emissary groups to display"],
+              type = "multiselect",
+              values = addon.EmissaryDisplayGroups,
+              set = function(info,key,val) self.config.profile.emissary.displayGroup[ key ] = val; end,
+              get = function(info,key) return self.config.profile.emissary.displayGroup[ key ] end
+            },
         }
     };
 end
@@ -435,7 +444,8 @@ function addon:getDefaultOptions()
                 displayExpansion = true
 			},
             emissary = {
-                show = true
+                show = true,
+                displayGroup = addon.EmissaryDisplayGroups
             },
             weeklyQuest = {
                 show = true

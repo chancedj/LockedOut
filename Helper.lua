@@ -28,6 +28,11 @@ addon.ExpansionAbbr = {
     [7] = L["BfA"],
 }
 
+addon.EmissaryDisplayGroups = {
+    [ "6" ] = L["Leg"],
+    [ "7" ] = L["BfA"]
+}
+
 addon.KEY_KEYSTONE = "keystone";
 addon.KEY_MYTHICBEST = "mythicbest";
 

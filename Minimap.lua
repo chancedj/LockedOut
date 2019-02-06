@@ -485,7 +485,7 @@ function addon:ShowInfo( frame, manualToggle )
     local raidList = {};
     local worldBossList = {};
     local currencyList = {};
-    local emissaryList = { [ "6"] = {}, [ "7" ] = {} }; -- initialize with the expansions
+    local emissaryList = { [ "6" ] = {}, [ "7" ] = {} }; -- initialize with the expansions
     local weeklyQuestList = {};
 
     local CURRENCY_LIST = self:getCurrencyList();
@@ -584,6 +584,12 @@ function addon:ShowInfo( frame, manualToggle )
             end -- for charName, instances in next, characters
         end
     end -- for realmName, characters in next, LockoutDb
+
+    for key, val in next, emissaryList do
+        if (not self.config.profile.emissary.displayGroup[ key ] ) then
+            emissaryList[ key ] = nil;
+        end
+    end
     
     -- sort list by realm then character
     local charSort = self:getCharSortOptions();
