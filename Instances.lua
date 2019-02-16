@@ -9,8 +9,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, type, table, tsort = -- variables
-      next, type, table, table.sort      -- lua functions
+local next, type, table, select, tsort = -- variables
+      next, type, table, select, table.sort      -- lua functions
 
 -- cache blizzard function/globals
 local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
@@ -134,6 +134,22 @@ local function removeUntouchedInstances( instances )
         end -- if( validInstanceCount == 0 )
     end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
+
+--[[
+function addon:ShowConnectedInfo()
+    local libRealm = LibStub("LibRealmInfo");
+    local connectedRealms = select( 9, libRealm:GetRealmInfo( GetRealmName() ) );
+
+    local realmNames = {};
+
+    for i = 1, #connectedRealms do
+      local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( connectedRealms[ i ] );
+      realmNames[ #realmNames + 1 ] = connectedName;
+    end
+
+    print( "Instance lock applies to these realms: ", table.concat( realmNames, ", ") );
+end
+--]]
 
 local function callbackResetInstances()
     local msg = addonName .. " - " .. L["Instances Reset"];
