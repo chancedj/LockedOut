@@ -487,8 +487,8 @@ function addon:OnInitialize()
     LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( self.optionFrameName, self:getConfigOptions() );
     self.optionFrame = LibStub( "AceConfigDialog-3.0" ):AddToBlizOptions( self.optionFrameName, addonName );
     self.optionFrame.default = function() self:ResetDefaults() end;
-	self:RegisterChatCommand( "lo", "ChatCommand" );
-	self:RegisterChatCommand( "lockedout", "ChatCommand" );
+	  self:RegisterChatCommand( "lo", "ChatCommand" );
+	  self:RegisterChatCommand( "lockedout", "ChatCommand" );
 
     -- events
     self:RegisterEvent( "PLAYER_ENTERING_WORLD", "EVENT_ResetExpiredData" );
@@ -497,9 +497,9 @@ function addon:OnInitialize()
     self:RegisterEvent( "BAG_UPDATE", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "TIME_PLAYED_MSG", "EVENT_TimePlayed" );
     self:RegisterEvent( "PLAYER_LOGOUT", "EVENT_Logout" );
-    self:RegisterBucketEvent( "ENCOUNTER_END", 1, "EVENT_SaveToInstance" );
+    self:RegisterEvent( "LFG_LOCK_INFO_RECEIVED", "EVENT_SaveToInstance" );
     self:RegisterBucketEvent( "CURRENCY_DISPLAY_UPDATE", 1, "EVENT_CoinUpdate" );
-    
+
     self.toolTipShowing = false;
     self.loggingOut = false;
 end
@@ -591,7 +591,7 @@ function addon:EVENT_CoinUpdate( event )
 end
 
 function addon:EVENT_SaveToInstance( event )
-    addon:debug( "EVENT_SaveToInstance: ", "ENCOUNTER_END" );
+    addon:debug( "EVENT_SaveToInstance: ", "LFG_LOCK_INFO_RECEIVED" );
 
     -- end status == 1 means success
     self:EVENT_FullCharacterRefresh();
