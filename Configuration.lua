@@ -15,8 +15,8 @@ local next, time =
       next, time;
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, MAX_PLAYER_LEVEL_TABLE =    -- variables
-      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, MAX_PLAYER_LEVEL_TABLE      -- lua functions
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, RequestRaidInfo, MAX_PLAYER_LEVEL_TABLE =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, RequestRaidInfo, MAX_PLAYER_LEVEL_TABLE      -- lua functions
 
 -- this allows me to override the blizzard function in the case of a "pre-patch" event.  e.g.: 8.0 (BfA) but Legion still active
 local function getCurrentExpansionLevel()
@@ -497,7 +497,7 @@ function addon:OnInitialize()
     self:RegisterEvent( "BAG_UPDATE", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "TIME_PLAYED_MSG", "EVENT_TimePlayed" );
     self:RegisterEvent( "PLAYER_LOGOUT", "EVENT_Logout" );
-    self:RegisterEvent( "LFG_LOCK_INFO_RECEIVED", "EVENT_SaveToInstance" );
+    self:RegisterEvent( "BOSS_KILL", "EVENT_SaveToInstance" );
     self:RegisterBucketEvent( "CURRENCY_DISPLAY_UPDATE", 1, "EVENT_CoinUpdate" );
 
     self.toolTipShowing = false;
@@ -591,10 +591,16 @@ function addon:EVENT_CoinUpdate( event )
 end
 
 function addon:EVENT_SaveToInstance( event )
-    addon:debug( "EVENT_SaveToInstance: ", "LFG_LOCK_INFO_RECEIVED" );
+    addon:debug( "EVENT_SaveToInstance: ", "BOSS_KILL" );
 
-    -- end status == 1 means success
-    self:EVENT_FullCharacterRefresh();
+	self:RegisterEvent( "UPDATE_INSTANCE_INFO", "EVENT_UpdateInstanceInfo" );
+	RequestRaidInfo();
+end
+
+function addon:EVENT_UpdateInstanceInfo()
+	self:UnregisterEvent( "UPDATE_INSTANCE_INFO" );
+
+	self:EVENT_FullCharacterRefresh();
 end
 
 function addon:EVENT_ResetExpiredData( event )
