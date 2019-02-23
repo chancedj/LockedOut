@@ -591,7 +591,7 @@ function addon:EVENT_CoinUpdate( event )
 end
 
 function addon:EVENT_SaveToInstance( event )
-    addon:debug( "EVENT_SaveToInstance: ", "BOSS_KILL" );
+    addon:debug( "EVENT_SaveToInstance: ", event );
 
 	self:RegisterEvent( "UPDATE_INSTANCE_INFO", "EVENT_UpdateInstanceInfo" );
 	RequestRaidInfo();

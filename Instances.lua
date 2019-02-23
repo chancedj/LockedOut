@@ -13,16 +13,18 @@ local next, type, table, select, tsort = -- variables
       next, type, table, select, table.sort      -- lua functions
 
 -- cache blizzard function/globals
-local GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
+local GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
       C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo,
+      C_GetOwnedKeystoneChallengeMapID, C_GetOwnedKeystoneLevel,
       C_RequestMapInfo, C_RequestRewards                                          =
 
-      GetRealmName, UnitName, UnitClass, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
+      GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
       C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo,
+      C_MythicPlus.GetOwnedKeystoneChallengeMapID, C_MythicPlus.GetOwnedKeystoneLevel,
       C_MythicPlus.RequestMapInfo, C_MythicPlus.RequestRewards
 
 local function convertDifficulty(difficulty)
@@ -135,19 +137,25 @@ local function removeUntouchedInstances( instances )
     end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
 
---[[
-function addon:ShowConnectedInfo()
+---[[
+local connectedRealms = {};
+function addon:GetConnectedRealms()
+	if ( #connectedRealms > 0 ) then
+		addon:debug( "pulling from cache" );
+		return connectedRealms;
+	end
+
     local libRealm = LibStub("LibRealmInfo");
-    local connectedRealms = select( 9, libRealm:GetRealmInfo( GetRealmName() ) );
+    local realmIdList = select( 9, libRealm:GetRealmInfo( GetRealmName() ) );
 
-    local realmNames = {};
-
-    for i = 1, #connectedRealms do
-      local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( connectedRealms[ i ] );
-      realmNames[ #realmNames + 1 ] = connectedName;
+    for i = 1, #realmIdList do
+      local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( realmIdList[ i ] );
+      connectedRealms[ #connectedRealms + 1 ] = connectedName;
     end
 
-    print( "Instance lock applies to these realms: ", table.concat( realmNames, ", ") );
+    addon:debug( "Instance lock applies to these realms: ", table.concat( connectedRealms, ", ") );
+
+    return connectedRealms;
 end
 --]]
 
@@ -206,28 +214,13 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
     end -- for lockId = 1, lockCount
     --]]
 
-    -- get mythic+ keystone info
-    local keyFound = false;
-    for bagID = 0, NUM_BAG_SLOTS do
-        for slotID = 1, GetContainerNumSlots(bagID) do
-            local link = GetContainerItemLink( bagID, slotID );
-            
-            if link and string.find( link, "Keystone: " ) then
-                local _, _, mapID, level = strsplit( ":", link );
-                local mapName = C_GetMapUIInfo( mapID );
-                addon:debug( "keystone found: link: " .. tostring( link ) );
-                addon:debug( "info: " .. mapName .." (" .. mapID .. ") level: " .. level );
-                
-                addKeystoneData( addon.KEY_KEYSTONE, instances, mapName, level, calculatedResetDate );
-
-                -- mark it found, then break out;
-                keyFound = true;
-                break;
-            end
-        end
+    local keystoneMapId = C_GetOwnedKeystoneChallengeMapID();
+    if ( keystoneMapId ) then
+    	local keystoneMapName = C_GetMapUIInfo( keystoneMapId );
+    	local keystoneLevel = C_GetOwnedKeystoneLevel();
         
-        -- since it's a nested loop, we need to break twice.
-        if (keyfound) then break end;
+        addon:debug( "info: " .. keystoneMapName .." (" .. keystoneMapId .. ") level: " .. keystoneLevel );
+		addKeystoneData( addon.KEY_KEYSTONE, instances, keystoneMapName, keystoneLevel, calculatedResetDate );
     end
 
     ---[[
@@ -236,10 +229,8 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
         --local _, _, bestLevel = C_GetMapPlayerStats( mapId );
         local _, bestLevel = C_GetWeeklyBestForMap( mapId );
         if( bestLevel ) then
-            local mapName = C_GetMapUIInfo( mapId );
-
+	        local mapName = C_GetMapUIInfo( mapId );
             addKeystoneData( addon.KEY_MYTHICBEST, instances, mapName, bestLevel, calculatedResetDate );
-
             addon:debug( mapName, " - bestLevel: ", bestLevel );
         end
     end
