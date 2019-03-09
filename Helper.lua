@@ -484,7 +484,7 @@ function addon:getWeeklyLockoutDate()
     local serverResetDay    = MapRegionReset[ currentRegion ];
     local currentServerTime = GetServerTime();
     local dayOfWeek         = date( "*t", currentServerTime ).wday;
-    local daysLefToReset    = weekdayRemapNew[ serverResetDay ][ dayOfWeek ];
+    local daysLefToReset    = weekdayRemap[ serverResetDay ][ dayOfWeek ];
 
     local dailyResetTime    = self:getDailyLockoutDate( currentServerTime );
     local weeklyResetTime   = dailyResetTime + (daysLefToReset * secondsInDay);
