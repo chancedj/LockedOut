@@ -12,10 +12,8 @@ local next = -- variables
       next   -- lua functions
 
 -- cache blizzard function/globals
-local UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetQuestObjectiveInfo, GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID, GetLFGDungeonRewards  =                       -- variables 
-      UnitClass, GetQuestBountyInfoForMapID, GetQuestLogTitle, GetQuestLogIndexByID, GetSpellCooldown
-        , GetQuestObjectiveInfo, GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID, GetLFGDungeonRewards    -- blizzard api
+local UnitClass, GetSpellCooldown, GetQuestObjectiveInfo, GetServerTime, GetLFGDungeonRewards  =                       -- variables 
+      UnitClass, GetSpellCooldown, GetQuestObjectiveInfo, GetServerTime, GetLFGDungeonRewards    -- blizzard api
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 
@@ -24,11 +22,12 @@ local function getResetDateByForm( resetForm, questID )
 
     if( resetForm == "daily" ) then         resetDate = addon:getDailyLockoutDate();
     elseif( resetForm == "weekly" ) then    resetDate = addon:getWeeklyLockoutDate();
-    else                                    resetDate = nil;    print( "improper resetForm for questID: ", questID ); end
+    else                                    resetDate = nil;    print( L["Improper resetForm for questID: "], questID ); end
     
     return resetDate;
 end
 
+-- todo: combine wth HolidayEvents.Lua version...
 local function checkQuestStatus( self )
     for _, questID in next, self.checkIDs do
         local resetDate = getResetDateByForm( self.resetForm, questID );
@@ -51,36 +50,6 @@ local function checkQuestStatus( self )
                 return resetDate, true, totalFullfilled .. "/" .. totalRequired;
             end
             
-        end
-    end
-    
-    return 0, false, nil;
-end
-
-local function checkSpellStatus( self )
-    local _, _, classType = UnitClass( "player" );
-    local talentTreeIDs = GetTalentTreeIDsByClassID(LE_GARRISON_TYPE_7_0, classType)
-    
-    -- not working properly, so disable for now.
-    if( talentTreeIDs ) then
-        local _, treeID = next(talentTreeIDs);
-        local _, _, tree = GetTalentTreeInfoForID( treeID );
-        
-        for ndx, data in next, tree do
-            if( data.selected ) then
-                for _, spellId in next, self.checkIDs do
-                    if( data.perkSpellID == spellId ) then
-                        local start, duration, enabled = GetSpellCooldown( spellId );
-                        
-                        -- when enabled == 1, it's not ready, meaning it's on cooldown
-                        if( start > 0 ) and ( enabled == 1 ) then
-                            return GetServerTime() + ((start + duration) - GetTime()), true, BOSS_KILL_TEXT;
-                        end
-                        
-                        break;
-                    end
-                end
-            end
         end
     end
     
@@ -114,7 +83,7 @@ local QUEST_LIBRARY = {
     ["islandex"]            = {name=L["Island Expeditions"],            startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={53435, 53436} }
 };
 
-function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
+function addon:Lockedout_BuildWeeklyQuests( )
     local weeklyQuests = {}; -- initialize weekly quest table;
 
     local calculatedResetDate = addon:getWeeklyLockoutDate();
@@ -141,5 +110,5 @@ function addon:Lockedout_BuildWeeklyQuests( realmName, charNdx )
         end
     end -- for bossId, bossData in next, WORLD_BOSS_LIST
  
-    LockoutDb[ realmName ][ charNdx ].weeklyQuests = weeklyQuests;
+    addon.playerDb.weeklyQuests = weeklyQuests;
 end -- Lockedout_BuildInstanceLockout()

@@ -125,15 +125,15 @@ local function displayReset( self )
 end -- function( data )
 
 local function handleResetDisplay( tooltip, lineNum, colNdx, anchor, data )
-    if( addon.config.profile.general.showResetTime ) then
-        if( data.displayText ~= "" ) then
+    if( data.displayText ~= "" ) then
+        if( addon.config.profile.general.showResetTime ) then
+            anchor.displayTT  = emptyFunction;
             tooltip:SetCell( lineNum, colNdx, getDisplayTime( data.resetDate ), nil, "CENTER" );
-        end;
-        anchor.displayTT  = emptyFunction;
-    else
-        anchor.displayTT  = displayReset;
-        tooltip:SetCell( lineNum, colNdx, data.displayText, nil, "CENTER" );
-    end
+        else
+            anchor.displayTT  = displayReset;
+            tooltip:SetCell( lineNum, colNdx, data.displayText, nil, "CENTER" );
+        end
+    end;
 end;
 
 local function populateInstanceData( header, tooltip, charList, instanceList )
@@ -165,7 +165,7 @@ local function populateInstanceData( header, tooltip, charList, instanceList )
                                                 local col = 2;
                                                 
                                                 tooltip:SetColumnLayout( 1 );
-                                                tooltip:AddHeader( "Boss Name" );
+                                                tooltip:AddHeader( L["Boss Name"] );
                                                 local hasBossData = false;
                                                 local resetAssigned = true;
                                                 for difficulty, instanceData in next, self.anchor.data do
@@ -313,6 +313,66 @@ local function populateWeeklyQuestData( header, tooltip, charList, weeklyQuestLi
     tooltip:AddSeparator( );
 end -- populateInstanceData
 
+local function popuateHolidayData( header, tooltip, charList, holidayList )
+    -- make sure it's not empty
+    if ( next( holidayList ) == nil ) then return; end
+
+    -- start adding the instances we have completed with any chacters
+    local lineNum = tooltip:AddLine( );
+    tooltip.lines[ lineNum ].is_header = true;
+    tooltip:SetCell( lineNum, 1, header, nil, "CENTER" );
+
+    local currentTime = GetServerTime();
+    function countQuests( quests ) local c, t = 0, 0; for _, q in next, quests do t=t+1 if( q.completed ) then c=c+1; end; end; return c, t; end;
+    for eventID, holidayData in next, holidayList do
+        lineNum = tooltip:AddLine( );
+        tooltip:SetCell( lineNum, 1, holidayData.title, nil, "LEFT" );
+        
+        for colNdx, charData in next, charList do
+            if( holidayData.activeStatus == "PENDING" ) then
+                tooltip:SetCell( lineNum, colNdx + 1, SecondsToTime( (60 * 60) - (currentTime - holidayData.startTime ) ) , nil, "LEFT" );
+            else
+                if (LockoutDb[ charData.realmName ] ~= nil) and
+                   (LockoutDb[ charData.realmName ][ charData.charNdx ] ~= nil) and
+                   (LockoutDb[ charData.realmName ][ charData.charNdx ].holidayEvents ~= nil) then
+
+                    local eventData = LockoutDb[ charData.realmName ][ charData.charNdx ].holidayEvents[ eventID ] or {};
+
+                    local holidayDisplay = {
+                        anchor = getAnchorPkt( "hl", eventID, eventData, lineNum, colNdx + 1 );
+                        displayTT = function( self )
+                                                local ttName = self.anchor:getTTName();
+                                                local tooltip = addon:aquireEmptyTooltip( ttName );
+                                                
+                                                tooltip:SetColumnLayout( 2 );
+                                                tooltip:AddHeader( L["Quest Name"], L["Status"] );
+                                                for questID, data in next, self.anchor.data do
+                                                    local ln = tooltip:AddLine( );
+                                                    tooltip:SetLineColor( ln, 1, 1, 1, 0.1 );
+                                                    tooltip:SetCell( ln, 1, addon:getQuestTitleByID( questID ) );
+                                                    tooltip:SetCell( ln, 2, data.displayText, nil, "CENTER" );
+                                                end
+
+                                                setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
+                                                tooltip:Show();
+                                            end, -- function( data )
+                        deleteTT = emptyFunction
+                    };
+                    local completed, total = countQuests( eventData );
+                    tooltip:SetCell( lineNum, colNdx + 1, completed .. "/" .. total, nil, "CENTER" );
+
+                    tooltip:SetCellScript( lineNum, colNdx + 1, "OnEnter", function() holidayDisplay:displayTT( ); end );    -- close out tooltip when leaving
+                    tooltip:SetCellScript( lineNum, colNdx + 1, "OnLeave", function() holidayDisplay:deleteTT( ); end );    -- open tooltip with info when entering cell.
+                    tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+
+                end -- if (LockoutDb[ charData.realmName ] ~= nil) and .....
+            end
+        end -- for colNdx, charData in next, charList
+    end
+
+    tooltip:AddSeparator( );
+end -- popuateHolidayData
+
 local function populateCurrencyData( header, tooltip, charList, currencyList )
     -- make sure it's not empty
     if ( next( currencyList ) == nil ) then return; end
@@ -365,7 +425,7 @@ local function populateCurrencyData( header, tooltip, charList, currencyList )
                                                     local tooltip = addon:aquireEmptyTooltip( ttName );
                                                     
                                                     tooltip:SetColumnLayout( 1 );
-                                                    tooltip:AddHeader( "Quest Name" );
+                                                    tooltip:AddHeader( L["Quest Name"] );
                                                     for ndx, questID in next, self.anchor.data.bonus do
                                                         addon:debug( "questID: " .. questID );
                                                         if( questID > 3 ) then
@@ -459,6 +519,7 @@ local function shouldDisplayChar( realmName, playerData )
 end
 
 function addon:ShowInfo( frame, manualToggle )
+    self:removeExpiredInstances();
     if( manualToggle ~= nil ) then
         if( not manualToggle ) then
             LibQTip:Release( self.tooltip );
@@ -473,28 +534,28 @@ function addon:ShowInfo( frame, manualToggle )
         self.tooltip = nil;
     end -- if ( self.tooltip ~= nil )
     
-    local currRealmName, currCharNdx, playerData = self:Lockedout_GetCurrentCharData( "abc" );
-
     -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
     local tooltip = LibQTip:Acquire( "LockedoutTooltip" );
     self.tooltip = tooltip;
 
     local realmCount = 0;
     local charList = {};
-    local dungeonList = {};
-    local raidList = {};
-    local worldBossList = {};
-    local currencyList = {};
-    local emissaryList = { [ "6" ] = {}, [ "7" ] = {} }; -- initialize with the expansions
-    local weeklyQuestList = {};
+    local dungeonDisplayList = {};
+    local raidDisplayList = {};
+    local worldBossDisplayList = {};
+    local currencyDisplayList = {};
+    local emissaryDisplayList = { [ "6" ] = {}, [ "7" ] = {} }; -- initialize with the expansions
+    local weeklyQuestDisplayList = {};
+    local holidayDisplayList = {};
 
+    local currencyMappingList = {};
     local CURRENCY_LIST = self:getCurrencyList();
     local CURRENCY_LIST_MAP = self:getCurrencyListMap();
     
     -- get list of characters and realms for the horizontal
     local dailyLockout = self:getDailyLockoutDate();
     for realmName, characters in next, LockoutDb do
-        if( not self.config.profile.general.currentRealm ) or ( currRealmName == realmName ) then
+        if( not self.config.profile.general.currentRealm ) or ( addon.currentRealm == realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
                 if( shouldDisplayChar( realmName, charData ) ) then
@@ -506,8 +567,8 @@ function addon:ShowInfo( frame, manualToggle )
                     charList[ tblNdx ].className = charData.className;
 
                     if( self.config.profile.general.loggedInFirst ) and
-                      ( realmName == currRealmName ) and 
-                      (currCharNdx == charNdx) then
+                      ( addon.currentRealm == realmName ) and 
+                      ( addon.charDbIndex == charNdx ) then
                         charList[ tblNdx ].priority = 0;
                     else
                         charList[ tblNdx ].priority = 1;
@@ -518,9 +579,9 @@ function addon:ShowInfo( frame, manualToggle )
                         local key, data = next( details );
                         
                         if ( data.isRaid ) then
-                            raidList[ encounterName ] = encounterName;
+                            raidDisplayList[ encounterName ] = encounterName;
                         else
-                            dungeonList[ encounterName ] = encounterName;
+                            dungeonDisplayList[ encounterName ] = encounterName;
                         end -- if ( data.isRaid )
                     end -- for encounterId, _ in next, instances
                     
@@ -528,7 +589,7 @@ function addon:ShowInfo( frame, manualToggle )
                         local instanceID, bossID = strsplit( "|", bossKey );
 
                         if( instanceID ~= nil ) and ( bossID ~= nil ) then
-                            worldBossList[ bossKey ] = addon:getWorldBossName( instanceID, bossID );
+                            worldBossDisplayList[ bossKey ] = addon:getWorldBossName( instanceID, bossID );
                         end
                     end -- for bossName, _ in next, charData.worldBosses
                     
@@ -537,21 +598,14 @@ function addon:ShowInfo( frame, manualToggle )
                         local curr = CURRENCY_LIST[ currNdx ];
                         
                         if( curr ~= nil ) and ( curr.name ~= nil ) and (curr.icon ~= nil ) and ( self.config.profile.currency.displayList[ currID ] ) then
-                            currencyList[ currID ] = currNdx;
+                            currencyMappingList[ currID ] = currNdx;
                         end
                     end -- for currName, _ in next, charData.currency
                     
                     for questAbbr, questData in next, charData.weeklyQuests do
-                        weeklyQuestList[ questAbbr ] = questData.name;
+                        weeklyQuestDisplayList[ questAbbr ] = questData.name;
                     end
                     
-                    --[[ TODO:  change k/v type.
-                        Key: #table (1,2,3....)
-                        table: =    code, "0", "1", .... "P"
-                                    questID, ....
-                                    emissaryName, ....
-                        sort:  =    code, emissaryName
-                    --]]
                     for questID, emData in next, charData.emissaries do
                         local title = addon:getQuestTitleByID( questID );
                         if( title ~= nil and emData.expLevel ~= nil ) then
@@ -564,19 +618,19 @@ function addon:ShowInfo( frame, manualToggle )
                             end
 
                             if( day >= 0 and day <= 3 ) then
-	                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
-	                            emissaryList[ emData.expLevel ][ questID ] = {
-	                                displayName = addon.ExpansionAbbr[ tonumber(emData.expLevel) ] .. "(+" .. day .. ") " .. title,
+                                self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+                                emissaryDisplayList[ emData.expLevel ][ questID ] = {
+                                    displayName = addon.ExpansionAbbr[ tonumber(emData.expLevel) ] .. "(+" .. day .. ") " .. title,
                                     emissaryName = title,
                                     code = tostring( day )
-	                            }
+                                }
                             elseif( emData.paragonReady ) then
-	                            self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
-	                            emissaryList[ emData.expLevel ][ questID ] = {
-	                                displayName = addon.ExpansionAbbr[ tonumber(emData.expLevel) ] .. " " .. title,
+                                self:debug( realmName .. "." .. charData.charName .. " title: " .. title .. " day: " .. day .. " resetDate: " .. emData.resetDate );
+                                emissaryDisplayList[ emData.expLevel ][ questID ] = {
+                                    displayName = addon.ExpansionAbbr[ tonumber(emData.expLevel) ] .. " " .. title,
                                     emissaryName = title,
                                     code = "P"
-	                            }
+                                }
                             end
                         end
                     end
@@ -585,9 +639,9 @@ function addon:ShowInfo( frame, manualToggle )
         end
     end -- for realmName, characters in next, LockoutDb
 
-    for key, val in next, emissaryList do
+    for key, val in next, emissaryDisplayList do
         if (not self.config.profile.emissary.displayGroup[ key ] ) then
-            emissaryList[ key ] = nil;
+            emissaryDisplayList[ key ] = nil;
         end
     end
     
@@ -595,16 +649,32 @@ function addon:ShowInfo( frame, manualToggle )
     local charSort = self:getCharSortOptions();
     tsort( charList, charSort[ self.config.profile.general.charSortBy ].sortFunction );
 
-    local currencyDisplayList = {};
-    
-    for currID, currNdx in next, currencyList do
+    for currID, currNdx in next, currencyMappingList do
         currencyDisplayList[ #currencyDisplayList + 1 ] = CURRENCY_LIST[ currNdx ];
     end
     
+    local currentHolidayEvents = self:Lockedout_GetCommingEvents();
+    local currentTime = GetServerTime();
+    for eventID, eventData in next, currentHolidayEvents do
+        if ( eventData.startTime > currentTime ) then
+            holidayDisplayList[ eventID ] = {
+                activeStatus = "PENDING",
+                startTime = eventData.startTime,
+                title = eventData.title
+            };
+        else
+            holidayDisplayList[ eventID ] = {
+                activeStatus = "CURRENT",
+                startTime = eventData.startTime,
+                title = eventData.title
+            };
+        end
+    end
+
     -- sort instance list
-    tsort( dungeonList );
-    tsort( raidList );
-    tsort( worldBossList );
+    tsort( dungeonDisplayList );
+    tsort( raidDisplayList );
+    tsort( worldBossDisplayList );
     local currSort = self:getCurrencyOptions();
     tsort( currencyDisplayList, currSort[ self.config.profile.currency.sortBy ].sortFunction );
     
@@ -625,9 +695,49 @@ function addon:ShowInfo( frame, manualToggle )
     for colNdx, char in next, charList do
         tooltip:SetCell( deleteLineNum, colNdx + 1, CHAR_DELETE_TEXT, nil, "CENTER" );
         if( realmCount > 1 ) and ( self.config.profile.general.showRealmHeader ) then -- show realm only when multiple are involved
-            tooltip:SetCell( realmLineNum, colNdx + 1, self:colorizeString( char.className, char.realmName ), nil, "CENTER" );
+            local realmInstanceLockData = addon:getLockDataByRealm( char.realmName );
+            local realmDisplay = {};
+            realmDisplay.displayTT =    function( self )
+                                            local ttName = self.anchor:getTTName();
+                                            local tooltip = addon:aquireEmptyTooltip( ttName );
+                                            tooltip:SetColumnLayout( 4 );
+
+                                            if ( self.anchor.data ) then
+                                                local currentTime = GetServerTime();
+                                                line = tooltip:AddHeader( "" );
+                                                tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                                tooltip:SetCell( line, 1, L["Locked Instances"], 4 );
+                                                
+                                                line = tooltip:AddHeader( "" );
+                                                tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                                tooltip:SetCell( line, 1, L["Time Remaining"] );
+                                                tooltip:SetCell( line, 2, L["Realm Name"] );
+                                                tooltip:SetCell( line, 3, L["Char Name"] );
+                                                tooltip:SetCell( line, 4, L["Instance Name"] );
+                                                
+                                                for k, p in next, self.anchor.data do
+                                                    line = tooltip:AddHeader( "" );
+                                                    tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                                    tooltip:SetCell( line, 1, SecondsToTime( (60 * 60) - (currentTime - p.timeSaved ) ) );
+                                                    tooltip:SetCell( line, 2, p.realmName );
+                                                    tooltip:SetCell( line, 3, p.charName );
+                                                    tooltip:SetCell( line, 4, addon:GetInstanceName( p.instanceId ) );
+                                                    tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                                end
+                                            end
+
+                                            setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
+                                            tooltip:Show();
+                                        end 
+            realmDisplay.deleteTT =     emptyFunction;
+            realmDisplay.anchor = getAnchorPkt( "realm", char.realmName, realmInstanceLockData, realmLineNum, colNdx + 1 );
+
+            tooltip:SetCell( realmLineNum, colNdx + 1, self:colorizeString( char.className, char.realmName .. " (" .. #realmInstanceLockData .. ")" ), nil, "CENTER" );
+            tooltip:SetCellScript( realmLineNum, colNdx + 1, "OnEnter", function() realmDisplay:displayTT( ); end ); -- close out tooltip when leaving
+            tooltip:SetCellScript( realmLineNum, colNdx + 1, "OnLeave", function() realmDisplay:deleteTT( ); end );     -- close out tooltip when leaving
         end
         local charData = LockoutDb[ char.realmName ][ char.charNdx ];
+        local charInstanceLockData = addon:getLockDataByChar( char.realmName, char.charNdx );
         local charDisplay = {};
         charDisplay.displayTT = function( self )
                                     if ( charData.iLevel == nil ) then
@@ -647,9 +757,9 @@ function addon:ShowInfo( frame, manualToggle )
                                     end -- for k, p in next, charData.iLevel
 
                                     if ( self.anchor.data.timePlayed ) then
-                                        local line = tooltip:AddHeader( "" );
+                                        line = tooltip:AddHeader( "" );
                                         tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
-                                        tooltip:SetCell( line, 1, "Time Played", 2 );
+                                        tooltip:SetCell( line, 1, L["Time Played"], 2 );
                                         for k, p in next, self.anchor.data.timePlayed do
                                             line = tooltip:AddLine( k, SecondsToTime( p, false, false, 5 ) );
                                             tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
@@ -657,13 +767,31 @@ function addon:ShowInfo( frame, manualToggle )
                                     end
 
                                     if ( self.anchor.data.lastLogin ) then
-                                        local line = tooltip:AddHeader( "" );
+                                        line = tooltip:AddHeader( "" );
                                         tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
-                                        tooltip:SetCell( line, 1, "Last Login" );
+                                        tooltip:SetCell( line, 1, L["Last Login"] );
                                         tooltip:SetCell( line, 2, date( "%c", self.anchor.data.lastLogin ) );
                                         tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end
-                                                                        
+
+                                    if ( self.anchor.data.instanceLockData ) then
+                                        local currentTime = GetServerTime();
+                                        line = tooltip:AddHeader( "" );
+                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                        tooltip:SetCell( line, 1, L["Locked Instances"], 2 );
+                                        line = tooltip:AddHeader( "" );
+                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                        tooltip:SetCell( line, 1, L["Time Remaining"] );
+                                        tooltip:SetCell( line, 2, L["Instance Name"] );
+                                        for k, p in next, self.anchor.data.instanceLockData do
+                                            line = tooltip:AddHeader( "" );
+                                            tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                            tooltip:SetCell( line, 1, SecondsToTime( (60 * 60) - (currentTime - p.timeSaved ) ) );
+                                            tooltip:SetCell( line, 2, addon:GetInstanceName( p.instanceId ) );
+                                            tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                        end
+                                    end
+
                                     setAnchorToTooltip( tooltip, self.anchor.lineNum, self.anchor.cellNum );
                                     tooltip:Show();
                                 end -- function( data )
@@ -677,7 +805,7 @@ function addon:ShowInfo( frame, manualToggle )
                                     end
         charDisplay.anchor = getAnchorPkt( "ch", charData.charName, charData, charLineNum, colNdx + 1 );
 
-        tooltip:SetCell( charLineNum, colNdx + 1, self:colorizeString( char.className, char.charName ), nil, "CENTER" );
+        tooltip:SetCell( charLineNum, colNdx + 1, self:colorizeString( char.className, char.charName .. " (" .. #charInstanceLockData .. ")" ), nil, "CENTER" );
 
         tooltip:SetCellScript( deleteLineNum, colNdx + 1, "OnMouseDown", function() charDisplay:deleteChar( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charDisplay:displayTT( ); end ); -- close out tooltip when leaving
@@ -689,25 +817,28 @@ function addon:ShowInfo( frame, manualToggle )
 
     local lineNum = 0;
     if( self.config.profile.dungeon.show ) then
-        populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonList );
+        populateInstanceData( L[ "Dungeon" ], tooltip, charList, dungeonDisplayList );
         lineNum = tooltip:AddLine( );
         tooltip:SetCell( lineNum, 1, "* " .. L["Keystone Helper"], nil, "LEFT", #charList + 1 );
         tooltip:SetLineScript( lineNum, "OnEnter", emptyFunction );
     end
     if( self.config.profile.raid.show ) then
-        populateInstanceData( L[ "Raid" ], tooltip, charList, raidList );
+        populateInstanceData( L[ "Raid" ], tooltip, charList, raidDisplayList );
     end
     if( self.config.profile.worldBoss.show ) then
-        populateWorldBossData( L["World Boss"], tooltip, charList, worldBossList );
+        populateWorldBossData( L["World Boss"], tooltip, charList, worldBossDisplayList );
     end
     if( self.config.profile.emissary.show ) then
-        populateEmissaryData( L["Emissary"], tooltip, charList, emissaryList );
+        populateEmissaryData( L["Emissary"], tooltip, charList, emissaryDisplayList );
     end
     if( self.config.profile.weeklyQuest.show ) then
-        populateWeeklyQuestData( L["Repeatable Quest"], tooltip, charList, weeklyQuestList );
+        populateWeeklyQuestData( L["Repeatable Quest"], tooltip, charList, weeklyQuestDisplayList );
     end
     if( self.config.profile.currency.show ) then
         populateCurrencyData( L["Currency"], tooltip, charList, currencyDisplayList );
+    end
+    if( true ) then
+        popuateHolidayData( L["Holiday Events"], tooltip, charList, holidayDisplayList );
     end
 
     lineNum = tooltip:AddLine( );

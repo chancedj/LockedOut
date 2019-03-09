@@ -16,23 +16,8 @@ local GetQuestObjectiveInfo, GetQuestTimeLeftMinutes, C_GetFactionParagonInfo, C
       GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes, C_Reputation.GetFactionParagonInfo, C_Reputation.IsFactionParagon    -- blizzard api
 
 --[[
-local EMISSARY_MAP_ID = 1014;
-local OLD_EMISSARY_LIST = {
-    { questID = "48642", numRequired=4 }, -- argussian reach
-    { questID = "48641", numRequired=4 }, -- armies of the legionfall
-    { questID = "48639", numRequired=4 }, -- armies of the light
-    { questID = "42420", numRequired=4 }, -- court of farondis
-    { questID = "42233", numRequired=4 }, -- highmountain tribes
-    { questID = "42170", numRequired=4 }, -- the dreamweavers
-    { questID = "43179", numRequired=3 }, -- kirin tor of dalaran
-    { questID = "42421", numRequired=4 }, -- the nightfallen
-    { questID = "42234", numRequired=4 }, -- the valajar   
-    { questID = "42422", numRequired=4 }  -- the wardens
-}
---]]
---[[
-	first key is the expansion level that the emissary applies to
-	second key is the questid that the emissary ties to
+    first key is the expansion level that the emissary applies to
+    second key is the questid that the emissary ties to
 --]]
 local EMISSARY_LIST = {
     [ "6" ] = {
@@ -68,8 +53,8 @@ local function copyEmissaryData( from, to )
     to.resetDate  = from.resetDate;
 end
 
-function addon:Lockedout_BuildEmissary( realmName, charNdx )
-    local emissaries = LockoutDb[ realmName ][ charNdx ].emissaries or {}; -- initialize world boss table;
+function addon:Lockedout_BuildEmissary( )
+    local emissaries = addon.playerDb.emissaries or {}; -- initialize world boss table;
     local dayCalc = 24 * 60 * 60;
     local dailyResetDate = addon:getDailyLockoutDate();
     
@@ -106,26 +91,26 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
                     resetDate = dailyResetDate + (day * dayCalc)
                 end
                 
-                emissaryData.active     	= true;
-                emissaryData.fullfilled 	= emData.numRequired;
-                emissaryData.required   	= emData.numRequired;
-                emissaryData.isComplete 	= true;
-                emissaryData.resetDate  	= resetDate;
-                emissaryData.paragonReady 	= factionParagonEnabled and hasRewardPending;
-                emissaryData.expLevel     	= expLevel;
+                emissaryData.active         = true;
+                emissaryData.fullfilled     = emData.numRequired;
+                emissaryData.required       = emData.numRequired;
+                emissaryData.isComplete     = true;
+                emissaryData.resetDate      = resetDate;
+                emissaryData.paragonReady   = factionParagonEnabled and hasRewardPending;
+                emissaryData.expLevel       = expLevel;
                 
                 self:debug( "Completed: resetDate: ", emissaryData.resetDate, "timeleft: ", timeleft, " - ", questID );
             elseif( factionParagonEnabled and hasRewardPending ) then
-                emissaryData.active     	= false;
-                emissaryData.fullfilled 	= 0;
-                emissaryData.required   	= 0;
-                emissaryData.isComplete 	= false;
-                emissaryData.resetDate  	= -1;
-                emissaryData.paragonReady 	= factionParagonEnabled and hasRewardPending;
-                emissaryData.expLevel     	= expLevel;
+                emissaryData.active         = false;
+                emissaryData.fullfilled     = 0;
+                emissaryData.required       = 0;
+                emissaryData.isComplete     = false;
+                emissaryData.resetDate      = -1;
+                emissaryData.paragonReady   = factionParagonEnabled and hasRewardPending;
+                emissaryData.expLevel       = expLevel;
                 
                 self:debug( "Paragon found: ", questID );
-        	else
+            else
                 emissaryData = nil;
             end
             --]]
@@ -134,16 +119,16 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
     end
 
     -- fix nil error on char rebuild
-    LockoutDb[ realmName ][ charNdx ].emissaries = emissaries;
+    addon.playerDb.emissaries = emissaries;
     for realmName, charDataList in next, LockoutDb do
         for charNdx, charData in next, charDataList do
             local charEmissaries = charData.emissaries;
             
             for questID, emissaryData in next, emissaries do
                 if( charEmissaries[ questID ] ~= nil ) then
-                	local charEmissaryData = charEmissaries[ questID ];
-                	if( charEmissaryData.resetData ) and (charEmissaryData.resetData == -1) then
-                		--- skip - paragon is tracking only for current char, so don't copy!;
+                    local charEmissaryData = charEmissaries[ questID ];
+                    if( charEmissaryData.resetData ) and (charEmissaryData.resetData == -1) then
+                        --- skip - paragon is tracking only for current char, so don't copy!;
                     elseif( charEmissaryData.resetDate < emissaries[ questID ].resetDate ) then
                         self:debug( "updating: ", realmName, " - ", charData.charName );
                         charEmissaryData.resetDate = emissaries[ questID ].resetDate;
@@ -161,5 +146,5 @@ function addon:Lockedout_BuildEmissary( realmName, charNdx )
     end
     
     -- last update since we may have updated
-    LockoutDb[ realmName ][ charNdx ].emissaries = emissaries;
+    addon.playerDb.emissaries = emissaries;
 end -- Lockedout_BuildEmissary()

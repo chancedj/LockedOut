@@ -82,7 +82,7 @@ function addon:shortenAmount( amount )
     return result;
 end
 
-function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
+function addon:Lockedout_BuildCurrencyList( )
     local currency = {}; -- initialize currency table;
 
     for ndx, currencyData in next, addon:getCurrencyList() do
@@ -129,5 +129,5 @@ function addon:Lockedout_BuildCurrencyList( realmName, charNdx )
         end
     end
 
-    LockoutDb[ realmName ][ charNdx ].currency = currency;
+    addon.playerDb.currency = currency;
 end -- Lockedout_BuildInstanceLockout()

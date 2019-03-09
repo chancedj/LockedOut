@@ -2,6 +2,8 @@ local addonName, _ = ...;
 
 local L = LibStub( "AceLocale-3.0" ):NewLocale( addonName, "enUS", true );
 
+-- TODO - Switch to blizzard global strings where possible!
+
 -- addon name
 L["Locked Out"] = "Locked Out";
 
@@ -16,12 +18,23 @@ L["Currency"]                           = "Currency";
 L["Emissary"]                           = "Emissary";
 L["Repeatable Quest"]                   = "Repeatable Quest";
 L["Character iLevels"]                  = "Character iLevels";
+L["Time Played"]                        = "Time Played";
+L["Last Login"]                         = "Last Login";
 L["Defeated"]                           = "Defeated";
 L["Available"]                          = "Available";
 L["Right-click for configuration menu"] = "Right-click for configuration menu";
 L["Keystone Helper"]                    = "+# is current keystone, [#] is best completed mythic";
 L["*Resets in"]                         = "*Resets in";
 L["Currency Display"]                   = "Currency Display";
+L["Boss Name"]                          = "Boss Name";
+L["Quest Name"]                         = "QuestName";
+L["Status"]                             = "Status";
+L["Locked Instances"]                   = "Locked Instances";
+L["Time Remaining"]                     = "Time Remaining";
+L["Realm Name"]                         = "Realm Name";
+L["Char Name"]                          = "Char Name";
+L["Instance Name"]                      = "Instance Name";
+L["Holiday Events"]                     = "Holiday Events";
 
 -- configuration menu
 -- * headers
@@ -58,6 +71,9 @@ L["Display Expansion"]          = "Display Expansion";
 L["Anchor To"]                  = "Anchor To";
 L["Show Reset Time"]            = "Show Reset Time"    
 L["Choose Icon (reload ui)"]    = "Choose Icon (reload ui)";
+L["Frame Scale"]                = "Frame Scale";
+L["Start Tracking Level"]       = "Start Tracking Level";
+L["Visible Characters"]         = "Visible Characters";
 
 -- * label descriptions
 L["Enables / disables the addon"]                                   = "Enables / disables the addon";
@@ -73,8 +89,8 @@ L["Show in list only when killed"]                                  = "Show in l
 L["Show currency information"]                                      = "Show currency information";
 L["Configures currency display"]                                    = "Configures currency display";
 L["Show Emissary Information"]                                      = "Show Emissary Information";
-L["Emissary groups"]												= "Emissary groups";
-L["Which emissary groups to display"]								= "Which emissary groups to display";
+L["Emissary groups"]                                                = "Emissary groups";
+L["Which emissary groups to display"]                               = "Which emissary groups to display";
 L["Show repeatable quest information"]                              = "Show repeatable quest information";
 L["Configure how currency is sorted"]                               = "Configure how currency is sorted";
 L["Select which currencies you'd like to see"]                      = "Select which currencies you'd like to see";
@@ -82,6 +98,9 @@ L["Display expansion abbreviation the currency belongs to"]         = "Display e
 L["Choose where hover tooltip displays"]                            = "Choose where hover tooltip displays";
 L["Show reset time instead of checkbox when completed"]             = "Show reset time instead of checkbox when completed"
 L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose icon for addon - requires ui refresh or login/logout";
+L["Configure the scale of the window"]                              = "Configure the scale of the window";
+L["Start tracking characters greater than or equal to level below"] = "Start tracking characters greater than or equal to level below";
+L["Which characters should show in menu"]                           = "Which characters should show in menu";
 
 -- difficulty mapping full
 L["Unknown"]            = "Unknown";
@@ -93,30 +112,31 @@ L["Timewalking"]        = "Timewalking";
 
 -- difficulty mapping abbreviation
 L["U"]  = "U";
-L["N"] 	= "N";
-L["H"] 	= "H";
+L["N"]  = "N";
+L["H"]  = "H";
 L["M"]  = "M";
 L["L"]  = "L";
 L["T"]  = "T";
 
--- server reset
-L["Instances Reset"]            = "Instances Reset";
-
 -- quest.lua mappings
-L["Blingtron"]                  = "Blingtron";
-L["Instant Complete"]           = "Instant Complete";
-L["Main City Weekly"]           = "Main City Weekly";
-L["Seal of Fate"]               = "Seal of Fate";
-L["WoW 13th - Bosses"]          = "WoW 13th - Bosses";
-L["WoW 13th - Lore."]           = "WoW 13th - Lore.";
-L["Argus - Pristine Argunite"]  = "Argus - Pristine Argunite";
-L["Argus - Invasions"]          = "Argus - Invasions";
-L["Argus - Cheap Ridgestalker"] = "Argus - Cheap Ridgestalker";
-L["Argus - Cheap Void-Purged"]  = "Argus - Cheap Void-Purged";
-L["Argus - Cheap Lightforged"]  = "Argus - Cheap Lightforged";
-L["Daily Heroic (essences)"]    = "Daily Heroic (essences)";
-L["Daily Heroic"]               = "Daily Heroic";
-L["Island Expeditions"]         = "Island Expeditions";
+L["Blingtron"]                          = "Blingtron";
+L["Instant Complete"]                   = "Instant Complete";
+L["Main City Weekly"]                   = "Main City Weekly";
+L["Seal of Fate"]                       = "Seal of Fate";
+L["Argus - Pristine Argunite"]          = "Argus - Pristine Argunite";
+L["Argus - Invasions"]                  = "Argus - Invasions";
+L["Argus - Cheap Ridgestalker"]         = "Argus - Cheap Ridgestalker";
+L["Argus - Cheap Void-Purged"]          = "Argus - Cheap Void-Purged";
+L["Argus - Cheap Lightforged"]          = "Argus - Cheap Lightforged";
+L["Daily Heroic (essences)"]            = "Daily Heroic (essences)";
+L["Daily Heroic"]                       = "Daily Heroic";
+L["Island Expeditions"]                 = "Island Expeditions";
+L["Improper resetForm for questID: "]   = "Improper resetForm for questID: ";
+
+-- instances.lua
+L["You have used %d/10 instance locks this hour."]          = "You have used %d/10 instance locks this hour.";
+L["Reset can only be successful outside of the instance."]  = "Reset can only be successful outside of the instance.";
+L["Instances Reset"]                                        = "Instances Reset";
 
 -- expansion abbreviations
 L["Van"]    = "Van";

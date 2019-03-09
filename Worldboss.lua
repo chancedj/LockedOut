@@ -18,6 +18,7 @@ local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterIn
         READY_CHECK_READY_TEXTURE, C_TaskQuest.IsActive     -- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode
+-- TODO - Query EJ_* on login and cache data to possible Localize names?
 local WORLD_BOSS_LIST = {
 ---[[
     -- Pandaria
@@ -123,7 +124,7 @@ function CheckForMissingMappings()
 end -- CheckForMissingMappings()
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
-function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
+function addon:Lockedout_BuildWorldBoss( )
     local worldBosses = {};
 
     local calculatedResetDate = self:getWeeklyLockoutDate();
@@ -142,6 +143,6 @@ function addon:Lockedout_BuildWorldBoss( realmName, charNdx )
         end
     end
 
-    LockoutDb[ realmName ][ charNdx ].worldBosses = worldBosses;
+    addon.playerDb.worldBosses = worldBosses;
 end -- Lockedout_BuildInstanceLockout()
 

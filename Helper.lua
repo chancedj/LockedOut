@@ -8,8 +8,8 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- cache lua functions
-local print, type, tonumber =                      -- variables
-      print, type, tonumber                        -- lua functions
+local print, type, tonumber, setmetatable, tonumber, next, pairs, tinsert, tsort =                  -- variables
+      print, type, tonumber, setmetatable, tonumber, next, pairs, table.insert, table.sort          -- lua functions
 
 -- cache blizzard function/globals
 local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
@@ -33,7 +33,7 @@ addon.EmissaryDisplayGroups = {
     [ "7" ] = L["BfA"]
 }
 
-addon.KEY_KEYSTONE = "keystone";
+addon.KEY_KEYSTONE   = "keystone";
 addon.KEY_MYTHICBEST = "mythicbest";
 
 local iconTextures = {
@@ -63,33 +63,43 @@ local MapRegionReset = {
     [5] = 5  -- CN
 }
 
+--[[ wday values
+1 = Sun
+2 = Mon
+3 = Tue
+4 = Wed
+5 = Thur
+6 = Fri
+7 = Sat
+--]]
+
 local weekdayRemap = {
     [3] = {
-        [1] = 1,
-        [2] = 0,
-        [3] = 6,
         [4] = 5,
         [5] = 4,
         [6] = 3,
         [7] = 2,
+        [1] = 1,
+        [2] = 0,
+        [3] = 6, -- Tue
     },
     [4] = {
-        [1] = 2,
-        [2] = 1,
-        [3] = 0,
-        [4] = 6,
         [5] = 5,
         [6] = 4,
         [7] = 3,
+        [1] = 2,
+        [2] = 1,
+        [3] = 0,
+        [4] = 6, -- Wed
     },
     [5] = {
+        [6] = 5,
+        [7] = 4,
         [1] = 3,
         [2] = 2,
         [3] = 1,
         [4] = 0,
-        [5] = 6,
-        [6] = 5,
-        [7] = 4,
+        [5] = 6, -- Thur
     },
 }
 
@@ -230,6 +240,7 @@ local CURRENCY_LIST = {
     { ID=1703, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- BFA Season 1 Rated Participation Currency 
     { ID=1704, name=nil, icon=nil, expansionLevel=1, type="C", show=true },  -- Spirit Shard 
     { ID=1705, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Warfronts - Personal Tracker - Iron in Chest (Hidden) 
+    { ID=1714, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Warfronts - Personal Tracker - Wood in Chest (Hidden) 
     { ID=1710, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Seafarer's Dubloon
     { ID=1716, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Honorbound Service Medal
     { ID=1717, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- 7th Legion Service Medal
@@ -319,14 +330,14 @@ end
 
 local MyScanningTooltip = CreateFrame("GameTooltip", "MyScanningTooltip", UIParent, "GameTooltipTemplate")
 local QuestTitleFromID = setmetatable({}, { __index = function(t, id)
-	MyScanningTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-	MyScanningTooltip:SetHyperlink("quest:"..id)
-	local title = MyScanningTooltipTextLeft1:GetText()
-	MyScanningTooltip:Hide()
-	if title and title ~= RETRIEVING_DATA then
-		t[id] = title
-		return title
-	end
+    MyScanningTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+    MyScanningTooltip:SetHyperlink("quest:"..id)
+    local title = MyScanningTooltipTextLeft1:GetText()
+    MyScanningTooltip:Hide()
+    if title and title ~= RETRIEVING_DATA then
+        t[id] = title
+        return title
+    end
 end })
 
 local _questCachDb = {};
@@ -398,6 +409,11 @@ function addon:deleteChar( realmName, charNdx )
                 LockoutDb[ realmName ] = nil;
             end
         end
+
+        if( addon.currentRealm == realmName ) and ( addon.charDbIndex == charNdx ) then
+            addon:debug( "current char deleted!  rebuilding now." );
+            self:Lockedout_RebuildAll();
+        end
     end
 end
 --]]
@@ -406,10 +422,10 @@ end
 function addon:getKeysSortedByValue(tbl, sortFunction)
   local keys = {}
   for key in pairs(tbl) do
-    table.insert(keys, key)
+    tinsert(keys, key)
   end
 
-  table.sort(keys, function(a, b)
+  tsort(keys, function(a, b)
     return sortFunction(tbl[a], tbl[b])
   end)
 
@@ -464,19 +480,20 @@ end
 
 function addon:getWeeklyLockoutDate()
     local secondsInDay      = 24 * 60 * 60;
-    local serverResetDay    = MapRegionReset[ GetCurrentRegion() ];
+    local currentRegion     = GetCurrentRegion();
+    local serverResetDay    = MapRegionReset[ currentRegion ];
     local currentServerTime = GetServerTime();
-    local daysLefToReset    = weekdayRemap[ serverResetDay ][ date( "*t", currentServerTime ).wday ];
-    local weeklyResetTime   = self:getDailyLockoutDate();
+    local dayOfWeek         = date( "*t", currentServerTime ).wday;
+    local daysLefToReset    = weekdayRemapNew[ serverResetDay ][ dayOfWeek ];
 
-    -- handle reset on day of reset (before vs after server reset)
-    if( daysLefToReset == 6 ) then
-        -- if they are diff, we've passed server reset time.  so push it a week.
-        if( date("%x", weeklyResetTime) ~= date("%x", currentServerTime) ) then
-            weeklyResetTime = weeklyResetTime + (daysLefToReset * secondsInDay);
+    local dailyResetTime    = self:getDailyLockoutDate( currentServerTime );
+    local weeklyResetTime   = dailyResetTime + (daysLefToReset * secondsInDay);
+
+    if( serverResetDay == dayOfWeek ) then
+        -- if we're on reset day AND the dates match,  we just use dailylockout because
+        if( date("%x", dailyResetTime) == date("%x", currentServerTime) ) then
+            weeklyResetTime = dailyResetTime;
         end
-    else
-        weeklyResetTime = weeklyResetTime + (daysLefToReset * secondsInDay);
     end
 
     return weeklyResetTime
@@ -492,25 +509,33 @@ end
 
 --- recursive printing for debug purposes
 function addon:printTable( tbl, maxDepth, depth )
-	if ( tbl == nil ) then return; end
-	if ( maxDepth ~= nil ) and ( depth == maxDepth ) then return; end
-	
-	depth = depth or 0; -- initialize depth to 0 if nil
-	local indent = strrep( "  ", depth ) .. "=>";
-	
-	for key, value in next, tbl do
-		if ( type ( value ) == "table" ) then
-			print( indent .. key );
+    if ( tbl == nil ) then return; end
+    if ( maxDepth ~= nil ) and ( depth == maxDepth ) then return; end
+    
+    depth = depth or 0; -- initialize depth to 0 if nil
+    local indent = strrep( "  ", depth ) .. "=>";
+    
+    for key, value in next, tbl do
+        if ( type ( value ) == "table" ) then
+            print( indent .. key );
 
-			-- initialize depth to 0 if nil
-			self:printTable( value, maxDepth, depth + 1 );
-		elseif( type( value ) == "boolean" ) then
-			print( indent .. key .. " - " .. fif( value, "true", "false" ) );
-		elseif( type( value ) == "function" ) then
-			print( indent .. key .. " = " .. value() );
-		else
-			print( indent .. key .. " - " .. value );
-		end -- if ( type ( value ) == "table" )
-	end -- for key, value in next, tbl
-	
+            -- initialize depth to 0 if nil
+            self:printTable( value, maxDepth, depth + 1 );
+        elseif( type( value ) == "boolean" ) then
+            print( indent .. key .. " - " .. fif( value, "true", "false" ) );
+        elseif( type( value ) == "function" ) then
+            print( indent .. key .. " = " .. value() );
+        else
+            print( indent .. key .. " - " .. value );
+        end -- if ( type ( value ) == "table" )
+    end -- for key, value in next, tbl
+    
 end 
+
+function addon:mergeTable( tTarget, tSource )
+    for k, v in next, tSource do
+        tinsert( tTarget, v );
+    end
+
+    return tTarget;
+end

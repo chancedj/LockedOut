@@ -9,23 +9,23 @@ local addon = LibStub( "AceAddon-3.0" ):GetAddon( addonName );
 local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
-local next, type, table, select, tsort = -- variables
-      next, type, table, select, table.sort      -- lua functions
+local next, type, table, select, sfmt, tsort = -- variables
+      next, type, table, select,  string.format, table.sort      -- lua functions
 
 -- cache blizzard function/globals
 local GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
-      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
-      C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo,
-      C_GetOwnedKeystoneChallengeMapID, C_GetOwnedKeystoneLevel,
-      C_RequestMapInfo, C_RequestRewards                                          =
+      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid, IsInInstance,
+      C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo, EJ_GetInstanceForMap,
+      C_GetOwnedKeystoneChallengeMapID, C_GetOwnedKeystoneLevel, GetServerTime,
+      C_RequestMapInfo, C_RequestRewards, C_GetBestMapForUnit, EJ_GetInstanceInfo                                          =
 
       GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
-      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid,
-      C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo,
-      C_MythicPlus.GetOwnedKeystoneChallengeMapID, C_MythicPlus.GetOwnedKeystoneLevel,
-      C_MythicPlus.RequestMapInfo, C_MythicPlus.RequestRewards
+      GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid, IsInInstance,
+      C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo, EJ_GetInstanceForMap,
+      C_MythicPlus.GetOwnedKeystoneChallengeMapID, C_MythicPlus.GetOwnedKeystoneLevel, GetServerTime,
+      C_MythicPlus.RequestMapInfo, C_MythicPlus.RequestRewards, C_Map.GetBestMapForUnit, EJ_GetInstanceInfo
 
 local function convertDifficulty(difficulty)
     if difficulty == 1 then         return L[ "Normal" ],       L[ "N" ];
@@ -103,6 +103,23 @@ local function addKeystoneData( difficultyName, instanceData, instanceName, diff
     return instanceData[ key ][ difficultyName ];
 end
 
+function addon:removeExpiredInstances()
+    local currentTime = GetServerTime() - (60 * 60);
+
+    for realmName, realmData in next, LockoutDb do
+        for charNdx, charData in next, realmData do
+            local instanceLockData = charData.instanceLockData or {};
+            for i = #instanceLockData, 1, -1 do
+                local secondsElapsed = currentTime - instanceLockData[ i ].timeSaved;
+
+                if( secondsElapsed > 0) then
+                    instanceLockData[ i ] = nil;
+                end
+            end
+        end
+    end
+end
+
 local function removeUntouchedInstances( instances )
     -- fix up the displayText now, and remove instances with no boss kills.
     for instanceKey, instanceDetails in next, instances do
@@ -138,15 +155,16 @@ local function removeUntouchedInstances( instances )
 end -- removeUntouchedInstances()
 
 ---[[
-local connectedRealms = {};
-function addon:GetConnectedRealms()
-	if ( #connectedRealms > 0 ) then
-		addon:debug( "pulling from cache" );
-		return connectedRealms;
-	end
+local connectedRealmsCache = { {} };
+function addon:GetConnectedRealms( realmName )
+    if ( connectedRealmsCache[ realmName] ) and ( #connectedRealmsCache[ realmName] > 0 ) then
+        addon:debug( "pulling from cache" );
+        return connectedRealmsCache[ realmName];
+    end
 
     local libRealm = LibStub("LibRealmInfo");
-    local realmIdList = select( 9, libRealm:GetRealmInfo( GetRealmName() ) );
+    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName ) );
+    local connectedRealms = {}
 
     for i = 1, #realmIdList do
       local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( realmIdList[ i ] );
@@ -155,13 +173,144 @@ function addon:GetConnectedRealms()
 
     addon:debug( "Instance lock applies to these realms: ", table.concat( connectedRealms, ", ") );
 
-    return connectedRealms;
+    connectedRealmsCache[ realmName] = connectedRealms;
+
+    return connectedRealmsCache[ realmName ];
 end
 --]]
 
-local function callbackResetInstances()
+local function getPlayerInstanceId()
+    local MapId = C_GetBestMapForUnit("player");
+
+    -- if it returns 0 the data is not ready yet.
+    if( MapId == 0) then
+        return 0, 0;
+    end
+
+    local instanceID = EJ_GetInstanceForMap( MapId );
+    local _, _, difficulty = GetInstanceInfo();
+    return instanceID, difficulty;
+end
+
+local instanceNameCache = {};
+function addon:GetInstanceName( instanceId )
+    local instanceName = instanceNameCache[ instanceId ];
+
+    if( instanceName ) then
+        return instanceName;
+    end
+
+    instanceNameCache[ instanceId ] = EJ_GetInstanceInfo( instanceId );
+
+    return instanceNameCache[ instanceId ]
+end
+
+local function lockedInstanceInList( instanceId, difficulty )
+    local found = false;
+    local instanceLockData = addon.playerDb.instanceLockData
+
+    for _, lockData in next, instanceLockData do
+        if ( lockData.instanceId == instanceId ) and ( lockData.difficulty == difficulty ) and ( not lockData.instanceWasReset ) then
+            addon:debug( "found instance: ", addon:GetInstanceName( lockData.instanceId ) );
+
+            return lockData;
+        end
+    end
+
+    return nil;
+end
+
+local function flagInstancesAsReset()
+    local instanceLockData = addon.playerDb.instanceLockData;
+
+    for i = 1, #instanceLockData do
+        if( not instanceLockData[ i ].instanceWasReset ) then
+            addon:debug( "flagged as reset: ", addon:GetInstanceName( instanceLockData[ i ].instanceId ) );
+            instanceLockData[ i ].instanceWasReset = true;
+        end
+    end
+end
+
+
+function addon:getLockDataByChar( realmName, charNdx )
+    local charData = LockoutDb[ realmName ][ charNdx ];
+    local instanceLockData = charData.instanceLockData or {};
+
+    local charLockData = {};
+    for ndx, singleLockData in next, instanceLockData do
+        charLockData[ #charLockData + 1 ] = {
+            realmName = realmName,
+            charName = charData.charName,
+            instanceId = singleLockData.instanceId,
+            timeSaved = singleLockData.timeSaved
+        };
+    end
+
+    addon:debug( "Char: ", charNdx, " is locked to ", #charLockData, " instances.");
+    return charLockData;
+end
+
+function addon:getLockDataByRealm( realmName )
+    local connectedRealms = addon:GetConnectedRealms( realmName );
+
+    local realmLockData = {};
+    for _, connectedRealmName in next, connectedRealms do
+        local realmChars = LockoutDb [ connectedRealmName ];
+        if( realmChars ) then
+            for charNdx, charData in next, realmChars do
+                local tmpLockData = addon:getLockDataByChar( connectedRealmName, charNdx );
+
+                addon:mergeTable( realmLockData, tmpLockData );
+            end
+        end
+    end
+
+    tsort( realmLockData, function( a, b ) return a.timeSaved < b.timeSaved end);
+
+    return realmLockData;
+end
+
+function addon:IncrementInstanceLockCount()
+    addon:removeExpiredInstances();
+    local instanceId, difficulty = getPlayerInstanceId();
+    local instanceLockData = addon.playerDb.instanceLockData or {};
+
+    local lockedTotal = #addon:getLockDataByRealm( addon.currentRealm );
+    if( lockedTotal > 5 ) then
+        print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
+    end
+
+    if( instanceId > 0 ) then
+        local lockedInstance = lockedInstanceInList( instanceId, difficulty );
+        if( lockedInstance ) then
+            lockedInstance.timeSaved = GetServerTime();
+        else
+            addon:debug( "adding instance to list: ", addon:GetInstanceName( instanceId ) );
+            instanceLockData[ #instanceLockData + 1 ] = {
+                                                            instanceId = instanceId,
+                                                            difficulty = difficulty,
+                                                            timeSaved = GetServerTime(),
+                                                            instanceWasReset = false
+                                                        };
+        end
+    end
+
+     addon.playerDb.instanceLockData = instanceLockData;
+end
+
+local function callbackResetInstances( test )
     local msg = addonName .. " - " .. L["Instances Reset"];
-    
+    local instanceId = getPlayerInstanceId();
+
+    if( instanceId ~= 0 ) then
+        print( L["Reset can only be successful outside of the instance."] );
+        return;
+    end
+
+    -- we maintain a list of instances.  when the reset is called,
+    -- flag them as reset so we can keep incrementing the list.
+    flagInstancesAsReset();
+
     if( IsInRaid() ) then
         SendChatMessage( msg, "RAID" );
     elseif( IsInGroup() ) then
@@ -170,10 +319,11 @@ local function callbackResetInstances()
         print( msg );
     end
 end
+
 -- hook in after function is defined
 hooksecurefunc("ResetInstances", callbackResetInstances);
 
-function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
+function addon:Lockedout_BuildInstanceLockout( )
     local instances = {}; -- initialize instance table;
     
     ---[[
@@ -216,11 +366,11 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
 
     local keystoneMapId = C_GetOwnedKeystoneChallengeMapID();
     if ( keystoneMapId ) then
-    	local keystoneMapName = C_GetMapUIInfo( keystoneMapId );
-    	local keystoneLevel = C_GetOwnedKeystoneLevel();
+        local keystoneMapName = C_GetMapUIInfo( keystoneMapId );
+        local keystoneLevel = C_GetOwnedKeystoneLevel();
         
         addon:debug( "info: " .. keystoneMapName .." (" .. keystoneMapId .. ") level: " .. keystoneLevel );
-		addKeystoneData( addon.KEY_KEYSTONE, instances, keystoneMapName, keystoneLevel, calculatedResetDate );
+        addKeystoneData( addon.KEY_KEYSTONE, instances, keystoneMapName, keystoneLevel, calculatedResetDate );
     end
 
     ---[[
@@ -229,14 +379,14 @@ function addon:Lockedout_BuildInstanceLockout( realmName, charNdx )
         --local _, _, bestLevel = C_GetMapPlayerStats( mapId );
         local _, bestLevel = C_GetWeeklyBestForMap( mapId );
         if( bestLevel ) then
-	        local mapName = C_GetMapUIInfo( mapId );
+            local mapName = C_GetMapUIInfo( mapId );
             addKeystoneData( addon.KEY_MYTHICBEST, instances, mapName, bestLevel, calculatedResetDate );
             addon:debug( mapName, " - bestLevel: ", bestLevel );
         end
     end
     --]]
-    
+
     removeUntouchedInstances( instances );
     
-    LockoutDb[ realmName ][ charNdx ].instances = instances;
+    addon.playerDb.instances = instances;
 end -- Lockedout_BuildInstanceLockout()

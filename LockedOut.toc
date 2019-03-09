@@ -17,3 +17,4 @@ Currency.lua
 Emissary.lua
 Quests.lua
 Minimap.lua
+HolidayEvents.lua
