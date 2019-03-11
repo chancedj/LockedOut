@@ -281,13 +281,6 @@ function addon:IncrementInstanceLockCount()
     local instanceId, difficulty = getPlayerInstanceId();
     local instanceLockData = addon.playerDb.instanceLockData or {};
 
-    local lockedTotal = #addon:getLockDataByRealm( addon.currentRealm );
-    -- only mention lock when entering or leaving the instance
-    if( lockedTotal > 5 ) and ( ( addon.currentInstanceID or 0 ) == 0 ) and ( currentInstanceID ~= instanceId ) then
-        print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
-    end
-    addon.currentInstanceID = instanceId;
-
     if( instanceId > 0 ) then
         local lockedInstance = lockedInstanceInList( instanceId, difficulty );
         if( lockedInstance ) then
@@ -302,10 +295,16 @@ function addon:IncrementInstanceLockCount()
                                                         };
         end
     end
-
     tsort( instanceLockData, sortLockedData );
 
-     addon.playerDb.instanceLockData = instanceLockData;
+    local lockedTotal = #addon:getLockDataByRealm( addon.currentRealm );
+    -- only mention lock when entering or leaving the instance
+    if( lockedTotal > 5 ) and ( ( addon.currentInstanceID or 0 ) == 0 ) and ( currentInstanceID ~= instanceId ) then
+        print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
+    end
+
+    addon.currentInstanceID = instanceId;
+    addon.playerDb.instanceLockData = instanceLockData;
 end
 
 local function callbackResetInstances( test )
