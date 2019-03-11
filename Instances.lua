@@ -112,7 +112,7 @@ function addon:removeExpiredInstances()
             for i = #instanceLockData, 1, -1 do
                 -- since this is fired very often, it's possible the entry is nil and cleared already.
                 -- so just flag it to something harmless.
-                local secondsElapsed = currentTime - ( instanceLockData[ i ].timeSaved or 1 );
+                local secondsElapsed = currentTime - ( instanceLockData[ i ] and instanceLockData[ i ].timeSaved or 1 );
 
                 if( secondsElapsed > 0) then
                     instanceLockData[ i ] = nil;
