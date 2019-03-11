@@ -110,7 +110,9 @@ function addon:removeExpiredInstances()
         for charNdx, charData in next, realmData do
             local instanceLockData = charData.instanceLockData or {};
             for i = #instanceLockData, 1, -1 do
-                local secondsElapsed = currentTime - instanceLockData[ i ].timeSaved;
+                -- since this is fired very often, it's possible the entry is nil and cleared already.
+                -- so just flag it to something harmless.
+                local secondsElapsed = currentTime - ( instanceLockData[ i ].timeSaved or 0 );
 
                 if( secondsElapsed > 0) then
                     instanceLockData[ i ] = nil;
@@ -276,9 +278,11 @@ function addon:IncrementInstanceLockCount()
     local instanceLockData = addon.playerDb.instanceLockData or {};
 
     local lockedTotal = #addon:getLockDataByRealm( addon.currentRealm );
-    if( lockedTotal > 5 ) then
+    -- only mention lock when entering or leaving the instance
+    if( lockedTotal > 5 ) and ( ( addon.currentInstanceID or 0 ) == 0 ) and ( currentInstanceID ~= instanceId ) then
         print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
     end
+    addon.currentInstanceID = instanceId;
 
     if( instanceId > 0 ) then
         local lockedInstance = lockedInstanceInList( instanceId, difficulty );
