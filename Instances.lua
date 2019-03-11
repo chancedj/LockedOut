@@ -303,6 +303,9 @@ function addon:IncrementInstanceLockCount()
         print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
     end
 
+    local db = LibStub( "LibDataBroker-1.1" ):GetDataObjectByName( "Locked Out" );
+    db.label =  lockedTotal .. "/10";
+
     addon.currentInstanceID = instanceId;
     addon.playerDb.instanceLockData = instanceLockData;
 end

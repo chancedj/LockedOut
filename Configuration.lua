@@ -503,6 +503,7 @@ function addon:OnInitialize()
     local LockedoutMo = LibStub( "LibDataBroker-1.1" ):NewDataObject( "Locked Out", {
         type = "data source",
         text = L[ "Locked Out" ],
+        label = "0/0",
         icon = self.config.profile.minimap.addonIcon,
         OnClick = function( frame, button ) self:OpenConfigDialog( button ) end,
         OnEnter = function( frame ) self:ShowInfo( frame ) end,
