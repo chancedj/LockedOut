@@ -119,10 +119,21 @@ function addon:Lockedout_GetCommingEvents()
     local events = {};
 
     C_Calendar.SetAbsMonth( currDp.month, currDp.year );
-    for offset = 0, 1 do 
+    for offset = 0, 2 do 
         local monthInfo = C_Calendar.GetMonthInfo( 0 );
+        local dayToUse  = 1;
 
-        for day = 1, monthInfo.numDays do
+        if( monthInfo.year == currDp.year ) and ( monthInfo.month == currDp.month ) then
+            dayToUse = currDp.day;
+        end;
+
+        for day = dayToUse, monthInfo.numDays do
+            local currentEventDate = time( { year=monthInfo.year, month=monthInfo.month, day=day } );
+
+            if( currentEventDate > endTime ) then
+                break;
+            end;
+
             local eventCount = C_Calendar.GetNumDayEvents( 0, day );
             for eventNum = 1, eventCount do
                 local eventInfo         = C_Calendar.GetDayEvent( 0, day, eventNum);
@@ -130,15 +141,13 @@ function addon:Lockedout_GetCommingEvents()
                 local eventEndTime      = convertEventTime( eventInfo.endTime );
 
                 if( EVENTS_TO_TRACK[ eventInfo.eventID ] ) and ( events[ eventInfo.eventID ] == nil ) then
-                    if ( currentTime >= eventStartTime) or ( endTime <= eventEndTime ) then
-                        EVENTS_TO_TRACK[ eventInfo.eventID ].title = eventInfo.title;
-                        events[ eventInfo.eventID ] = {
-                            startTime = eventStartTime,
-                            endTime   = eventEndTime,
-                            title     = eventInfo.title
-                        };
-                        addon:debug( "[", currentCalendarTime.month + offset, "/", day, " | ", eventInfo.eventID, " == ", eventInfo.title );
-                    end
+                    EVENTS_TO_TRACK[ eventInfo.eventID ].title = eventInfo.title;
+                    events[ eventInfo.eventID ] = {
+                        startTime = eventStartTime,
+                        endTime   = eventEndTime,
+                        title     = eventInfo.title
+                    };
+                    addon:debug( "[", currentCalendarTime.month + offset, "/", day, " | ", eventInfo.eventID, " == ", eventInfo.title );
                 end
             end
         end
