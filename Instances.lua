@@ -10,7 +10,7 @@ local L     = LibStub( "AceLocale-3.0" ):GetLocale( addonName, false );
 
 -- Upvalues
 local next, type, table, select, sfmt, tsort = -- variables
-      next, type, table, select,  string.format, table.sort      -- lua functions
+      next, type, table, select, string.format, table.sort      -- lua functions
 
 -- cache blizzard function/globals
 local GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
@@ -112,7 +112,7 @@ function addon:removeExpiredInstances()
             for i = #instanceLockData, 1, -1 do
                 -- since this is fired very often, it's possible the entry is nil and cleared already.
                 -- so just flag it to something harmless.
-                local secondsElapsed = currentTime - ( instanceLockData[ i ] and instanceLockData[ i ].timeSaved or 1 );
+                local secondsElapsed = currentTime - instanceLockData[ i ].timeSaved;
 
                 if( secondsElapsed > 0) then
                     instanceLockData[ i ] = nil;
@@ -252,6 +252,10 @@ function addon:getLockDataByChar( realmName, charNdx )
     return charLockData;
 end
 
+local function sortLockedData( l1, l2 )
+    return l1.timeSaved > l2.timeSaved;
+end
+
 function addon:getLockDataByRealm( realmName )
     local connectedRealms = addon:GetConnectedRealms( realmName );
 
@@ -267,7 +271,7 @@ function addon:getLockDataByRealm( realmName )
         end
     end
 
-    tsort( realmLockData, function( a, b ) return a.timeSaved < b.timeSaved end);
+    tsort( realmLockData, sortLockedData );
 
     return realmLockData;
 end
@@ -298,6 +302,8 @@ function addon:IncrementInstanceLockCount()
                                                         };
         end
     end
+
+    tsort( instanceLockData, sortLockedData );
 
      addon.playerDb.instanceLockData = instanceLockData;
 end
