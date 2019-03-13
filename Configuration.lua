@@ -592,9 +592,9 @@ function addon:EVENT_Logout( event )
     
     -- means we fired before, and we can go ahead and force an update
     if( self.lastTimePlayedUpdate ) then
-        local diff = playerData.lastLogin - self.lastTimePlayedUpdate;
+        local diff = self.playerDb.lastLogin - self.lastTimePlayedUpdate;
         
-        self:EVENT_TimePlayed( event, playerData.timePlayed.total + diff, playerData.timePlayed.currentLevel + diff ); 
+        self:EVENT_TimePlayed( event, self.playerDb.timePlayed.total + diff, self.playerDb.timePlayed.currentLevel + diff ); 
     end
 end
 
