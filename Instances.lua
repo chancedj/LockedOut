@@ -189,6 +189,13 @@ local function getPlayerInstanceId()
         return 0, 0;
     end
 
+    -- in some areas the InstanceID is returned when NOT in the instance
+    -- so we need a second check to make sure this won't get triggered.
+    local inInstance = IsInInstance();
+    if( not inInstance ) then
+        return 0, 0;
+    end
+
     local instanceID = EJ_GetInstanceForMap( MapId );
     local _, _, difficulty = GetInstanceInfo();
     return instanceID, difficulty;
