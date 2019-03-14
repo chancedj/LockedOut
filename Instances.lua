@@ -182,7 +182,8 @@ end
 --]]
 
 local function getPlayerInstanceId()
-    local MapId = C_GetBestMapForUnit("player");
+    -- sometimes function will return nil, so force to 0
+    local MapId = C_GetBestMapForUnit("player") or 0;
 
     -- if it returns 0 the data is not ready yet.
     if( MapId == 0) then
