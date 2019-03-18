@@ -527,6 +527,18 @@ local function IsLoggedInChar( realmName, charNdx )
            ( addon.charDbIndex == charNdx );
 end
 
+local function ShouldDisplayInstanceLocks( realmName, charNdx )
+    --[[
+    0: all
+    1: realm only
+    2: char only
+    3: none.
+    --]]
+    return ( addon.config.profile.dungeon.displayType == 0 ) or
+           ( addon.config.profile.dungeon.displayType == 1 and IsLoggedInRealm( realmName ) ) or
+           ( addon.config.profile.dungeon.displayType == 2 and IsLoggedInChar( realmName, charNdx ) );
+end
+
 function addon:ShowInfo( frame, manualToggle )
     self:removeExpiredInstances();
     if( manualToggle ~= nil ) then
@@ -741,9 +753,7 @@ function addon:ShowInfo( frame, manualToggle )
 
             local displayText = char.realmName;
             local displayFn = emptyFunction;
-            if( self.config.profile.dungeon.displayType == "all" ) or
-              ( self.config.profile.dungeon.displayType == "realmOnly" and IsLoggedInRealm( char.realmName ) ) or
-              ( self.config.profile.dungeon.displayType == "charOnly" and IsLoggedInChar( char.realmName, char.charNdx ) ) then
+            if ( ShouldDisplayInstanceLocks( char.realmName, char.charNdx ) ) then
                 displayText = displayText .. " (" .. #realmInstanceLockData .. ")";
                 displayFn = function() realmDisplay:displayTT( ); end;
             end;  
@@ -789,9 +799,7 @@ function addon:ShowInfo( frame, manualToggle )
                                         tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end
 
-                                    if( addon.config.profile.dungeon.displayType == "all" ) or
-                                      ( addon.config.profile.dungeon.displayType == "realmOnly" and IsLoggedInRealm( char.realmName ) ) or
-                                      ( addon.config.profile.dungeon.displayType == "charOnly" and IsLoggedInChar( char.realmName, char.charNdx ) ) then
+                                    if ( ShouldDisplayInstanceLocks( char.realmName, char.charNdx ) ) then
                                         if ( self.anchor.data.instanceLockData ) then
                                             local currentTime = GetServerTime();
                                             line = tooltip:AddHeader( "" );
@@ -825,9 +833,7 @@ function addon:ShowInfo( frame, manualToggle )
         charDisplay.anchor = getAnchorPkt( "ch", charData.charName, charData, charLineNum, colNdx + 1 );
 
         local displayText = char.charName;
-        if( self.config.profile.dungeon.displayType == "all" ) or
-          ( self.config.profile.dungeon.displayType == "realmOnly" and IsLoggedInRealm( char.realmName ) ) or
-          ( self.config.profile.dungeon.displayType == "charOnly" and IsLoggedInChar( char.realmName, char.charNdx ) ) then
+        if ( ShouldDisplayInstanceLocks( char.realmName, char.charNdx ) ) then
             displayText = displayText .. " (" .. #charInstanceLockData .. ")";
         end;  
 

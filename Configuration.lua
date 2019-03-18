@@ -179,10 +179,10 @@ end
 
 local function getDungeonHeaderConfig( self )
     local dungeonDisplayType = {
-        ["all"] = L["All Characters"],
-        ["realmOnly"] = L["Current realm only"],
-        ["charOnly"] = L["Current char only"],
-        ["zzzz"] = L["Hide completely"], -- table displays by index - sorted.  so make zzzz
+        [0] = L["All Characters"],
+        [1] = L["Current realm only"],
+        [2] = L["Current char only"],
+        [3] = L["Hide completely"],
     };
 
     return {
@@ -444,7 +444,7 @@ function addon:getDefaultOptions()
       },
       dungeon = {
         show = true,
-        displayType = "all"
+        displayType = 0
       },
       raid = {
         show = true
