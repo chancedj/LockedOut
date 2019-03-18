@@ -56,12 +56,19 @@ local iconTextures = {
 
 -- tues for US, Wed for rest?
 local MapRegionReset = {
-    [1] = 3, -- US
-    [2] = 5, -- KR
-    [3] = 4, -- EU
-    [4] = 5, -- TW
-    [5] = 5  -- CN
+    [1] = { dayOfWeek = 3, region = "US" }, -- US
+    [2] = { dayOfWeek = 5, region = "KR" }, -- KR
+    [3] = { dayOfWeek = 4, region = "EU" }, -- EU
+    [4] = { dayOfWeek = 5, region = "TW" }, -- TW
+    [5] = { dayOfWeek = 5, region = "CN" }  -- CN
 }
+
+function addon:GetRegionMap()
+    local currentRegion = GetCurrentRegion();
+    local MappedRegion  = MapRegionReset[ currentRegion ];
+
+    return MappedRegion.dayOfWeek, MappedRegion.region;
+end
 
 --[[ wday values
 1 = Sun
@@ -480,8 +487,9 @@ end
 
 function addon:getWeeklyLockoutDate()
     local secondsInDay      = 24 * 60 * 60;
-    local currentRegion     = GetCurrentRegion();
-    local serverResetDay    = MapRegionReset[ currentRegion ];
+    --local currentRegion     = GetCurrentRegion();
+    --local serverResetDay    = MapRegionReset[ currentRegion ];
+    local serverResetDay    = addon:GetRegionMap();
     local currentServerTime = GetServerTime();
     local dayOfWeek         = date( "*t", currentServerTime ).wday;
     local daysLefToReset    = weekdayRemap[ serverResetDay ][ dayOfWeek ];

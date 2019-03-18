@@ -165,7 +165,8 @@ function addon:GetConnectedRealms( realmName )
     end
 
     local libRealm = LibStub("LibRealmInfo");
-    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName ) );
+    local _, region = addon:GetRegionMap();
+    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName, region ) );
     local connectedRealms = {}
 
     for i = 1, #realmIdList do
