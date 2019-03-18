@@ -178,6 +178,13 @@ local function getCharacterOptionConfig( self )
 end
 
 local function getDungeonHeaderConfig( self )
+    local dungeonDisplayType = {
+        ["all"] = L["All Characters"],
+        ["realmOnly"] = L["Current realm only"],
+        ["charOnly"] = L["Current char only"],
+        ["zzzz"] = L["Hide completely"], -- table displays by index - sorted.  so make zzzz
+    };
+
     return {
             order  = 10,
             name = L["Instance Options"],
@@ -190,6 +197,16 @@ local function getDungeonHeaderConfig( self )
                   type = "toggle",
                   set = function(info,val) self.config.profile.dungeon.show = val; end,
                   get = function(info) return self.config.profile.dungeon.show end
+                },
+                instanceDisplay = {
+                  order = 22,
+                  name = L["Locked Instance #"],
+                  desc = L["Determine how the locked instances show"],
+                  type = "select",
+                  style = "dropdown",
+                  values = dungeonDisplayType,
+                  set = function(info,val) self.config.profile.dungeon.displayType = val; end,
+                  get = function(info) return self.config.profile.dungeon.displayType end
                 },
             }
         };
@@ -426,7 +443,8 @@ function addon:getDefaultOptions()
                 showResetTime = false
       },
       dungeon = {
-        show = true
+        show = true,
+        displayType = "all"
       },
       raid = {
         show = true

@@ -101,6 +101,12 @@ L["Choose icon for addon - requires ui refresh or login/logout"]    = "Choose ic
 L["Configure the scale of the window"]                              = "Configure the scale of the window";
 L["Start tracking characters greater than or equal to level below"] = "Start tracking characters greater than or equal to level below";
 L["Which characters should show in menu"]                           = "Which characters should show in menu";
+L["Locked Instance #"]                                              = "Locked Instance #";
+L["Determine how the locked instances show"]                        = "Determine how the locked instances show";
+L["All Characters"]                                                 = "All Characters";
+L["Current realm only"]                                             = "Current realm only";
+L["Current char only"]                                              = "Current char only";
+L["Hide completely"]                                                = "Hide completely";
 
 -- difficulty mapping full
 L["Unknown"]            = "Unknown";

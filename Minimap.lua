@@ -518,6 +518,15 @@ local function shouldDisplayChar( realmName, playerData )
             ( playerData.currentLevel == nil or playerData.currentLevel >= addon.config.profile.general.minTrackCharLevel )
 end
 
+local function IsLoggedInRealm( realmName )
+    return ( addon.currentRealm == realmName);
+end
+
+local function IsLoggedInChar( realmName, charNdx )
+    return ( addon.currentRealm == realmName ) and 
+           ( addon.charDbIndex == charNdx );
+end
+
 function addon:ShowInfo( frame, manualToggle )
     self:removeExpiredInstances();
     if( manualToggle ~= nil ) then
@@ -555,7 +564,7 @@ function addon:ShowInfo( frame, manualToggle )
     -- get list of characters and realms for the horizontal
     local dailyLockout = self:getDailyLockoutDate();
     for realmName, characters in next, LockoutDb do
-        if( not self.config.profile.general.currentRealm ) or ( addon.currentRealm == realmName ) then
+        if( not self.config.profile.general.currentRealm ) or IsLoggedInRealm( realmName ) then
             realmCount = realmCount + 1;
             for charNdx, charData in next, characters do
                 if( shouldDisplayChar( realmName, charData ) ) then
@@ -566,9 +575,7 @@ function addon:ShowInfo( frame, manualToggle )
                     charList[ tblNdx ].charName = charData.charName;
                     charList[ tblNdx ].className = charData.className;
 
-                    if( self.config.profile.general.loggedInFirst ) and
-                      ( addon.currentRealm == realmName ) and 
-                      ( addon.charDbIndex == charNdx ) then
+                    if( self.config.profile.general.loggedInFirst ) and IsLoggedInChar( realmName, charNdx ) then
                         charList[ tblNdx ].priority = 0;
                     else
                         charList[ tblNdx ].priority = 1;
@@ -732,8 +739,16 @@ function addon:ShowInfo( frame, manualToggle )
             realmDisplay.deleteTT =     emptyFunction;
             realmDisplay.anchor = getAnchorPkt( "realm", char.realmName, realmInstanceLockData, realmLineNum, colNdx + 1 );
 
-            tooltip:SetCell( realmLineNum, colNdx + 1, self:colorizeString( char.className, char.realmName .. " (" .. #realmInstanceLockData .. ")" ), nil, "CENTER" );
-            tooltip:SetCellScript( realmLineNum, colNdx + 1, "OnEnter", function() realmDisplay:displayTT( ); end ); -- close out tooltip when leaving
+            local displayText = char.realmName;
+            local displayFn = emptyFunction;
+            if( self.config.profile.dungeon.displayType == "all" ) or
+              ( self.config.profile.dungeon.displayType == "realmOnly" and IsLoggedInRealm( char.realmName ) ) or
+              ( self.config.profile.dungeon.displayType == "charOnly" and IsLoggedInChar( char.realmName, char.charNdx ) ) then
+                displayText = displayText .. " (" .. #realmInstanceLockData .. ")";
+                displayFn = function() realmDisplay:displayTT( ); end;
+            end;  
+            tooltip:SetCell( realmLineNum, colNdx + 1, self:colorizeString( char.className, displayText ), nil, "CENTER" );
+            tooltip:SetCellScript( realmLineNum, colNdx + 1, "OnEnter", displayFn ); -- close out tooltip when leaving
             tooltip:SetCellScript( realmLineNum, colNdx + 1, "OnLeave", function() realmDisplay:deleteTT( ); end );     -- close out tooltip when leaving
         end
         local charData = LockoutDb[ char.realmName ][ char.charNdx ];
@@ -774,21 +789,25 @@ function addon:ShowInfo( frame, manualToggle )
                                         tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
                                     end
 
-                                    if ( self.anchor.data.instanceLockData ) then
-                                        local currentTime = GetServerTime();
-                                        line = tooltip:AddHeader( "" );
-                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
-                                        tooltip:SetCell( line, 1, L["Locked Instances"], 2 );
-                                        line = tooltip:AddHeader( "" );
-                                        tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
-                                        tooltip:SetCell( line, 1, L["Time Remaining"] );
-                                        tooltip:SetCell( line, 2, L["Instance Name"] );
-                                        for k, p in next, self.anchor.data.instanceLockData do
+                                    if( addon.config.profile.dungeon.displayType == "all" ) or
+                                      ( addon.config.profile.dungeon.displayType == "realmOnly" and IsLoggedInRealm( char.realmName ) ) or
+                                      ( addon.config.profile.dungeon.displayType == "charOnly" and IsLoggedInChar( char.realmName, char.charNdx ) ) then
+                                        if ( self.anchor.data.instanceLockData ) then
+                                            local currentTime = GetServerTime();
                                             line = tooltip:AddHeader( "" );
                                             tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
-                                            tooltip:SetCell( line, 1, SecondsToTime( (60 * 60) - (currentTime - p.timeSaved ) ) );
-                                            tooltip:SetCell( line, 2, addon:GetInstanceName( p.instanceId ) );
-                                            tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                            tooltip:SetCell( line, 1, L["Locked Instances"], 2 );
+                                            line = tooltip:AddHeader( "" );
+                                            tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                            tooltip:SetCell( line, 1, L["Time Remaining"] );
+                                            tooltip:SetCell( line, 2, L["Instance Name"] );
+                                            for k, p in next, self.anchor.data.instanceLockData do
+                                                line = tooltip:AddHeader( "" );
+                                                tooltip:SetLineColor( line, 1, 1, 1, 0.1 );
+                                                tooltip:SetCell( line, 1, SecondsToTime( (60 * 60) - (currentTime - p.timeSaved ) ) );
+                                                tooltip:SetCell( line, 2, addon:GetInstanceName( p.instanceId ) );
+                                                tooltip:SetLineScript( line, "OnEnter", emptyFunction );                -- empty function allows the background to highlight
+                                            end
                                         end
                                     end
 
@@ -805,8 +824,14 @@ function addon:ShowInfo( frame, manualToggle )
                                     end
         charDisplay.anchor = getAnchorPkt( "ch", charData.charName, charData, charLineNum, colNdx + 1 );
 
-        tooltip:SetCell( charLineNum, colNdx + 1, self:colorizeString( char.className, char.charName .. " (" .. #charInstanceLockData .. ")" ), nil, "CENTER" );
+        local displayText = char.charName;
+        if( self.config.profile.dungeon.displayType == "all" ) or
+          ( self.config.profile.dungeon.displayType == "realmOnly" and IsLoggedInRealm( char.realmName ) ) or
+          ( self.config.profile.dungeon.displayType == "charOnly" and IsLoggedInChar( char.realmName, char.charNdx ) ) then
+            displayText = displayText .. " (" .. #charInstanceLockData .. ")";
+        end;  
 
+        tooltip:SetCell( charLineNum, colNdx + 1, self:colorizeString( char.className, displayText ), nil, "CENTER" );
         tooltip:SetCellScript( deleteLineNum, colNdx + 1, "OnMouseDown", function() charDisplay:deleteChar( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnEnter", function() charDisplay:displayTT( ); end ); -- close out tooltip when leaving
         tooltip:SetCellScript( charLineNum, colNdx + 1, "OnLeave", function() charDisplay:deleteTT( ); end );     -- close out tooltip when leaving
