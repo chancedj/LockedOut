@@ -103,6 +103,15 @@ local function addKeystoneData( difficultyName, instanceData, instanceName, diff
     return instanceData[ key ][ difficultyName ];
 end
 
+local function UpdateLabel()
+    local lockedTotal = #addon:getLockDataByRealm( addon.currentRealm );
+
+    local db = LibStub( "LibDataBroker-1.1" ):GetDataObjectByName( "Locked Out" );
+    db.label = lockedTotal .. "/10";
+
+    return lockedTotal;
+end
+
 function addon:removeExpiredInstances()
     local currentTime = GetServerTime() - (60 * 60);
 
@@ -120,6 +129,8 @@ function addon:removeExpiredInstances()
             end
         end
     end
+
+    UpdateLabel();
 end
 
 local function removeUntouchedInstances( instances )
@@ -312,14 +323,13 @@ function addon:IncrementInstanceLockCount()
     end
     tsort( instanceLockData, sortLockedData );
 
-    local lockedTotal = #addon:getLockDataByRealm( addon.currentRealm );
+
+
+    local lockedTotal = UpdateLabel();
     -- only mention lock when entering or leaving the instance
     if( lockedTotal > 5 ) and ( ( addon.currentInstanceID or 0 ) == 0 ) and ( currentInstanceID ~= instanceId ) then
         print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
     end
-
-    local db = LibStub( "LibDataBroker-1.1" ):GetDataObjectByName( "Locked Out" );
-    db.label = lockedTotal .. "/10";
 
     addon.currentInstanceID = instanceId;
     addon.playerDb.instanceLockData = instanceLockData;
