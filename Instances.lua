@@ -13,14 +13,14 @@ local next, type, table, select, sfmt, tsort = -- variables
       next, type, table, select, string.format, table.sort      -- lua functions
 
 -- cache blizzard function/globals
-local GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- variables
+local GetRealmName, GetNumRFDungeons, GetRFDungeonInfo, GetInstanceInfo,                                       -- variables
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid, IsInInstance,
       C_GetMapTable, C_GetWeeklyBestForMap, C_GetMapUIInfo, EJ_GetInstanceForMap,
       C_GetOwnedKeystoneChallengeMapID, C_GetOwnedKeystoneLevel, GetServerTime,
       C_RequestMapInfo, C_RequestRewards, C_GetBestMapForUnit, EJ_GetInstanceInfo                                          =
 
-      GetRealmName, GetNumRFDungeons, GetRFDungeonInfo,                                        -- blizzard api
+      GetRealmName, GetNumRFDungeons, GetRFDungeonInfo, GetInstanceInfo,                                        -- blizzard api
       GetLFGDungeonNumEncounters, GetLFGDungeonEncounterInfo, GetSavedInstanceInfo,
       GetSavedInstanceEncounterInfo, SendChatMessage, IsInGroup, IsInRaid, IsInInstance,
       C_ChallengeMode.GetMapTable, C_MythicPlus.GetWeeklyBestForMap, C_ChallengeMode.GetMapUIInfo, EJ_GetInstanceForMap,
@@ -185,22 +185,24 @@ end
 local function getPlayerInstanceId()
     -- sometimes function will return nil, so force to 0
     local MapId = C_GetBestMapForUnit("player") or 0;
+    local _, _, difficulty, _, _, _, _, _, _, lfgInstanceId = GetInstanceInfo();
 
     -- if it returns 0 the data is not ready yet.
-    if( MapId == 0) then
-        return 0, 0;
+    if( MapId == 0) or (difficulty == 0) then
+        return 0, 0, 0;
     end
 
     -- in some areas the InstanceID is returned when NOT in the instance
     -- so we need a second check to make sure this won't get triggered.
     local inInstance = IsInInstance();
     if( not inInstance ) then
-        return 0, 0;
+        return 0, 0, 0;
     end
 
+    -- force to 0.  this is only populated when in LFR/LFD groups.  so make sure to default to 0
+    lfgInstanceId = lfgInstanceId or 0;
     local instanceID = EJ_GetInstanceForMap( MapId );
-    local _, _, difficulty = GetInstanceInfo();
-    return instanceID, difficulty;
+    return instanceID, difficulty, lfgInstanceId;
 end
 
 local instanceNameCache = {};
@@ -216,12 +218,15 @@ function addon:GetInstanceName( instanceId )
     return instanceNameCache[ instanceId ]
 end
 
-local function lockedInstanceInList( instanceId, difficulty )
+local function lockedInstanceInList( instanceId, difficulty, lfgInstanceId )
     local found = false;
     local instanceLockData = addon.playerDb.instanceLockData
 
     for _, lockData in next, instanceLockData do
-        if ( lockData.instanceId == instanceId ) and ( lockData.difficulty == difficulty ) and ( not lockData.instanceWasReset ) then
+        if ( lockData.instanceId == instanceId ) and 
+           ( lockData.difficulty == difficulty ) and 
+           ( lockData.lfgInstanceId == lfgInstanceId ) and 
+           ( not lockData.instanceWasReset ) then
             addon:debug( "found instance: ", addon:GetInstanceName( lockData.instanceId ) );
 
             return lockData;
@@ -287,11 +292,11 @@ end
 
 function addon:IncrementInstanceLockCount()
     addon:removeExpiredInstances();
-    local instanceId, difficulty = getPlayerInstanceId();
+    local instanceId, difficulty, lfgInstanceId = getPlayerInstanceId();
     local instanceLockData = addon.playerDb.instanceLockData or {};
 
     if( instanceId > 0 ) then
-        local lockedInstance = lockedInstanceInList( instanceId, difficulty );
+        local lockedInstance = lockedInstanceInList( instanceId, difficulty, lfgInstanceId );
         if( lockedInstance ) then
             lockedInstance.timeSaved = GetServerTime();
         else
@@ -299,6 +304,7 @@ function addon:IncrementInstanceLockCount()
             instanceLockData[ #instanceLockData + 1 ] = {
                                                             instanceId = instanceId,
                                                             difficulty = difficulty,
+                                                            lfgInstanceId = lfgInstanceId,
                                                             timeSaved = GetServerTime(),
                                                             instanceWasReset = false
                                                         };
@@ -313,7 +319,7 @@ function addon:IncrementInstanceLockCount()
     end
 
     local db = LibStub( "LibDataBroker-1.1" ):GetDataObjectByName( "Locked Out" );
-    db.label =  lockedTotal .. "/10";
+    db.label = lockedTotal .. "/10";
 
     addon.currentInstanceID = instanceId;
     addon.playerDb.instanceLockData = instanceLockData;
