@@ -323,11 +323,10 @@ function addon:IncrementInstanceLockCount()
     end
     tsort( instanceLockData, sortLockedData );
 
-
-
     local lockedTotal = UpdateLabel();
+    local currentInstanceID = addon.currentInstanceID or 0;
     -- only mention lock when entering or leaving the instance
-    if( lockedTotal > 5 ) and ( ( addon.currentInstanceID or 0 ) == 0 ) and ( currentInstanceID ~= instanceId ) then
+    if( lockedTotal > 5 ) and ( currentInstanceID == 0 ) and ( currentInstanceID ~= instanceId ) then
         print( sfmt(L["You have used %d/10 instance locks this hour."], lockedTotal) );
     end
 
