@@ -491,6 +491,10 @@ function addon:OnEnable()
     self:RegisterEvent( "BAG_UPDATE", "EVENT_FullCharacterRefresh" );
     self:RegisterEvent( "TIME_PLAYED_MSG", "EVENT_TimePlayed" );
     self:RegisterEvent( "PLAYER_LOGOUT", "EVENT_Logout" );
+    self:RegisterEvent( "CHALLENGE_MODE_MAPS_UPDATE", "EVENT_SaveToInstance" );
+    self:RegisterEvent( "CHALLENGE_MODE_LEADERS_UPDATE", "EVENT_SaveToInstance" );
+    self:RegisterEvent( "CHALLENGE_MODE_MEMBER_INFO_UPDATED", "EVENT_SaveToInstance" );
+    self:RegisterEvent( "CHALLENGE_MODE_COMPLETED", "EVENT_SaveToInstance" );
     self:RegisterEvent( "BOSS_KILL", "EVENT_SaveToInstance" );
     self:RegisterBucketEvent( "CURRENCY_DISPLAY_UPDATE", 1, "EVENT_CoinUpdate" );
 
@@ -506,6 +510,10 @@ function addon:OnDisable()
     self:UnRegisterEvent( "BAG_UPDATE" );
     self:UnRegisterEvent( "TIME_PLAYED_MSG" );
     self:UnRegisterEvent( "PLAYER_LOGOUT" );
+    self:UnRegisterEvent( "CHALLENGE_MODE_MAPS_UPDATE" );
+    self:UnRegisterEvent( "CHALLENGE_MODE_LEADERS_UPDATE" );
+    self:UnRegisterEvent( "CHALLENGE_MODE_MEMBER_INFO_UPDATED" );
+    self:UnRegisterEvent( "CHALLENGE_MODE_COMPLETED" );
     self:UnRegisterEvent( "BOSS_KILL" );
     self:UnRegisterEvent( "CURRENCY_DISPLAY_UPDATE" );
 
