@@ -168,16 +168,19 @@ local function removeUntouchedInstances( instances )
 end -- removeUntouchedInstances()
 
 ---[[
-local connectedRealmsCache = { {} };
+--local connectedRealmsCache = { {} };
 function addon:GetConnectedRealms( realmName )
-    if ( connectedRealmsCache[ realmName] ) and ( #connectedRealmsCache[ realmName] > 0 ) then
+    --[[
+    -- find a safer way to do this later....
+    if ( connectedRealmsCache[ realmName ] ) and ( #connectedRealmsCache[ realmName ] > 0 ) then
         addon:debug( "pulling from cache" );
         return connectedRealmsCache[ realmName];
     end
+    --]]
 
     local libRealm = LibStub("LibRealmInfo");
     local _, region = addon:GetRegionMap();
-    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName, region ) );
+    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName, region ) ) or {}; -- for issue #160.  if the api returns null, don't save it.
     local connectedRealms = {}
 
     for i = 1, #realmIdList do
@@ -187,9 +190,9 @@ function addon:GetConnectedRealms( realmName )
 
     addon:debug( "Instance lock applies to these realms: ", table.concat( connectedRealms, ", ") );
 
-    connectedRealmsCache[ realmName] = connectedRealms;
-
-    return connectedRealmsCache[ realmName ];
+    return connectedRealms;
+    --connectedRealmsCache[ realmName ] = connectedRealms;
+    --return connectedRealmsCache[ realmName ];
 end
 --]]
 
