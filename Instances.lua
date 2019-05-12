@@ -180,12 +180,16 @@ function addon:GetConnectedRealms( realmName )
 
     local libRealm = LibStub("LibRealmInfo");
     local _, region = addon:GetRegionMap();
-    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName, region ) ) or {}; -- for issue #160.  if the api returns null, don't save it.
-    local connectedRealms = {}
+    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName, region ) );
+    local connectedRealms = {};
 
-    for i = 1, #realmIdList do
-      local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( realmIdList[ i ] );
-      connectedRealms[ #connectedRealms + 1 ] = connectedName;
+    if( realmIdList ) then   
+        for i = 1, #realmIdList do
+          local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( realmIdList[ i ] );
+          connectedRealms[ #connectedRealms + 1 ] = connectedName;
+        end
+    else
+        connectedRealms[ #connectedRealms + 1 ] = realmName;
     end
 
     addon:debug( "Instance lock applies to these realms: ", table.concat( connectedRealms, ", ") );
