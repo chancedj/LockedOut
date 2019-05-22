@@ -381,6 +381,24 @@ local function getCurrencyHeaderConfig( self )
     };
 end
 
+local function getHolidayHeaderConfig( self )
+    return {
+        order  = 40,
+        name = L["Holiday Options"],
+        type = "group",
+        args = {
+            holidayShow = {
+              order = 101,
+              name = L["Show"],
+              desc = L["Show holiday tracing info"],
+              type = "toggle",
+              set = function(info,val) self.config.profile.holidayEvents.show = val; end,
+              get = function(info) return self.config.profile.holidayEvents.show end
+            },
+        }
+    };
+end
+
 function addon:getConfigOptions()
     local configOptions = {
     type = "group",
@@ -395,6 +413,7 @@ function addon:getConfigOptions()
             emissaryHeader      = getEmissaryHeaderConfig( self ),
             weeklyQuestHeader   = getWeeklyQuestHeaderConfig( self ),
             currencyHeader      = getCurrencyHeaderConfig( self ),
+            holidayHeader       = getHolidayHeaderConfig( self ),
         }
     };
 
@@ -422,25 +441,25 @@ function addon:getDefaultOptions()
     },
     profile = {
       minimap = {
-                --[[
-                     position can only be >= 0
-                     so use this to fix the position saving issue
-                     by forcing it to 0 later on if it == -1
-                --]]
-                minimapPos = -1,
-                hide = false,
-                addonIcon = "134244",
+        --[[
+            position can only be >= 0
+            so use this to fix the position saving issue
+            by forcing it to 0 later on if it == -1
+        --]]
+        minimapPos = -1,
+        hide = false,
+        addonIcon = "134244",
       },
       general = {
         currentRealm = false,
-                showRealmHeader = true,
-                loggedInFirst = true,
-                anchorPoint = "cell",
-                showCharList = showCharList,
-                charSortBy = "rc",
-                frameScale = 1.0,
-                minTrackCharLevel = getCurrentMaxLevel(),
-                showResetTime = false
+        showRealmHeader = true,
+        loggedInFirst = true,
+        anchorPoint = "cell",
+        showCharList = showCharList,
+        charSortBy = "rc",
+        frameScale = 1.0,
+        minTrackCharLevel = getCurrentMaxLevel(),
+        showResetTime = false
       },
       dungeon = {
         show = true,
@@ -451,22 +470,25 @@ function addon:getDefaultOptions()
       },
       worldBoss = {
         show = true,
-                showKilledOnly = true
+        showKilledOnly = true
       },
       currency = {
         show = true,
-                display = "long",
-                displayList = currencyListDefaults,
-                sortBy = "en",
-                displayExpansion = true
+        display = "long",
+        displayList = currencyListDefaults,
+        sortBy = "en",
+        displayExpansion = true
       },
-            emissary = {
-                show = true,
-                displayGroup = addon.EmissaryDisplayGroups
-            },
-            weeklyQuest = {
-                show = true
-            }
+      emissary = {
+        show = true,
+        displayGroup = addon.EmissaryDisplayGroups
+      },
+      weeklyQuest = {
+        show = true
+      },
+      holidayEvents = {
+        show = true
+      },
     }
   }
   

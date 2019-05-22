@@ -50,6 +50,7 @@ L["World Boss Options"]         = "World Boss Options";
 L["Currency Options"]           = "Currency Options";
 L["Emissary Options"]           = "Emissary Options";
 L["Repeatable Quest Options"]   = "Repeatable Quest Options";
+L["Holiday Options"]            = "Holiday Options";
 
 L["Short"]                      = "Short";
 L["Long"]                       = "Long";
@@ -107,6 +108,7 @@ L["All Characters"]                                                 = "All Chara
 L["Current realm only"]                                             = "Current realm only";
 L["Current char only"]                                              = "Current char only";
 L["Hide completely"]                                                = "Hide completely";
+L["Show holiday tracing info"]                                      = "Show holiday tracing info";
 
 -- difficulty mapping full
 L["Unknown"]            = "Unknown";

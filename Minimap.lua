@@ -868,7 +868,7 @@ function addon:ShowInfo( frame, manualToggle )
     if( self.config.profile.currency.show ) then
         populateCurrencyData( L["Currency"], tooltip, charList, currencyDisplayList );
     end
-    if( true ) then
+    if( self.config.profile.holidayEvents.show ) then
         popuateHolidayData( L["Holiday Events"], tooltip, charList, holidayDisplayList );
     end
 
