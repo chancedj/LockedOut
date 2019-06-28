@@ -199,7 +199,6 @@ local CURRENCY_LIST = {
     { ID=1268, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Timeworn Artifact
     { ID=1273, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Seal of Broken Fate
     { ID=1275, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Curious Coin
-    { ID=1299, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Brawler's Gold
     { ID=1314, name=nil, icon=nil, expansionLevel=6, type="C", show=true }, -- Lingering Soul Fragment
     { ID=1324, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Horde Qiraji Commendation
     { ID=1325, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Alliance Qiraji Commendation
@@ -225,15 +224,15 @@ local CURRENCY_LIST = {
     { ID=1535, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Drust Archaeology Fragment 
     { ID=1540, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Wood 
     { ID=1541, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Iron 
-    { ID=1553, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Azerite 
+    { ID=1553, name=nil, icon=nil, expansionLevel=7, type="C", show=false },  -- Azerite 
     { ID=1559, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Essence of Storms 
     { ID=1560, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- War Resources 
-    { ID=1565, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Rich Azerite Fragment 
+    { ID=1565, name=nil, icon=nil, expansionLevel=7, type="C", show=false },  -- Rich Azerite Fragment 
     { ID=1579, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Champions of Azeroth 
     { ID=1580, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Seal of Wartorn Fate 
     { ID=1585, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Honor 
     { ID=1586, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Honor Level 
-    { ID=1587, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- War Supplies 
+    { ID=1587, name=nil, icon=nil, expansionLevel=7, type="C", show=false },  -- War Supplies 
     { ID=1592, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Order of Embers 
     { ID=1593, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Proudmore Admiralty 
     { ID=1594, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Storm's Wake 
@@ -252,16 +251,28 @@ local CURRENCY_LIST = {
     { ID=1716, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Honorbound Service Medal
     { ID=1717, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- 7th Legion Service Medal
     { ID=1718, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Titanium Residium
+    { ID=1721, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Prismatic Manapearl 
+    { ID=1722, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Azerite Ore 
+    { ID=1723, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Lumber 
+    { ID=1738, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Unshackled 
+    { ID=1739, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Ankoan 
+    { ID=1740, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Rustbolt Resistance (Hidden) 
+    { ID=1742, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Rustbolt Resistance 
+    { ID=1743, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- 8.2 NOT CURRENTLY USED 
+    { ID=1745, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Nazjatar Bodyguard - Neri Sharpfin 
+    { ID=1746, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Nazjatar Bodyguard - Vim Brinehe
 
     -- items
     { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Shiny Pet Charm
     { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
     { ID=151568, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Primal Sargerite
+    { ID=137642, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Mark of Honor
     { ID=152668, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Expulsum
     { ID=163036, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Polished Pet Charm
-    
+
     -- currencies that extend beyond expansions (expansionLevel should always be == current
     { ID=1166, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Timewarped Badge
+    { ID=1299, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Brawler's Gold
 
 };
 

@@ -1,4 +1,4 @@
-## Interface: 81500
+## Interface: 82000
 ## Title: Locked Out
 ## Notes: An addon for tracking lockouts.
 ## Author: Hwap

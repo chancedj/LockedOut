@@ -618,7 +618,7 @@ function addon:OpenConfigDialog( button )
         
             if( found == false ) then
                 --print( '{ ID=' .. ndx .. ', name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- ' .. name );
-                print( "{ [" .. ndx .. "] = { ID=" .. ndx .. ", name=nil, expansionLevel=" .. GetAccountExpansionLevel() .. " } }, -- " .. name );
+                print( "{ ID=" .. ndx .. ", name=nil, expansionLevel=" .. GetAccountExpansionLevel() .. " }, -- " .. name );
             end
         end
     end

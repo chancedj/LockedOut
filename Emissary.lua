@@ -42,7 +42,9 @@ local EMISSARY_LIST = {
         [ "50598" ] = { numRequired=4, factionId=2103 }, -- Zandalari Empire (horde)
         [ "50603" ] = { numRequired=4, factionId=2158 }, -- Voldunai (horde)
         [ "50602" ] = { numRequired=4, factionId=2156 }, -- Talanji's Expedition (horde)
-        [ "50606" ] = { numRequired=4, factionId=2157 }  -- Horde War Effort (horde)
+        [ "50606" ] = { numRequired=4, factionId=2157 }, -- Horde War Effort (horde)
+        [ "56119" ] = { numRequired=4, factionId=2400 }, -- The Waveblade Akoan (alliance)
+        [ "56120" ] = { numRequired=4, factionId=2373 }  -- The Unshackled (horde)
     }
 }
 
