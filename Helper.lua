@@ -358,38 +358,43 @@ local QuestTitleFromID = setmetatable({}, { __index = function(t, id)
     end
 end })
 
-local _questCachDb = {};
+local _questCacheDb = {};
 function addon:getQuestTitleByID( questID )
     -- example pulled from below
     -- http://www.wowinterface.com/forums/showthread.php?t=46934
-    local questName =  _questCachDb[ questID ];
+    local questName =  _questCacheDb[ questID ];
 
     if ( not questName ) then
-        _questCachDb[ questID ] = QuestTitleFromID[ questID ];
-        questName =  _questCachDb[ questID ];
+        _questCacheDb[ questID ] = QuestTitleFromID[ questID ];
+        questName =  _questCacheDb[ questID ];
     end
 
     return questName;
 end
 
+local _worldBossCacheDb = {};
 function addon:getWorldBossName( sInstanceID, sBossID )
-    local iInstanceID = tonumber( sInstanceID );
-    local iBossID = tonumber( sBossID );
+    local cachedBossName = _worldBossCacheDb[ sInstanceID .. sBossID ];
+    if( not cachedBossName) then
+        local iBossID = tonumber( sBossID );
+        local iInstanceID = tonumber( sInstanceID );
+        local bossNdx = 1;
 
-    EJ_SelectInstance( iInstanceID );
+        EJ_SelectInstance( iInstanceID );
+        local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
+        while bossID do
+            if( bossID == iBossID ) then
+                _worldBossCacheDb[ sInstanceID .. sBossID ] = bossName;
+                cachedBossName = bossName;
 
-    local bossNdx = 1;
-    local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
-    while bossID do
-        if( bossID == iBossID ) then
-            return bossName
+                break;
+            end
+            
+            bossNdx = bossNdx + 1;
+            bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
         end
-        
-        bossNdx = bossNdx + 1;
-        bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossNdx );
-    end
-    
-    return "unknown";
+    end    
+    return cachedBossName or "unknown";
 end
 
 function addon:debug( msg )

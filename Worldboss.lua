@@ -75,6 +75,10 @@ local WORLD_BOSS_LIST = {
     -- Warfront Bosses
     { instanceID=1028, bossID=2213, questID=52847, bossName="Doom's Howl" }, -- verified
     { instanceID=1028, bossID=2212, questID=52848, bossName="The Lion's Roar" }, -- verified
+
+    -- New BFA Area bosses
+    { instanceID=1028, bossID=2362, questID=56057, bossName="Ulmath, the Soulbinder" }, -- verified
+    { instanceID=1028, bossID=2363, questID=56055, bossName="Wekemara" }, -- verified
 --]]
 }
 
@@ -84,6 +88,11 @@ function CheckForMissingMappings()
     local currentTierId = EJ_GetCurrentTier();
 
     local worldBosses = {};
+    local worldBossList = {};
+
+    for _, bossData in next, WORLD_BOSS_LIST do
+        worldBossList[ bossData.bossID ] = bossData.questID;
+    end
     
     -- world bosses started with Pandaria - so start with that one and skip the ones before it.
     for tierId = 5, EJ_GetNumTiers() do
@@ -95,7 +104,7 @@ function CheckForMissingMappings()
         EJ_SelectInstance( instanceId );
 
         local bossIndex = 1;
-        local bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex );
+        local bossName, _, bossId = EJ_GetEncounterInfoByIndex( bossIndex );
 
         while bossId do
             worldBosses[ bossId ] = {}
@@ -103,7 +112,7 @@ function CheckForMissingMappings()
             worldBosses[ bossId ].bossName = bossName;
 
             bossIndex = bossIndex + 1;
-            bossName, _, bossID = EJ_GetEncounterInfoByIndex( bossIndex );
+            bossName, _, bossId = EJ_GetEncounterInfoByIndex( bossIndex );
         end -- while bossId
     end -- for tierId = 5, EJ_GetNumTiers()
 
@@ -112,8 +121,8 @@ function CheckForMissingMappings()
 
     local found = false;
     for bossId, bossData in next, worldBosses do
-        if( WORLD_BOSS_LIST[ bossId ] == nil ) then
-            print( 'unmapped boss found: [' .. bossId .. '] = { instanceId=' .. bossData.instanceId .. ', questID=0, bossName="' .. bossData.bossName .. '" }' );
+        if( worldBossList[ bossId ] == nil ) then
+            print( 'unmapped boss found: { instanceID=' .. bossData.instanceId .. ', bossID = ' .. bossId .. ', questID=0, bossName="' .. bossData.bossName .. '" },' );
             found = true;
         end -- if( WORLD_BOSS_LIST[ bossId ] == nil )
     end; -- for bossId, bossData in next, worldBosses
