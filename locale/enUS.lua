@@ -117,6 +117,8 @@ L["Heroic"]             = "Heroic";
 L["Mythic"]             = "Mythic";
 L["Lfr"]                = "Lfr";
 L["Timewalking"]        = "Timewalking";
+L["Anniversary"]        = "Anniversary";
+L["PVP"]                = "PVP";
 
 -- difficulty mapping abbreviation
 L["U"]  = "U";
@@ -125,6 +127,8 @@ L["H"]  = "H";
 L["M"]  = "M";
 L["L"]  = "L";
 L["T"]  = "T";
+L["A"]  = "A";
+L["P"]  = "P";
 
 -- quest.lua mappings
 L["Blingtron"]                          = "Blingtron";
