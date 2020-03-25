@@ -42,8 +42,29 @@ local function convertDifficulty(difficulty)
     elseif difficulty == 15 then    return L[ "Heroic" ],       L[ "H" ];
     elseif difficulty == 16 then    return L[ "Mythic" ],       L[ "M" ];
     elseif difficulty == 17 then    return L[ "Lfr" ],          L[ "L" ];
+    --elseif difficulty == 18 then    return L[ "Lfr" ],          L[ "L" ];
+    --elseif difficulty == 19 then    return L[ "Lfr" ],          L[ "L" ];
+    --elseif difficulty == 20 then    return L[ "Lfr" ],          L[ "L" ];
     elseif difficulty == 23 then    return L[ "Mythic" ],       L[ "M" ];
+    elseif difficulty == 24 then    return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 25 then    return L[ "Lfr" ],          L[ "L" ];
+    --elseif difficulty == 29 then    return L[ "Lfr" ],          L[ "L" ];
+    --elseif difficulty == 30 then    return L[ "Lfr" ],          L[ "L" ];
+    --elseif difficulty == 32 then    return L[ "Lfr" ],          L[ "L" ];
+
     elseif difficulty == 33 then    return L[ "Timewalking" ],  L[ "T" ];
+
+    --elseif difficulty == 34 then    return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 38 then    return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 39 then    return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 40 then    return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 45 then    return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 147 then   return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 149 then   return L[ "Timewalking" ],  L[ "T" ];
+    elseif difficulty == 151 then   return L[ "Anniversary" ],  L[ "T" ];
+    --elseif difficulty == 152 then   return L[ "Timewalking" ],  L[ "T" ];
+    --elseif difficulty == 153 then   return L[ "Timewalking" ],  L[ "T" ];
+
     end -- if difficulty
 
     print( "unknown difficulty: ", difficulty );
