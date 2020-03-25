@@ -139,6 +139,12 @@ L["Argus - Cheap Lightforged"]          = "Argus - Cheap Lightforged";
 L["Daily Heroic (essences)"]            = "Daily Heroic (essences)";
 L["Daily Heroic"]                       = "Daily Heroic";
 L["Island Expeditions"]                 = "Island Expeditions";
+L["N\'Zoth Minor Vision"]               = "N\'Zoth Minor Vision";
+L["N\'Zoth Minor Vision Weekly"]        = "N\'Zoth Minor Vision Weekly";
+L["Major N\'Zoth Assault"]              = "Major N\'Zoth Assault";
+L["Minor N\'Zoth Assault"]              = "Minor N\'Zoth Assault";
+
+
 L["Improper resetForm for questID: "]   = "Improper resetForm for questID: ";
 
 -- instances.lua

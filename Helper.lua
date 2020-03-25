@@ -261,7 +261,10 @@ local CURRENCY_LIST = {
     { ID=1743, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- 8.2 NOT CURRENTLY USED 
     { ID=1745, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Nazjatar Bodyguard - Neri Sharpfin 
     { ID=1746, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Nazjatar Bodyguard - Vim Brinehe
-
+	{ ID=1755, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Coaslescing Visions
+	{ ID=1803, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Echoes of Ny'alotha
+	
+	
     -- items
     { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Shiny Pet Charm
     { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
@@ -269,6 +272,7 @@ local CURRENCY_LIST = {
     { ID=137642, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Mark of Honor
     { ID=152668, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Expulsum
     { ID=163036, name=nil, icon=nil, expansionLevel=7, type="I", show=true },  -- Polished Pet Charm
+		
 
     -- currencies that extend beyond expansions (expansionLevel should always be == current
     { ID=1166, name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- Timewarped Badge
