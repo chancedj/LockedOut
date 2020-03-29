@@ -251,6 +251,7 @@ local CURRENCY_LIST = {
     { ID=1716, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Honorbound Service Medal
     { ID=1717, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- 7th Legion Service Medal
     { ID=1718, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Titanium Residium
+    { ID=1719, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Corrupted Mementos
     { ID=1721, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Prismatic Manapearl 
     { ID=1722, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Azerite Ore 
     { ID=1723, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Lumber 
@@ -261,8 +262,8 @@ local CURRENCY_LIST = {
     { ID=1743, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- 8.2 NOT CURRENTLY USED 
     { ID=1745, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Nazjatar Bodyguard - Neri Sharpfin 
     { ID=1746, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Nazjatar Bodyguard - Vim Brinehe
-	{ ID=1755, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Coaslescing Visions
-	{ ID=1803, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Echoes of Ny'alotha
+    { ID=1755, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Coaslescing Visions
+    { ID=1803, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Echoes of Ny'alotha
 	
 	
     -- items
