@@ -27,9 +27,9 @@ local WORLD_BOSS_LIST = {
     { instanceID=322, bossID=814,  questID=32518, bossName="Nalak, The Storm Lord", },
     { instanceID=322, bossID=826,  questID=32519, bossName="Oondasta",  },
     { instanceID=322, bossID=857,  questID=33117, bossName="Celestials" }, -- bossName="Chi-Ji, The Red Crane", }, remapped name
-    --{ instanceID=322, bossID=859,  questID=33117, bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
-    --{ instanceID=322, bossID=858,  questID=33117, bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
-    --{ instanceID=322, bossID=860,  questID=33117, bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
+    { instanceID=322, bossID=859,  questID=0,     bossName="Niuzao, The Black Ox", }, -- mapped so i don't chase missing mappings
+    { instanceID=322, bossID=858,  questID=0,     bossName="Yu'lon, The Jade Serpent", }, -- mapped so i don't chase missing mappings
+    { instanceID=322, bossID=860,  questID=0,     bossName="Xuen, The White Tiger", }, -- mapped so i don't chase missing mappings
     { instanceID=322, bossID=861,  questID=33118, bossName="Ordos, Fire-God of the Yaungol", },
     
     -- Draenor
@@ -63,22 +63,24 @@ local WORLD_BOSS_LIST = {
     { instanceID=959, bossID=2014, questID=49171, bossName="Sotanathor" },
 
     -- BfA
-    { instanceID=1028, bossID=2139, questID=52181, bossName="T'zane" }, -- verified
-    { instanceID=1028, bossID=2141, questID=52169, bossName="Ji'arak" }, -- verified
-    { instanceID=1028, bossID=2197, questID=52157, bossName="Hailstone Construct" }, -- verified
-    { instanceID=1028, bossID=2199, questID=52163, bossName="Azurethos" }, -- verified
-    { instanceID=1028, bossID=2198, questID=52166, bossName="Warbringer Yenajz" }, -- verified
-    { instanceID=1028, bossID=2210, questID=52196, bossName="Dunegorger Kraulok" }, -- verified
-    { instanceID=1028, bossID=2345, questID=54895, bossName="Ivus the Decayed" }, -- verified
-    { instanceID=1028, bossID=2329, questID=54896, bossName="Ivus the Forest Lord" }, -- verified
+    { instanceID=1028, bossID=2139, questID=52181, bossName="T'zane" },
+    { instanceID=1028, bossID=2141, questID=52169, bossName="Ji'arak" },
+    { instanceID=1028, bossID=2197, questID=52157, bossName="Hailstone Construct" },
+    { instanceID=1028, bossID=2199, questID=52163, bossName="Azurethos" },
+    { instanceID=1028, bossID=2198, questID=52166, bossName="Warbringer Yenajz" },
+    { instanceID=1028, bossID=2210, questID=52196, bossName="Dunegorger Kraulok" },
+    { instanceID=1028, bossID=2345, questID=54895, bossName="Ivus the Decayed" },
+    { instanceID=1028, bossID=2329, questID=54896, bossName="Ivus the Forest Lord" },
     
     -- Warfront Bosses
-    { instanceID=1028, bossID=2213, questID=52847, bossName="Doom's Howl" }, -- verified
-    { instanceID=1028, bossID=2212, questID=52848, bossName="The Lion's Roar" }, -- verified
+    { instanceID=1028, bossID=2213, questID=52847, bossName="Doom's Howl" },
+    { instanceID=1028, bossID=2212, questID=52848, bossName="The Lion's Roar" },
 
     -- New BFA Area bosses
-    { instanceID=1028, bossID=2362, questID=56057, bossName="Ulmath, the Soulbinder" }, -- verified
-    { instanceID=1028, bossID=2363, questID=56055, bossName="Wekemara" }, -- verified
+    { instanceID=1028, bossID=2362, questID=56057, bossName="Ulmath, the Soulbinder" },
+    { instanceID=1028, bossID=2363, questID=56056, bossName="Wekemara" },
+    { instanceID=1028, bossID=2378, questID=0,     bossName="Grand Empress Shek'zara" }, -- unverified
+    { instanceID=1028, bossID=2381, questID=55466, bossName="Vuk'laz the Earthbreaker" },
 --]]
 }
 

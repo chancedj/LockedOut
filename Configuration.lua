@@ -595,11 +595,11 @@ function addon:OpenConfigDialog( button )
     self.config:RegisterDefaults( self:getDefaultOptions() );
     LibStub( "AceConfigRegistry-3.0" ):RegisterOptionsTable( self.optionFrameName, self:getConfigOptions() );
 
-  if( button == nil) or ( button == "RightButton" ) then
-    -- this command is buggy, open it twice to fix the bug.
-    InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #1
-    InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
-  end
+    if( button == nil) or ( button == "RightButton" ) then
+      -- this command is buggy, open it twice to fix the bug.
+      InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #1
+      InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
+    end
     
     --[[ this helps to build the currency table
     local currList = self:getCurrencyList();
