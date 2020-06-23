@@ -46,7 +46,7 @@ local EVENTS_TO_TRACK = {
     },
     -- midsummer fire festival
     [341] = {
-        ["All"]         = {},
+        ["All"]         = {11691,11924,11954},
         ["Alliance"]    = {},
         ["Horde"]       = {},
     },
