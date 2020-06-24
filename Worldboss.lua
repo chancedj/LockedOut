@@ -79,7 +79,7 @@ local WORLD_BOSS_LIST = {
     -- New BFA Area bosses
     { instanceID=1028, bossID=2362, questID=56057, bossName="Ulmath, the Soulbinder" },
     { instanceID=1028, bossID=2363, questID=56056, bossName="Wekemara" },
-    { instanceID=1028, bossID=2378, questID=0,     bossName="Grand Empress Shek'zara" }, -- unverified
+    { instanceID=1028, bossID=2378, questID=58705, bossName="Grand Empress Shek'zara" },
     { instanceID=1028, bossID=2381, questID=55466, bossName="Vuk'laz the Earthbreaker" },
 --]]
 }
