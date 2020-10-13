@@ -12,8 +12,8 @@ local next = -- variables
       next   -- lua functions
 
 -- cache blizzard function/globals
-local UnitClass, GetSpellCooldown, GetQuestObjectiveInfo, GetServerTime, GetLFGDungeonRewards  =                       -- variables 
-      UnitClass, GetSpellCooldown, GetQuestObjectiveInfo, GetServerTime, GetLFGDungeonRewards    -- blizzard api
+local UnitClass, GetSpellCooldown, GetQuestObjectiveInfo, GetServerTime, GetLFGDungeonRewards, IsQuestFlaggedCompleted  =                       -- variables 
+      UnitClass, GetSpellCooldown, GetQuestObjectiveInfo, GetServerTime, GetLFGDungeonRewards, C_QuestLog.IsQuestFlaggedCompleted    -- blizzard api
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 

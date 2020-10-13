@@ -12,9 +12,9 @@ local print, type, tonumber, setmetatable, tonumber, next, pairs, tinsert, tsort
       print, type, tonumber, setmetatable, tonumber, next, pairs, table.insert, table.sort          -- lua functions
 
 -- cache blizzard function/globals
-local GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
+local GetSecondsUntilWeeklyReset, GetQuestResetTime, GetServerTime, GetCurrencyInfo, GetItemInfo,
         EJ_SelectInstance, EJ_GetEncounterInfoByIndex, RAID_CLASS_COLORS =                          -- variables
-      GetCurrentRegion, GetServerTime, GetCurrencyInfo, GetQuestResetTime, GetItemInfo,
+      C_DateAndTime.GetSecondsUntilWeeklyReset, GetQuestResetTime, GetServerTime, C_CurrencyInfo.GetCurrencyInfo, GetItemInfo,
         EJ_SelectInstance, EJ_GetEncounterInfoByIndex, CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS;    -- blizzard global table
 
 addon.ExpansionAbbr = {
@@ -69,46 +69,6 @@ function addon:GetRegionMap()
 
     return MappedRegion.dayOfWeek, MappedRegion.region;
 end
-
---[[ wday values
-1 = Sun
-2 = Mon
-3 = Tue
-4 = Wed
-5 = Thur
-6 = Fri
-7 = Sat
---]]
-
-local weekdayRemap = {
-    [3] = {
-        [4] = 5,
-        [5] = 4,
-        [6] = 3,
-        [7] = 2,
-        [1] = 1,
-        [2] = 0,
-        [3] = 6, -- Tue
-    },
-    [4] = {
-        [5] = 5,
-        [6] = 4,
-        [7] = 3,
-        [1] = 2,
-        [2] = 1,
-        [3] = 0,
-        [4] = 6, -- Wed
-    },
-    [5] = {
-        [6] = 5,
-        [7] = 4,
-        [1] = 3,
-        [2] = 2,
-        [3] = 1,
-        [4] = 0,
-        [5] = 6, -- Thur
-    },
-}
 
 local CURRENCY_LIST = {
     -- currency
@@ -513,25 +473,7 @@ function addon:getDailyLockoutDate()
 end
 
 function addon:getWeeklyLockoutDate()
-    local secondsInDay      = 24 * 60 * 60;
-    --local currentRegion     = GetCurrentRegion();
-    --local serverResetDay    = MapRegionReset[ currentRegion ];
-    local serverResetDay    = addon:GetRegionMap();
-    local currentServerTime = GetServerTime();
-    local dayOfWeek         = date( "*t", currentServerTime ).wday;
-    local daysLefToReset    = weekdayRemap[ serverResetDay ][ dayOfWeek ];
-
-    local dailyResetTime    = self:getDailyLockoutDate( currentServerTime );
-    local weeklyResetTime   = dailyResetTime + (daysLefToReset * secondsInDay);
-
-    if( serverResetDay == dayOfWeek ) then
-        -- if we're on reset day AND the dates match,  we just use dailylockout because
-        if( date("%x", dailyResetTime) == date("%x", currentServerTime) ) then
-            weeklyResetTime = dailyResetTime;
-        end
-    end
-
-    return weeklyResetTime
+    return GetServerTime() + GetSecondsUntilWeeklyReset();
 end
 
 local function fif( value, t, f )

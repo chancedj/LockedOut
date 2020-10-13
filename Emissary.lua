@@ -12,8 +12,8 @@ local next, mfloor =    -- variables
       next, math.floor  -- lua functions
 
 -- cache blizzard function/globals
-local GetQuestObjectiveInfo, GetQuestTimeLeftMinutes, C_GetFactionParagonInfo, C_IsFactionParagon =                                    -- variables 
-      GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes, C_Reputation.GetFactionParagonInfo, C_Reputation.IsFactionParagon    -- blizzard api
+local GetQuestObjectiveInfo, GetQuestTimeLeftMinutes, C_GetFactionParagonInfo, C_IsFactionParagon, IsQuestFlaggedCompleted =                                    -- variables 
+      GetQuestObjectiveInfo, C_TaskQuest.GetQuestTimeLeftMinutes, C_Reputation.GetFactionParagonInfo, C_Reputation.IsFactionParagon, C_QuestLog.IsQuestFlaggedCompleted    -- blizzard api
 
 --[[
     first key is the expansion level that the emissary applies to

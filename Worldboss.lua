@@ -14,7 +14,7 @@ local next = -- variables
 -- cache blizzard function/globals
 local EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
         READY_CHECK_READY_TEXTURE, IsQuestActive =          -- variables 
-      EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, IsQuestFlaggedCompleted,
+      EJ_GetCurrentTier, EJ_SelectTier, EJ_GetInstanceByIndex, EJ_GetEncounterInfoByIndex, C_QuestLog.IsQuestFlaggedCompleted,
         READY_CHECK_READY_TEXTURE, C_TaskQuest.IsActive     -- blizzard api
 
 -- Blizzard api cannot link npc id's to world quests, so we have to hardcode

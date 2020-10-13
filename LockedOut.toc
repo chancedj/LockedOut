@@ -1,7 +1,7 @@
-## Interface: 80300
+## Interface: 90001
 ## Title: Locked Out
 ## Notes: An addon for tracking lockouts.
-## Author: Hwap
+## Author: Ængelcandy - Proudmoore
 ## Version: @project-version@
 ## SavedVariables: LockoutDb LockedOutConfig
 

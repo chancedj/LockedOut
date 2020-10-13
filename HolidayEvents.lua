@@ -13,9 +13,9 @@ local next = -- variables
 
 -- cache blizzard function/globals
 local UnitClass, GetSpellCooldown, UnitFactionGroup
-        , GetQuestObjectiveInfo, GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID, GetLFGDungeonRewards  =                       -- variables 
+        , GetQuestObjectiveInfo, GetServerTime, GetTime, GetTalentTreeIDsByClassID, GetTalentTreeInfoForID, GetLFGDungeonRewards, IsQuestFlaggedCompleted  =                       -- variables 
       UnitClass, GetSpellCooldown, UnitFactionGroup
-        , GetQuestObjectiveInfo, GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID, GetLFGDungeonRewards    -- blizzard api
+        , GetQuestObjectiveInfo, GetServerTime, GetTime, C_Garrison.GetTalentTreeIDsByClassID, C_Garrison.GetTalentTreeInfoForID, GetLFGDungeonRewards, C_QuestLog.IsQuestFlaggedCompleted    -- blizzard api
 
 local BOSS_KILL_TEXT = "|T" .. READY_CHECK_READY_TEXTURE .. ":0|t";
 

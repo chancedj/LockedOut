@@ -15,8 +15,8 @@ local next, time =
       next, time;
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, RequestRaidInfo, MAX_PLAYER_LEVEL_TABLE =    -- variables
-      InterfaceOptionsFrame_OpenToCategory, GetCurrencyInfo, GetItemInfo, GetMacroIcons, GetAccountExpansionLevel, RequestRaidInfo, MAX_PLAYER_LEVEL_TABLE      -- lua functions
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyListSize, GetCurrencyInfo, GetItemInfo, GetMacroIcons, RequestRaidInfo, GetAccountExpansionLevel, GetMaxLevelForPlayerExpansion =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, C_CurrencyInfo.GetCurrencyListSize, C_CurrencyInfo.GetCurrencyInfo, GetItemInfo, GetMacroIcons, RequestRaidInfo, GetAccountExpansionLevel, GetMaxLevelForPlayerExpansion      -- lua functions
 
 -- this allows me to override the blizzard function in the case of a "pre-patch" event.  e.g.: 8.0 (BfA) but Legion still active
 local function getCurrentExpansionLevel()
@@ -24,9 +24,7 @@ local function getCurrentExpansionLevel()
 end
 
 local function getCurrentMaxLevel()
-    local accountExpansion = getCurrentExpansionLevel();
-    
-    return MAX_PLAYER_LEVEL_TABLE[ accountExpansion ];
+    return GetMaxLevelForPlayerExpansion();
 end
 
 local function getGeneralOptionConfig( self )
@@ -601,9 +599,9 @@ function addon:OpenConfigDialog( button )
       InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
     end
     
-    --[[ this helps to build the currency table
+    ----[[ this helps to build the currency table
     local currList = self:getCurrencyList();
-    for ndx=1, 2500 do
+    for ndx=1, GetCurrencyListSize() do
         local name = GetCurrencyInfo( ndx );
         
         if( name ~= nil ) and ( name ~= "" ) then
@@ -618,7 +616,7 @@ function addon:OpenConfigDialog( button )
         
             if( found == false ) then
                 --print( '{ ID=' .. ndx .. ', name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- ' .. name );
-                print( "{ ID=" .. ndx .. ", name=nil, expansionLevel=" .. GetAccountExpansionLevel() .. " }, -- " .. name );
+                print( "{ ID=" .. ndx .. ", name=nil, expansionLevel=" .. getCurrentExpansionLevel() .. " }, -- " .. name );
             end
         end
     end

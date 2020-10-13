@@ -14,7 +14,7 @@ local next, strfmt =            -- variables
 
 -- cache blizzard function/globals
 local GetCurrencyInfo, GetItemCount, IsQuestFlaggedCompleted =    -- variables
-      GetCurrencyInfo, GetItemCount, IsQuestFlaggedCompleted      -- blizzard api
+      C_CurrencyInfo.GetCurrencyInfo, GetItemCount, C_QuestLog.IsQuestFlaggedCompleted      -- blizzard api
 
 ---[[
 local BONUS_ROLL_QUESTID = {
