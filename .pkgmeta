@@ -16,7 +16,7 @@ externals:
         url: https://repos.wowace.com/wow/libdbicon-1-0/trunk
         tag: latest
     Libs/LibQTip-1.0:
-        url: git://repos.wowace.com/wow/libqtip-1-0/trunk
+        url: git://repos.wowace.com/wow/libqtip-1-0
         tag: latest
     Libs/AceLocale-3.0:
         url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
