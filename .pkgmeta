@@ -10,13 +10,13 @@ externals:
         url: https://repos.wowace.com/wow/callbackhandler/trunk
         tag: latest
     Libs/LibDataBroker-1.1:
-        url: https://repos.wowace.com/wow/libdatabroker-1-1
+        url: git://repos.wowace.com/wow/libdatabroker-1-1
         tag: latest
     Libs/LibDBIcon-1.0:
         url: https://repos.wowace.com/wow/libdbicon-1-0/trunk
         tag: latest
     Libs/LibQTip-1.0:
-        url: https://repos.wowace.com/wow/libqtip-1-0/trunk
+        url: git://repos.wowace.com/wow/libqtip-1-0/trunk
         tag: latest
     Libs/AceLocale-3.0:
         url: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
@@ -47,6 +47,7 @@ externals:
         tag: latest
     Libs/LibRealmInfo:
         url: git://github.com/phanx-wow/LibRealmInfo.git
+        tag: latest
 
 ignore:
  - README.MD
