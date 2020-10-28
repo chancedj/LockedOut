@@ -305,7 +305,9 @@ local function resolveCurrencyInfo( )
     for _, currency in next, CURRENCY_LIST do
         if( currency.name == nil ) or ( currency.icon == nil ) then
             if( currency.type == "C" ) then
-                currency.name, _, currency.icon = GetCurrencyInfo( currency.ID );
+                local currencyInfo = GetCurrencyInfo( currency.ID );
+                currency.icon = currencyInfo.iconFileID;
+                currency.name = currencyInfo.name;
             else
                 currency.name, _, _, _, _, _, _, _, _, currency.icon = GetItemInfo( currency.ID );
             end;

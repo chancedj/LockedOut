@@ -315,7 +315,9 @@ local function getCurrencyHeaderConfig( self )
         if( currencyData.show ) then
             if( currencyData.icon == nil ) then
                 if( currencyData.type == "C" ) then
-                    _, _, currencyData.icon = GetCurrencyInfo( currencyData.ID );
+                  local currencyInfo = GetCurrencyInfo( currency.ID );
+                  currencyData.icon = currencyInfo.iconFileID;
+                  currencyData.name = currencyInfo.name;
                 else
                     _, _, _, _, _, _, _, _, _, currencyData.icon = GetItemInfo( currencyData.ID );
                 end;
@@ -602,9 +604,10 @@ function addon:OpenConfigDialog( button )
     ----[[ this helps to build the currency table
     local currList = self:getCurrencyList();
     for ndx=1, GetCurrencyListSize() do
-        local name = GetCurrencyInfo( ndx );
+        local currencyInfo = GetCurrencyInfo( ndx );
         
-        if( name ~= nil ) and ( name ~= "" ) then
+        if( currencyInfo ~= nil ) then
+            local name = currencyInfo.name;
             local found = false;
         
             for _, data in next, currList do

@@ -89,7 +89,10 @@ function addon:Lockedout_BuildCurrencyList( )
         if( currencyData.show ) then
             local count, maximum, discovered;
             if( currencyData.type == "C" ) then
-                _, count, _, _, _, maximum, discovered = GetCurrencyInfo( currencyData.ID );
+                local currencyInfo = GetCurrencyInfo( currencyData.ID );
+                count = currencyInfo.quantity;
+                maximum = currencyInfo.maxQuantity;
+                discovered = currencyInfo.discovered;
             else
                 count = GetItemCount( currencyData.ID, true, false );
                 discovered = (count > 0);

@@ -81,6 +81,12 @@ local WORLD_BOSS_LIST = {
     { instanceID=1028, bossID=2363, questID=56056, bossName="Wekemara" },
     { instanceID=1028, bossID=2378, questID=58705, bossName="Grand Empress Shek'zara" },
     { instanceID=1028, bossID=2381, questID=55466, bossName="Vuk'laz the Earthbreaker" },
+
+    -- Shadowlands
+    { instanceID=1192, bossID=2430, questID=0, bossName="Valinor, the Light of Eons" }, 
+    { instanceID=1192, bossID=2432, questID=0, bossName="Oranomonos the Everbranching" }, 
+    { instanceID=1192, bossID=2433, questID=0, bossName="Nurgash Muckformed" }, 
+    { instanceID=1192, bossID=2431, questID=0, bossName="Mortanis" }, 
 --]]
 }
 
@@ -155,5 +161,7 @@ function addon:Lockedout_BuildWorldBoss( )
     end
 
     addon.playerDb.worldBosses = worldBosses;
+
+    CheckForMissingMappings();
 end -- Lockedout_BuildInstanceLockout()
 
