@@ -15,12 +15,12 @@ local next, time =
       next, time;
 
 -- cache lua functions
-local InterfaceOptionsFrame_OpenToCategory, GetCurrencyListSize, GetCurrencyInfo, GetItemInfo, GetMacroIcons, RequestRaidInfo, GetAccountExpansionLevel, GetMaxLevelForPlayerExpansion =    -- variables
-      InterfaceOptionsFrame_OpenToCategory, C_CurrencyInfo.GetCurrencyListSize, C_CurrencyInfo.GetCurrencyInfo, GetItemInfo, GetMacroIcons, RequestRaidInfo, GetAccountExpansionLevel, GetMaxLevelForPlayerExpansion      -- lua functions
+local InterfaceOptionsFrame_OpenToCategory, GetCurrencyListSize, GetCurrencyInfo, GetItemInfo, GetMacroIcons, RequestRaidInfo, GetServerExpansionLevel, GetMaxLevelForPlayerExpansion =    -- variables
+      InterfaceOptionsFrame_OpenToCategory, C_CurrencyInfo.GetCurrencyListSize, C_CurrencyInfo.GetCurrencyInfo, GetItemInfo, GetMacroIcons, RequestRaidInfo, GetServerExpansionLevel, GetMaxLevelForPlayerExpansion      -- lua functions
 
 -- this allows me to override the blizzard function in the case of a "pre-patch" event.  e.g.: 8.0 (BfA) but Legion still active
 local function getCurrentExpansionLevel()
-    return GetAccountExpansionLevel();
+    return GetServerExpansionLevel();
 end
 
 local function getCurrentMaxLevel()

@@ -162,6 +162,6 @@ function addon:Lockedout_BuildWorldBoss( )
 
     addon.playerDb.worldBosses = worldBosses;
 
-    CheckForMissingMappings();
+    --CheckForMissingMappings();
 end -- Lockedout_BuildInstanceLockout()
 
