@@ -86,7 +86,7 @@ local WORLD_BOSS_LIST = {
     { instanceID=1192, bossID=2430, questID=0, bossName="Valinor, the Light of Eons" }, 
     { instanceID=1192, bossID=2432, questID=0, bossName="Oranomonos the Everbranching" }, 
     { instanceID=1192, bossID=2433, questID=0, bossName="Nurgash Muckformed" }, 
-    { instanceID=1192, bossID=2431, questID=0, bossName="Mortanis" }, 
+    { instanceID=1192, bossID=2431, questID=61816, bossName="Mortanis" }, 
 --]]
 }
 
