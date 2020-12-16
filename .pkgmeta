@@ -45,9 +45,6 @@ externals:
     Libs/AceTimer-3.0:
         url: https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
         tag: latest
-    Libs/LibRealmInfo:
-        url: git://github.com/phanx-wow/LibRealmInfo.git
-        tag: latest
 
 ignore:
  - README.MD

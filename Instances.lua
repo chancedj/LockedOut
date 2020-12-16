@@ -186,39 +186,6 @@ local function removeUntouchedInstances( instances )
     end -- for instanceKey, instanceDetails in next, instances
 end -- removeUntouchedInstances()
 
----[[
---local connectedRealmsCache = { {} };
-function addon:GetConnectedRealms( realmName )
-    --[[
-    -- find a safer way to do this later....
-    if ( connectedRealmsCache[ realmName ] ) and ( #connectedRealmsCache[ realmName ] > 0 ) then
-        addon:debug( "pulling from cache" );
-        return connectedRealmsCache[ realmName];
-    end
-    --]]
-
-    local libRealm = LibStub("LibRealmInfo");
-    local _, region = addon:GetRegionMap();
-    local realmIdList = select( 9, libRealm:GetRealmInfo( realmName, region ) );
-    local connectedRealms = {};
-
-    if( realmIdList ) then   
-        for i = 1, #realmIdList do
-          local _, connectedName, connectedApiName = libRealm:GetRealmInfoByID( realmIdList[ i ] );
-          connectedRealms[ #connectedRealms + 1 ] = connectedName;
-        end
-    else
-        connectedRealms[ #connectedRealms + 1 ] = realmName;
-    end
-
-    addon:debug( "Instance lock applies to these realms: ", table.concat( connectedRealms, ", ") );
-
-    return connectedRealms;
-    --connectedRealmsCache[ realmName ] = connectedRealms;
-    --return connectedRealmsCache[ realmName ];
-end
---]]
-
 local function getPlayerInstanceId()
     -- sometimes function will return nil, so force to 0
     local MapId = C_GetBestMapForUnit("player") or 0;
@@ -308,17 +275,14 @@ local function sortLockedData( l1, l2 )
 end
 
 function addon:getLockDataByRealm( realmName )
-    local connectedRealms = addon:GetConnectedRealms( realmName );
-
     local realmLockData = {};
-    for _, connectedRealmName in next, connectedRealms do
-        local realmChars = LockoutDb [ connectedRealmName ];
-        if( realmChars ) then
-            for charNdx, charData in next, realmChars do
-                local tmpLockData = addon:getLockDataByChar( connectedRealmName, charNdx );
 
-                addon:mergeTable( realmLockData, tmpLockData );
-            end
+    local realmChars = LockoutDb [ realmName ];
+    if( realmChars ) then
+        for charNdx, charData in next, realmChars do
+            local tmpLockData = addon:getLockDataByChar( realmName, charNdx );
+
+            addon:mergeTable( realmLockData, tmpLockData );
         end
     end
 
