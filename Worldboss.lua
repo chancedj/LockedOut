@@ -85,7 +85,7 @@ local WORLD_BOSS_LIST = {
     -- Shadowlands
     { instanceID=1192, bossID=2430, questID=0, bossName="Valinor, the Light of Eons" }, 
     { instanceID=1192, bossID=2432, questID=61815, bossName="Oranomonos the Everbranching" }, 
-    { instanceID=1192, bossID=2433, questID=0, bossName="Nurgash Muckformed" }, 
+    { instanceID=1192, bossID=2433, questID=61814, bossName="Nurgash Muckformed" }, 
     { instanceID=1192, bossID=2431, questID=61816, bossName="Mortanis" }, 
 --]]
 }
