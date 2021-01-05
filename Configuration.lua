@@ -601,9 +601,9 @@ function addon:OpenConfigDialog( button )
       InterfaceOptionsFrame_OpenToCategory( self.optionFrame ); -- #2
     end
     
-    ----[[ this helps to build the currency table
+    --[[ this helps to build the currency table
     local currList = self:getCurrencyList();
-    for ndx=1, GetCurrencyListSize() do
+    for ndx=1, 2000 do
         local currencyInfo = GetCurrencyInfo( ndx );
         
         if( currencyInfo ~= nil ) then
@@ -619,7 +619,7 @@ function addon:OpenConfigDialog( button )
         
             if( found == false ) then
                 --print( '{ ID=' .. ndx .. ', name=nil, icon=nil, expansionLevel=7, type="C", show=true }, -- ' .. name );
-                print( "{ ID=" .. ndx .. ", name=nil, expansionLevel=" .. getCurrentExpansionLevel() .. " }, -- " .. name );
+                print( "{ ID=" .. ndx .. ", name=nil, expansionLevel=" .. getCurrentExpansionLevel() .. ", type="C", show=true }, -- " .. name );
             end
         end
     end

@@ -165,3 +165,4 @@ L["MoP"]    = "MoP";
 L["WoD"]    = "WoD";
 L["Leg"]    = "Leg";
 L["BfA"]    = "BfA";
+L["SL"]     = "SL";

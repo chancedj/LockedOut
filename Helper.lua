@@ -26,11 +26,13 @@ addon.ExpansionAbbr = {
     [5] = L["WoD"],
     [6] = L["Leg"],
     [7] = L["BfA"],
+    [8] = L["SL"],
 }
 
 addon.EmissaryDisplayGroups = {
     [ "6" ] = L["Leg"],
-    [ "7" ] = L["BfA"]
+    [ "7" ] = L["BfA"],
+    [ "8" ] = L["SL"],
 }
 
 addon.KEY_KEYSTONE   = "keystone";
@@ -175,9 +177,6 @@ local CURRENCY_LIST = {
     { ID=1506, name=nil, icon=nil, expansionLevel=6, type="C", show=false }, -- Argus Waystone
     { ID=1508, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Veiled Argunite
     { ID=1533, name=nil, icon=nil, expansionLevel=6, type="C", show=true },  -- Wakening Essence
-    
-    -- new BFA  currency.  Not sure which yet are hidden and which should be displayed.
-    -- using best guess (based on previous expansion currencies) to set flag.
     { ID=1388, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Armor Scraps 
     { ID=1401, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Stronghold Supplies 
     { ID=1534, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Zandalari Archaeology Fragment 
@@ -232,7 +231,82 @@ local CURRENCY_LIST = {
     { ID=1757, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Uldum Accord 
     { ID=1758, name=nil, icon=nil, expansionLevel=7, type="C", show=false }, -- Rajani 
     { ID=1803, name=nil, icon=nil, expansionLevel=7, type="C", show=true },  -- Echoes of Ny'alotha
-
+----[[
+    { ID=1715, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Progenitor Shard 
+    { ID=1728, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Phantasma 
+    { ID=1754, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Argent Commendation 
+    { ID=1761, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Enemy Damage 
+    { ID=1762, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Enemy Health 
+    { ID=1763, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Deaths 
+    { ID=1767, name=nil, icon=nil, expansionLevel=8, type="C", show=true }, -- Stygia 
+    { ID=1769, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Quest Experience (Standard, Hidden) 
+    { ID=1792, name=nil, icon=nil, expansionLevel=8, type="C", show=tue }, -- Honor 
+    { ID=1794, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Atonement Anima 
+    { ID=1802, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Shadowlands PvP Weekly Reward Progress 
+    { ID=1804, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Ascended 
+    { ID=1805, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Undying Army 
+    { ID=1806, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Wild Hunt 
+    { ID=1807, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Court of Harvesters 
+    { ID=1808, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Channeled Anima 
+    { ID=1810, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Redeemed Soul 
+    { ID=1811, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- zzoldSanctum Architect 
+    { ID=1812, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- zzoldSanctum Anima Weaver 
+    { ID=1813, name=nil, icon=nil, expansionLevel=8, type="C", show=true }, -- Reservoir Anima 
+    { ID=1816, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sinstone Fragments 
+    { ID=1819, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Medallion of Service 
+    { ID=1820, name=nil, icon=nil, expansionLevel=8, type="C", show=true }, -- Infused Ruby 
+    { ID=1822, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Renown 
+    { ID=1828, name=nil, icon=nil, expansionLevel=8, type="C", show=true }, -- Soul Ash 
+    { ID=1829, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Renown-Kyrian 
+    { ID=1830, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Renown-Venthyr 
+    { ID=1831, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Renown-NightFae 
+    { ID=1832, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Renown-Necrolord 
+    { ID=1835, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Linked Currency Test (Src) - PTH 
+    { ID=1836, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Linked Currency Test (Dst) - PTH 
+    { ID=1837, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- The Ember Court 
+    { ID=1838, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- The Countess 
+    { ID=1839, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Rendle and Cudgelface 
+    { ID=1840, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Stonehead 
+    { ID=1841, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Cryptkeeper Kassir 
+    { ID=1842, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Baroness Vashj 
+    { ID=1843, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Plague Deviser Marileth 
+    { ID=1844, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Grandmaster Vole 
+    { ID=1845, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Alexandros Mograine 
+    { ID=1846, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sika 
+    { ID=1847, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Kleia and Pelegos 
+    { ID=1848, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Polemarch Adrestes 
+    { ID=1849, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Mikanikos 
+    { ID=1850, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Choofa 
+    { ID=1851, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Droman Aliothe 
+    { ID=1852, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Hunt-Captain Korayn 
+    { ID=1853, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Lady Moonberry 
+    { ID=1859, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Reservoir Anima-Kyrian 
+    { ID=1860, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Reservoir Anima-Venthyr 
+    { ID=1861, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Reservoir Anima-Night Fae 
+    { ID=1862, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Reservoir Anima-Necrolord 
+    { ID=1863, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Redeemed Soul-Kyrian 
+    { ID=1864, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Redeemed Soul-Venthyr 
+    { ID=1865, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Redeemed Soul-Night Fae 
+    { ID=1866, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Redeemed Soul-Necrolord 
+    { ID=1867, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Architect-Kyrian 
+    { ID=1868, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Architect-Venthyr 
+    { ID=1869, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Architect-Night Fae 
+    { ID=1870, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Architect-Necrolord 
+    { ID=1871, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Anima Weaver-Kyrian 
+    { ID=1872, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Anima Weaver-Venthyr 
+    { ID=1873, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Anima Weaver-Night Fae 
+    { ID=1874, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Sanctum Anima Weaver-Necrolord 
+    { ID=1877, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Bonus Experience 
+    { ID=1878, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Stitchmasters 
+    { ID=1880, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Ve'nari 
+    { ID=1883, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Soulbind Conduit Energy 
+    { ID=1884, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- The Avowed 
+    { ID=1885, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Grateful Offering 
+    { ID=1887, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Court of Night 
+    { ID=1888, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Marasmius 
+    { ID=1889, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Adventure Campaign Progress 
+    { ID=1891, name=nil, icon=nil, expansionLevel=8, type="C", show=false }, -- Honor from Rated
+--]]
     -- items
     { ID=116415, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Shiny Pet Charm
     { ID=124124, name=nil, icon=nil, expansionLevel=6, type="I", show=true },  -- Blood of Sargeras
