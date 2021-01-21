@@ -72,7 +72,7 @@ end
 
 local QUEST_LIBRARY = {
     ["blingtron"]           = {name=L["Blingtron"],                     startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=true,  checkIDs={40753,34774,31752} },
-    ["cityweekly"]          = {name=L["Main City Weekly"],              startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={53032,53036,53033,53034,53035,53037,53039,53038,53030} },
+    ["cityweekly"]          = {name=L["Main City Weekly"],              startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={62631, 62633, 62634, 62637, 62638, 62639, 62640} },
     ["seals"]               = {name=L["Seal of Fate"],                  startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={43510} },
     ["argusweekly"]         = {name=L["Argus - Pristine Argunite"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={48799} },
     ["argusinvasions"]      = {name=L["Argus - Invasions"],             startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={49293} },
@@ -81,9 +81,9 @@ local QUEST_LIBRARY = {
     ["argusclightforged"]   = {name=L["Argus - Cheap Lightforged"],     startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=false, copyAccountWide=false, checkIDs={48912} },
     ["dailyheroic"]         = {name=L["Daily Heroic"],                  startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkDailyHeroicStatus,   checkFullfilled=false, copyAccountWide=false, checkIDs={50627} },
     ["islandex"]            = {name=L["Island Expeditions"],            startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={53435, 53436} },
-	["minorvision"]         = {name=L["N\'Zoth Minor Vision"],          startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={58168, 58155, 58151, 58167, 58156} },
-	["majorassault"]        = {name=L["Major N\'Zoth Assault"],         startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={57157, 56064} },
-	["minorassault"]        = {name=L["Minor N\'Zoth Assault"],         startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={57008, 57728, 55350, 56308} }
+    ["minorvision"]         = {name=L["N\'Zoth Minor Vision"],          startNdx=1, endNdx=1, resetForm="daily",  checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={58168, 58155, 58151, 58167, 58156} },
+    ["majorassault"]        = {name=L["Major N\'Zoth Assault"],         startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={57157, 56064} },
+    ["minorassault"]        = {name=L["Minor N\'Zoth Assault"],         startNdx=1, endNdx=1, resetForm="weekly", checkStatus=checkQuestStatus,         checkFullfilled=true,  copyAccountWide=false, checkIDs={57008, 57728, 55350, 56308} }
 	
 	
 };
